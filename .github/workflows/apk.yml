@@ -1,6 +1,8 @@
 name: Crea APK Android
 on:
   workflow_dispatch:
+permissions:
+  contents: write
 jobs:
   apk:
     runs-on: ubuntu-24.04
@@ -47,3 +49,10 @@ jobs:
         with:
           name: UPSimulator-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
+      - name: Pubblica il file scaricabile
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp android/app/build/outputs/apk/debug/app-debug.apk UPSimulator.apk
+          gh release delete apk --yes --cleanup-tag || true
+          gh release create apk UPSimulator.apk --title "UPSimulator APK" --notes "Ultimo APK di UPSimulator" --latest
