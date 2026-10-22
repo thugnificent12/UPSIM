@@ -536,12 +536,13 @@ const AVO=[
 {fem:true,hl:-3.5,hs:40,hr:'#101010',sk:'#f2d2b0',cl:'#b03a5b',er:1,es:0,alm:1},
 {fem:false,hs:31,hr:'#8a8a8a',sk:'#d9a98a',cl:'#6e6a5a',fk:1,ms:3,no:'gilet',pk:{4:'#3a3a3a',8:'#6e6a5a'}}];
 const AVC={};
-function avCust(i,cls){
-  if(AVC[i])return AVC[i].replace('class="AVCLS"','class="'+(cls||'av')+'"');
+function avCust(i,cls,ext){
+  if(!ext&&AVC[i])return AVC[i].replace('class="AVCLS"','class="'+(cls||'av')+'"');
   const a=AVS[i],v=AVO[i];
-  const c={id:'av'+i,age:a.age,arch:'',name:a.n,work:null,pri:null,prov:false,trans:null,mus:false,diff:false,_bt:'',_no:v.no||'',_ov:Object.assign({},v,{gl:!!v.gl,be:!!v.be,er:v.er?1:0,fk:v.fk||0})};
+  const c={id:'av'+i,age:a.age,arch:'',name:a.n,work:null,pri:null,prov:false,trans:null,mus:false,diff:false,_bt:['','atl','amg','ob','mel','','bas','amg','ob','atl','amg','mel','','ob','bas',''][i]||'',_no:v.no||'',_ov:Object.assign({},v,{gl:!!v.gl,be:!!v.be,er:v.er?1:0,fk:v.fk||0})};
   const fig=custSVG(c,0,0,1,0,true,false,false).replace('class="sc-bob"','class=""').replace(/^(<g transform="translate\([^)]*\) scale\()[0-9.]+/,'$11.02');
-  const o=`<svg class="AVCLS" viewBox="0 0 64 64" aria-hidden="true"><defs><clipPath id="avb${i}"><rect x="-40" y="-42" width="80" height="94"/></clipPath></defs><circle cx="32" cy="32" r="32" fill="${a.bg}"/><g transform="translate(32 31) scale(.75)" clip-path="url(#avb${i})">${fig}</g></svg>`;
+  const o=`<svg class="AVCLS" viewBox="0 0 64 64" aria-hidden="true"><defs><clipPath id="avb${i}"><rect x="-40" y="-42" width="80" height="${ext?130:94}"/></clipPath></defs>${ext?'':`<circle cx="32" cy="32" r="32" fill="${a.bg}"/>`}<g transform="translate(32 31) scale(.75)" clip-path="url(#avb${i})">${fig}</g></svg>`;
+  if(ext)return o.replace('class="AVCLS"','class="'+(cls||'av')+'"');
   AVC[i]=o;return o.replace('class="AVCLS"','class="'+(cls||'av')+'"');
 }
 function avSVG(i,cls,raw){
@@ -2453,13 +2454,14 @@ function renderScene(){
     return `<g class="${cls.trim()}" style="${sty}">${fF()}</g>`;}).join('');
   const clerk=meOK()?(()=>{const av=AVS[S.me.av]||AVS[0],shade=mixc(av.cl,'#000000',.22),qn=S.queue.length,ins=performance.now()-(RT.insAt||-1e9)<3500,mood=ins?'ang':(qn>=12||S.rep<35)?'tired':S.rep>=70?'happy':'neutral';
     const armP=(d,hx,dl)=>`<g class="clk-arm${sv?(qn>=12?' on fast':' on'):''}"${dl?` style="animation-delay:${dl}s"`:''}><path d="${d}" stroke="${shade}" stroke-opacity=".55" stroke-width="9.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="${d}" stroke="${av.cl}" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="${hx}" cy="78.5" rx="4.2" ry="3.3" fill="${av.skin}"/></g>`;
-    const arm=armP('M16 56Q11 68 21 76',21,.2)+armP('M48 56Q53 68 43 76',43,0);
-    let sv0=avSVG(S.me.av,'clerk').replace(/<circle cx="32" cy="32" r="32"[^>]*\/>/,'').replace('M8 64Q8 45 32 44Q56 45 56 64Z','M10 82Q10 46 32 44Q54 46 54 82Z').replace('<svg class="','<svg overflow="visible" x="192" y="33" width="56" height="56" class="').replace('</svg>',`<path d="M32 44l-4 5 4 6 4-6z" fill="#fff" opacity=".85"/><rect x="42" y="52" width="9" height="5" rx="1" fill="#fff" stroke="${shade}" stroke-width=".6"/>${AVO[S.me.av]?`<path d="M13.5 60H50.5L52 82H12Z" fill="${av.cl}"/>`:''}${arm}</svg>`);
+    const hnd=(hx,dl)=>`<g class="clk-arm${sv?(qn>=12?' on fast':' on'):''}" style="animation-delay:${dl}s"><ellipse cx="${hx}" cy="78.5" rx="4.2" ry="3.3" fill="${av.skin}"/></g>`;
+    const arm=AVO[S.me.av]?'':armP('M16 56Q11 68 21 76',21,.2)+armP('M48 56Q53 68 43 76',43,0);
+    let sv0=(AVO[S.me.av]?avCust(S.me.av,'clerk',true):avSVG(S.me.av,'clerk')).replace(/<circle cx="32" cy="32" r="32"[^>]*\/>/,'').replace('M8 64Q8 45 32 44Q56 45 56 64Z','M10 82Q10 46 32 44Q54 46 54 82Z').replace('<svg class="','<svg overflow="visible" x="192" y="'+(AVO[S.me.av]?38:33)+'" width="56" height="56" class="').replace('</svg>',`${AVO[S.me.av]?'':`<path d="M32 44l-4 5 4 6 4-6z" fill="#fff" opacity=".85"/><rect x="42" y="52" width="9" height="5" rx="1" fill="#fff" stroke="${shade}" stroke-width=".6"/>`}${arm}</svg>`);
     const MO={happy:'M28.5 32.5Q32 37.5 35.5 32.5',tired:'M29 35Q32 33 35 35',ang:'M29 35.2Q32 32.6 35 35.2'};
     if(MO[mood])sv0=sv0.replace('M29 33Q32 35.5 35 33',MO[mood]);
     sv0=sv0.replace('<circle cx="28" cy="27" r="1.4" fill="#222"/><circle cx="36" cy="27" r="1.4" fill="#222"/>','<g class="blink"><circle cx="28" cy="27" r="1.4" fill="#222"/><circle cx="36" cy="27" r="1.4" fill="#222"/></g>');
     const EX=mood==='tired'?'<path d="M26.3 29.4q1.7 1.1 3 0M33.7 29.4q1.7 1.1 3 0" stroke="#a8745a" fill="none" stroke-width=".8" stroke-linecap="round"/>':mood==='ang'?'<path d="M25.5 22.3l5 2.2M38.5 22.3l-5 2.2" stroke="#2a1a12" stroke-width="1.4" stroke-linecap="round"/>':'';
-    sv0=sv0.replace('<path d="M32 44l-4 5',EX+'<path d="M32 44l-4 5');
+    if(AVO[S.me.av])sv0=sv0.replace('</svg>',EX+'</svg>');else sv0=sv0.replace('<path d="M32 44l-4 5',EX+'<path d="M32 44l-4 5');
     return `<g class="clk-g${ins?' sc-shk':''}">${sv0}</g>`;})():'';
   const html=`<svg viewBox="0 0 360 215" role="img">
    <rect width="360" height="215" fill="${PAL.wall}"/>${doors}
