@@ -28,7 +28,16 @@ jobs:
           mkdir -p assets
           cp icons/icon-512.png assets/icon-only.png
           cp icons/icon-512.png assets/icon-foreground.png
-          npx capacitor-assets generate --android --iconBackgroundColor '#2255c8' || true
+          python3 - <<'PY'
+          import zlib,struct
+          w=h=1024
+          raw=b''.join(b'\x00'+bytes([0x22,0x55,0xc8])*w for _ in range(h))
+          def ch(t,d):
+              c=struct.pack('>I',len(d))+t+d
+              return c+struct.pack('>I',zlib.crc32(t+d)&0xffffffff)
+          open('assets/icon-background.png','wb').write(b'\x89PNG\r\n\x1a\n'+ch(b'IHDR',struct.pack('>IIBBBBB',w,h,8,2,0,0,0))+ch(b'IDAT',zlib.compress(raw))+ch(b'IEND',b''))
+          PY
+          npx capacitor-assets generate --android
       - name: Compila
         run: |
           cd android
