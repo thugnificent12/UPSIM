@@ -847,39 +847,37 @@ const INCS={
    {l:'La inviti a fare reclamo',h:'veloce, un po’ freddo',fx(){adjRep(-.7);S.st.angry++;log('La cliente scrive un reclamo sul libro dei reclami.','warn');}}]}};
 
 const UPGS=[
- {id:'sp',n:'Nuovo sportello',max:7,cost:[600,1400,2800,5000,8000,11000,15000],gate:l=>l>=4&&!S.upg.reno?'Oltre 5 sportelli serve la ristrutturazione dell’ufficio':'',d:'Un altro bancone, un’altra sedia, un’altra fila. Poi serve qualcuno che ci stia dietro. Fino a 8 sportelli.',eff:l=>`${l+1} sportelli`},
- {id:'reno',n:'Ristrutturazione dell’ufficio',max:1,cost:[12000],d:'Cartongesso, luci nuove, sala più grande. Armadietti, pareti, porta e totem diventano grigi. Sala più capiente, clienti più pazienti, e si possono aprire gli sportelli dal sesto all’ottavo.',eff:l=>l?'sala da 70 posti, +10% pazienza':'—'},
+ {id:'sp',n:'Nuovo sportello',max:7,cost:[600,1400,2800,5000,8000,11000,15000],gate:l=>l>=4&&!S.upg.reno?'Oltre 5 sportelli serve la ristrutturazione dell’ufficio':'',d:'',eff:l=>`${l+1} sportelli`},
+ {id:'reno',n:'Ristrutturazione dell’ufficio',max:1,cost:[12000],d:'Cartongesso, luci nuove, sala più grande. Armadietti, pareti, porta e totem diventano grigi.',eff:l=>l?'sala da 70 posti, +10% pazienza':'—'},
  {id:'locker',n:'Locker automatico per pacchi',max:1,cost:[9000],d:'Un armadio che consegna pacchi da solo. Si rompe ogni tanto e costa manutenzione, ma una parte dei pacchi non passa più dalla coda.',eff:l=>l?'45% dei pacchi in autonomia, 14 €/giorno di manutenzione':'—'},
- {id:'angolo',n:'Angolo informazioni',max:1,cost:[3500],d:'Un banchetto con la scritta «Informazioni» e una persona che le dà. Assume Armando Dipende (58 €/giorno): ai tuoi sportelli arrivano meno curiosi e meno problemi.',eff:l=>l?'Armando risponde a chi chiede solo informazioni':'—'},
- {id:'sed',n:'Sedie in sala d’attesa',max:4,cost:[220,480,950,1700],d:'I clienti resistono di più. Sono sempre le sedie del 1994.',eff:l=>`+${l*8}% pazienza`},
+ {id:'angolo',n:'Angolo informazioni',max:1,cost:[3500],d:'Un banchetto con la scritta «Informazioni» e una persona che le dà.',eff:l=>l?'Armando risponde a chi chiede solo informazioni':'—'},
+ {id:'sed',n:'Sedie in sala d’attesa',max:4,cost:[220,480,950,1700],d:'',eff:l=>`+${l*8}% pazienza`},
  {id:'ticket',n:'Eliminacode con stima dell’attesa',max:1,cost:[750],d:'',eff:l=>l?'+12% pazienza':'—'},
  {id:'pannello',n:'Chiamata automatica al tuo sportello',max:1,cost:[900],d:'Il tuo sportello chiama il prossimo da solo, come quelli degli altri.',eff:l=>l?'attiva':'—'},
  {id:'caffe',n:'Macchinetta del caffè',max:3,cost:[350,800,1500],d:'Il caffè costa 0,50 €. La macchinetta ne trattiene 0,60, ma il personale è più veloce.',eff:l=>`+${l*5}% velocità`},
  {id:'formaz',n:'Corso di formazione',max:3,cost:[600,1400,2800],d:'',eff:l=>`+${l*8}% velocità`},
  {id:'clima',n:'Condizionatore',max:1,cost:[1200],d:'',eff:l=>l?'meno danni dal caldo':'—'},
- {id:'moduli',n:'Moduli precompilati',max:2,cost:[500,1200],d:'Meno matite, meno firme del 1974, meno problemi allo sportello.',eff:l=>`−${l*20}% problemi`},
- {id:'server',n:'Server nuovo',max:1,cost:[2200],d:'Il vecchio resta acceso per affetto. Quando il sistema rallenta, rallenta meno.',eff:l=>l?'blocchi meno gravi':'—'},
- {id:'recl',n:'Libro dei reclami digitale',max:1,cost:[800],d:'Raccoglie i reclami in un file che nessuno apre. Ai clienti sembra comunque efficienza.',eff:l=>l?'−25% danno da abbandoni':'—'},
+ {id:'moduli',n:'Moduli precompilati',max:2,cost:[500,1200],d:'',eff:l=>`−${l*20}% problemi`},
+ {id:'server',n:'Server nuovo',max:1,cost:[2200],d:'',eff:l=>l?'blocchi meno gravi':'—'},
+ {id:'recl',n:'Libro dei reclami digitale',max:1,cost:[800],d:'',eff:l=>l?'−25% danno da abbandoni':'—'},
  {id:'sicur',n:'Vigilante all’ingresso',max:1,cost:[1500],d:'',eff:l=>l?'sblocca scelte':'—'},
  {id:'atm',n:'ATM sull’esterno',max:1,cost:[3000],d:'Uno sportello automatico sul muro esterno, accessibile anche a ufficio chiuso. Prelievi fino a 600 €, commissione di 2 € ciascuno, nessuna manutenzione. Le guardie giurate portano una sovvenzione di 5.000 € da caricare. Si carica dalla cassaforte solo a ufficio chiuso; se i contanti finiscono i clienti si lamentano.',eff:l=>l?'prelievi fino a 600 €, commissione 2 €':'—'},
  {id:'shop',n:'UP SHOP',max:1,cost:[1500],d:'Un piccolo angolo vendita accanto agli sportelli: buste e scatole in tre misure, penne e tazze con il logo, libri sui francobolli e scotch per pacchi. Si vende dal PDS, con margini piccoli. Chi spedisce a volte ha bisogno di una busta o di una scatola, il resto è per pochi appassionati.',eff:l=>l?'menu UP SHOP nel PDS':'—'},
  {id:'app',n:'App ContoPosta',max:1,cost:[1800],d:'Prenoti il ticket da casa: gli arrivi si distribuiscono meglio e arrivano più clienti.',eff:l=>l?'+12% clienti, meno picchi':'—'}];
 
 const POOL=[
- {id:'pas',name:'Pasquale Mancuso',role:'Il Ritardatario',sp:'B',spd:.95,wage:48,hire:260,late:35,abs0:.04,prb:1,quip:'Arriva sempre «un attimo» dopo.'},
- {id:'con',f:1,name:'Concetta Sempreinferie',role:'Specialista pacchi',sp:'P',spd:1.05,wage:60,hire:420,late:0,abs0:.14,prb:1,quip:'Ogni tanto c’è una cugina che si sposa.'},
- {id:'gig',name:'Gigi il Precario',role:'Veloce e distratto',sp:'C',spd:1.15,wage:46,hire:330,late:0,abs0:.03,prb:1.5,quip:'Veloce. I moduli li legge dopo.'},
- {id:'fab',name:'Rag. Fabrizio Cavilli',role:'Scrupoloso',sp:'B',spd:1,wage:70,hire:650,late:0,abs0:.04,prb:.4,quip:'Lento, ma i moduli li legge per davvero.'},
- {id:'mar',f:1,name:'Marilena Previdenza',role:'Regina delle pensioni',sp:'F',spd:1.2,wage:78,hire:700,late:0,abs0:.05,prb:.8,quip:'Conosce 4.000 pensionati e le loro nipoti.'},
- {id:'ros',f:1,name:'Rosaria la Veterana',role:'Ha visto tre riforme',sp:'P',spd:1.3,wage:105,hire:1400,late:0,abs0:.08,prb:.7,quip:'Non ne ha applicata nessuna. Ma sa come si fa.'},
- {id:'ila',f:1,name:'Ilaria la Stagista',role:'Sorride e impara',sp:'C',spd:1.05,wage:40,hire:200,late:20,abs0:.03,prb:1.3,quip:'Il contratto è «formativo». Le formazioni sono sul tutorial.'},
- {id:'ott',name:'Dott. Ottavio Polizza',role:'Consulente finanziario',sp:'E',spd:1.2,wage:92,hire:1100,late:0,abs0:.05,prb:.6,quip:'Ha una polizza per ogni evenienza, inclusa questa.'},
- {id:'lia',f:1,name:'Lia Notifica',role:'Esperta di passaporti',sp:'F',spd:1.2,wage:88,hire:1000,late:0,abs0:.05,prb:.6,quip:'Sa sempre chi ha ricevuto cosa, e quando.'}];
-const EXC=['è in permesso sindacale','ha una visita specialistica (sempre di lunedì)','è bloccata sulla Tangenziale da ieri','ha il matrimonio di una cugina di cui nessuno sapeva'];
-const LATE=['«Il tram 9, lo sapete»','«C’era traffico, da casa mia»','«Il cane non voleva uscire»'];
+ {id:'pas',name:'Pasquale Mancuso',role:'Il Ritardatario',sp:'B',spd:.95,wage:48,hire:260,late:35,abs0:.04,prb:1},
+ {id:'con',f:1,name:'Concetta Sempreinferie',role:'Specialista pacchi',sp:'P',spd:1.05,wage:60,hire:420,late:0,abs0:.14,prb:1},
+ {id:'gig',name:'Gigi il Precario',role:'Veloce e distratto',sp:'C',spd:1.15,wage:46,hire:330,late:0,abs0:.03,prb:1.5},
+ {id:'fab',name:'Rag. Fabrizio Cavilli',role:'Scrupoloso',sp:'B',spd:1,wage:70,hire:650,late:0,abs0:.04,prb:.4},
+ {id:'mar',f:1,name:'Marilena Previdenza',role:'Regina delle pensioni',sp:'F',spd:1.2,wage:78,hire:700,late:0,abs0:.05,prb:.8},
+ {id:'ros',f:1,name:'Rosaria la Veterana',role:'Ha visto tre riforme',sp:'P',spd:1.3,wage:105,hire:1400,late:0,abs0:.08,prb:.7},
+ {id:'ila',f:1,name:'Ilaria la Stagista',role:'Sorride e impara',sp:'C',spd:1.05,wage:40,hire:200,late:20,abs0:.03,prb:1.3},
+ {id:'ott',name:'Dott. Ottavio Polizza',role:'Consulente finanziario',sp:'E',spd:1.2,wage:92,hire:1100,late:0,abs0:.05,prb:.6},
+ {id:'lia',f:1,name:'Lia Notifica',role:'Esperta di passaporti',sp:'F',spd:1.2,wage:88,hire:1000,late:0,abs0:.05,prb:.6}];
+const exc=()=>chance(.1)?'è in permesso sindacale':chance(.5)?'è in malattia':'è in ferie';
 const RK=[8500,80000,275000,590000];
 const RANKS=[[0,'Videoterminalista Junior (liv. E)'],[RK[0],'Videoterminalista (liv. D)'],[RK[1],'Sportellista (liv. C)'],[RK[2],'Collaboratore (liv. B)'],[RK[3],'Direttore UP (liv. A)']];
-const CLOSERS=['«Arrivederci, {T}!» dice l’ultimo cliente. Per una volta intendeva davvero il secondo.','Per oggi basta, {N}. Anche il timbro lo dice.','Si abbassa la serranda. Una serranda a caso fa il suo rumore.','Il personale esce in gruppo come in una foto di classe.','Fuori è già buio, anche se sono le due del pomeriggio d’inverno.','Il vigile urbano ti saluta, ma solo per prendere le chiavi del parcheggio.','L’ultimo cliente dice «grazie e arrivederci». Per una volta intendeva davvero il secondo.'];
 const ANGRY=['«Io qui non ci metto più piede.» (Tornerà giovedì.)','«{T}, così non va!» (Ha ragione, ma se ne va lo stesso.)','«Lo dirò a {N}!» Non sa che {N} sei tu.','«Così ci vuole una settimana!» (Aveva ragione.)','«Chiamerò chi di dovere.» (Non esiste.)','«Qui non cambia mai niente.» Intanto se ne va lui.','«Mi fa un reclamo.» «Lo faccia pure.» «Dov’è?» Se ne va comunque.'];
 
 /* ---------- stato ---------- */
@@ -954,7 +952,7 @@ function prepDay(){
   S.lkDown=!!S.upg.locker&&chance(.04);S.angoloAbs=!!S.angolo&&chance(.05);
   if(S.lkDown)log('Il locker automatico è fuori servizio.','warn');
   if(S.angoloAbs)log('Armando Dipende è assente: angolo informazioni chiuso.','warn');
-  S.staff.forEach(s=>{s.today={abs:chance(s.abs0*(premOn()?.6:1))||(S.today.strike&&chance(.5)),ex:pick(EXC),lt:pick(LATE)};});
+  S.staff.forEach(s=>{s.today={abs:chance(s.abs0*(premOn()?.6:1))||(S.today.strike&&chance(.5)),ex:exc()};});
   S.appts=(S.appts||[]).filter(a=>a.off>=S.off);
   if(S.ppCamp&&S.ppCamp.left>0){S.ppCamp.left--;S.ppActive=true;}
   else{S.ppActive=false;if(S.day>=3&&chance(.05)){S.ppCamp={left:2};S.ppActive=true;log('PostaPhone lancia la promo «Tre giorni, tutto doppio»: per 3 giorni le tue commissioni sulle sue operazioni raddoppiano.','good');}}
@@ -1537,8 +1535,8 @@ function step(dt){
 /* portalettere: incassano a consegna, ma costano stipendio, benzina, assicurazione, riparazioni e qualche multa */
 const ANG={name:'Armando Dipende',wage:58};
 const POSTMEN=[
- {id:'p1',name:'Nino Sciarra',role:'Il veterano del Borgo',route:'Centro Storico e Borgo Vecchio Nuovo',base:34,fee:3.8,wage:70,fuel:7,upk:6,hire:500,moto:1800,ztl:true,quip:'Conosce ogni portone e ogni cane. I cani conoscono lui.'},
- {id:'p2',name:'Debora Cuccurullo',role:'Scattista di Satellite 7',route:'Satellite 7, Le Palme e Zona Industriale',base:46,fee:3.6,wage:76,fuel:13,upk:6,hire:500,moto:1800,tang:true,quip:'Fa il giro in 40 minuti. Metà dei pacchi finisce nel palazzo accanto.'}];
+ {id:'p1',name:'Nino Sciarra',role:'Il veterano del Borgo',route:'Centro Storico e Borgo Vecchio Nuovo',base:34,fee:3.8,wage:70,fuel:7,upk:6,hire:500,moto:1800,ztl:true},
+ {id:'p2',name:'Debora Cuccurullo',role:'Scattista di Satellite 7',route:'Satellite 7, Le Palme e Zona Industriale',base:46,fee:3.6,wage:76,fuel:13,upk:6,hire:500,moto:1800,tang:true}];
 function postDay(){
   const r={rev:0,veh:0,wages:0,fines:0,n:0};
   (S.post||[]).forEach(p=>{
@@ -2617,7 +2615,7 @@ function cntBody(k,av){
     if(av.why==='vuoto')return`<p class="muted">Sportello senza personale. Assumi qualcuno dalla scheda Ufficio.</p>`;
     if(av.why==='sost')return`<p class="muted">${esc(s.name)} è in sostituzione ${S.sub.pl.a}: ${subBack(S.sub.left)}. Lo stipendio è a tuo carico.</p>`;
     if(av.why==='assente')return`<p class="muted">${esc(s.name)} oggi non c’è: ${esc(s.today.ex)}. Domani torna.</p>`;
-    return`<p class="muted">${esc(s.name)} arriva alle ${hh(OPEN+s.late)}: ${esc(s.today.lt)}.</p>`;
+    return`<p class="muted">${esc(s.name)} arriva alle ${hh(OPEN+s.late)}.</p>`;
   }
   const c=k.cur;
   if(c){
@@ -2693,7 +2691,7 @@ function renderUff(){
    h+=`<div class="card"><h2>Portalettere</h2><p class="muted" style="margin:0 0 8px;font-size:13px">Fino a due. Consegnano in giro per Cenide e incassano a consegna, ma costano stipendio, benzina, assicurazione, riparazioni e qualche multa.</p>`;
    POSTMEN.forEach(pm=>{const h0=P.find(x=>x.id===pm.id),daily=pm.wage+pm.fuel+pm.upk;
      if(h0){h+=`<div class="staff" style="margin-bottom:10px"><div class="tt"><b>${esc(pm.name)}</b><small>${esc(pm.role)} · ${esc(pm.route)}<br>Costo al giorno: ${eur(daily)} (stipendio ${eur(pm.wage)}, benzina ${eur(pm.fuel)}, assicurazione e manutenzione ${eur(pm.upk)})<br>${h0.last?`Ultima giornata: ${h0.last.n} consegne, ${eur(h0.last.rev,2)} incassati${h0.last.note?' · '+esc(h0.last.note):''}`:'Non ha ancora fatto il giro.'}</small></div></div>`;}
-     else{const tot=pm.hire+pm.moto,ok=S.cash>=tot;h+=`<div class="staff" style="margin-bottom:10px"><div class="tt"><b>${esc(pm.name)}</b><small>${esc(pm.role)} · ${esc(pm.route)}<br>${esc(pm.quip)}<br>Circa ${pm.base} consegne al giorno a ${eur(pm.fee,2)} l’una. Costo al giorno: ${eur(daily)}. All’inizio: assunzione, divisa e casco ${eur(pm.hire)} più motorino ${eur(pm.moto)}.</small></div><button class="btn blue" data-act="hirep" data-id="${pm.id}" ${ok?'':'disabled'}>${eur(tot)}</button></div>`;}});
+     else{const tot=pm.hire+pm.moto,ok=S.cash>=tot;h+=`<div class="staff" style="margin-bottom:10px"><div class="tt"><b>${esc(pm.name)}</b><small>${esc(pm.role)} · ${esc(pm.route)}<br>Circa ${pm.base} consegne al giorno a ${eur(pm.fee,2)} l’una. Costo al giorno: ${eur(daily)}. All’inizio: assunzione, divisa e casco ${eur(pm.hire)} più motorino ${eur(pm.moto)}.</small></div><button class="btn blue" data-act="hirep" data-id="${pm.id}" ${ok?'':'disabled'}>${eur(tot)}</button></div>`;}});
    h+='</div>';}
   {const ppl=S.staff.length+(S.post||[]).length+(S.angolo?1:0),pc=250*ppl,on=premOn();
    if(ppl)h+=`<div class="card"><h2>Premio di produttività</h2><p class="muted" style="margin:0 0 8px;font-size:13px">Un bonus di 250 € a testa a tutti (dipendenti, portalettere, angolo). Per 30 giorni: +10% di velocità agli sportelli e alle consegne, meno assenze. ${on?`<b>In corso fino al ${dt0(S.prem.until).getUTCDate()} ${MESI[dt0(S.prem.until).getUTCMonth()].toLowerCase()}.</b>`:''}</p>${on?`<span class="pill good">Scade tra ${Math.max(1,S.prem.until-S.off)} giorni</span>`:ppl?`<button class="btn gold" data-act="prem" ${S.cash>=pc?'':'disabled'}>Paga ${eur(pc)}</button>`:'<span class="muted" style="font-size:12.5px">Serve almeno una persona da premiare.</span>'}</div>`;}
@@ -2823,7 +2821,7 @@ function buyUpg(id){
 function hireStaff(id){
   const p=POOL.find(x=>x.id===id),k=S.counters.find(x=>x.who===null);
   if(!(p&&k&&S.cash>=p.hire&&!S.staff.some(s=>s.id===p.id)))return false;
-  S.cash-=p.hire;const s=Object.assign({},p,{today:{abs:false,ex:pick(EXC),lt:pick(LATE)}});S.staff.push(s);k.who=s.id;
+  S.cash-=p.hire;const s=Object.assign({},p,{today:{abs:false,ex:exc()}});S.staff.push(s);k.who=s.id;
   toast(`${p.name} allo sportello ${k.id+1}`,'good');log(`${p.name} entra in servizio allo sportello ${k.id+1}.`,'good');save();return true;
 }
 function hirePost(id){
