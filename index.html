@@ -222,13 +222,14 @@ details.types summary{cursor:pointer;padding:4px 0}
 .qb:active{background:var(--accent);color:var(--accentfg)}
 .itd{text-decoration:line-through;opacity:.55}
 
-#start{position:fixed;inset:0;z-index:45;display:grid;grid-template-rows:1fr auto;background:#14213d;color:#fff;font-family:var(--f-body);font-weight:700;overflow:hidden;max-width:600px;margin:0 auto}
+#start{position:fixed;inset:0;z-index:45;display:grid;grid-template-rows:1fr auto;background:#14213d;color:#fff;font-family:var(--f-body);font-weight:700;overflow:hidden}
 #start[hidden]{display:none!important}
 #start .bg{position:absolute;inset:0;background-size:cover;background-position:center;filter:blur(14px) saturate(1.1);transform:scale(1.15)}
 #start .tintl{position:absolute;inset:0;background:var(--st-tint)}
-#start .top{position:relative;z-index:1;display:grid;align-content:center;padding-top:8%}
-#start .top img{display:block;width:100%;height:auto;-webkit-mask-image:linear-gradient(transparent,#000 7%,#000 93%,transparent);mask-image:linear-gradient(transparent,#000 7%,#000 93%,transparent)}
-#start .bot{position:relative;z-index:1;display:grid;gap:6px;padding:0 max(70px,calc((100% - 260px)/2)) calc(10px + env(safe-area-inset-bottom,0px))}
+#start .top{position:absolute;inset:0;z-index:1}
+#start .top img{display:block;width:100%;height:100%;object-fit:cover;object-position:center}
+@media (min-aspect-ratio:1/1){#start .top img{object-position:center top}}
+#start .bot{position:relative;z-index:2;grid-row:2;display:grid;gap:6px;width:100%;padding:40px max(24px,calc((100% - 420px)/2)) calc(10px + env(safe-area-inset-bottom,0px));box-sizing:border-box;background:linear-gradient(transparent,rgba(0,0,0,.5))}
 #start .sbtn{font:var(--hw) 15px var(--f-display);border:0;border-radius:999px;padding:8px;color:var(--st-pf);background:var(--st-p);box-shadow:0 2px 0 var(--st-sh);width:100%;min-height:0}
 #start .sbtn.sec{background:var(--st-glass);color:var(--st-gt);box-shadow:0 2px 0 rgba(0,0,0,.25)}
 #start .sbtn:disabled{opacity:.5}
@@ -250,8 +251,10 @@ details.types summary{cursor:pointer;padding:4px 0}
 .sc-sw{animation:scsw 1.6s ease-in infinite}
 .wk-f,.wk-b{animation-duration:inherit;animation-delay:inherit;animation-iteration-count:infinite;animation-timing-function:linear}
 .wk-f{animation-name:wkf}.wk-b{animation-name:wkb;opacity:0}
-@keyframes wkf{0%,24.9%{opacity:1}25%,74.9%{opacity:0}75%,100%{opacity:1}}
-@keyframes wkb{0%,24.9%{opacity:0}25%,74.9%{opacity:1}75%,100%{opacity:0}}
+@keyframes wkf{0%,44.9%{opacity:0}45%,99.9%{opacity:1}100%{opacity:0}}
+@keyframes wkb{0%,44.9%{opacity:1}45%,99.9%{opacity:0}100%{opacity:1}}
+.sc-walkv{animation-name:scwalkv}
+@keyframes scwalkv{0%{transform:translate(0,0)}45%,50%{transform:translate(0,calc(var(--dy) * -1))}95%,100%{transform:translate(0,0)}}
 .sc-out{animation-name:scout;animation-timing-function:linear;animation-fill-mode:both}
 @keyframes scout{from{transform:translate(0,0)}to{transform:translate(var(--ox),0)}}
 @keyframes scbob{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
@@ -824,7 +827,7 @@ const INCS={
   o:()=>{const o=[
    {l:'Lo rimandi in coda',h:'la sala applaude (a bassa voce)',fx(){adjRep(.9);log('Cliente che cercava di passare avanti rimandato in coda.','good');}},
    {l:'Lo servi: «due secondi»',h:'ne passano nove, la coda lo nota',fx(){S.queue.forEach(c=>c.wait+=7);addCash(6,'rev');adjRep(-.9);log('Cliente servito passando avanti: la coda aspetta 7 minuti in più.','bad');}}];
-   if(S.upg.sicur)o.push({l:'Chiami il vigilante Tonino',h:'lo accompagna in fondo',fx(){adjRep(1.4);log('Il vigilante riporta in fondo alla coda il cliente che passava avanti.','good');}});
+   if(S.upg.sicur)o.push({l:'Chiami il vigilante',h:'lo accompagna in fondo',fx(){adjRep(1.4);log('Il vigilante riporta in fondo alla coda il cliente che passava avanti.','good');}});
    return o;}},
  influ:{n:'L’influencer in sala',txt:'Una ragazza filma la sala d’attesa con il telefono: «Ragazzi, eccoci alla fila del secolo». Ti chiede un commento: «{T}, una parola per i miei follower?»',
   o:()=>[
@@ -843,18 +846,18 @@ const UPGS=[
  {id:'locker',n:'Locker automatico per pacchi',max:1,cost:[9000],d:'Un armadio che consegna pacchi da solo. Si rompe ogni tanto e costa manutenzione, ma una parte dei pacchi non passa più dalla coda.',eff:l=>l?'45% dei pacchi in autonomia, 14 €/giorno di manutenzione':'—'},
  {id:'angolo',n:'Angolo informazioni',max:1,cost:[3500],d:'Un banchetto con la scritta «Informazioni» e una persona che le dà. Assume Armando Dipende (58 €/giorno): ai tuoi sportelli arrivano meno curiosi e meno problemi.',eff:l=>l?'Armando risponde a chi chiede solo informazioni':'—'},
  {id:'sed',n:'Sedie in sala d’attesa',max:4,cost:[220,480,950,1700],d:'I clienti resistono di più. Sono sempre le sedie del 1994.',eff:l=>`+${l*8}% pazienza`},
- {id:'ticket',n:'Eliminacode con stima dell’attesa',max:1,cost:[750],d:'Il display dice «attesa stimata: 12 minuti». Nessuno sa come la stima, ma funziona.',eff:l=>l?'+12% pazienza':'—'},
+ {id:'ticket',n:'Eliminacode con stima dell’attesa',max:1,cost:[750],d:'',eff:l=>l?'+12% pazienza':'—'},
  {id:'pannello',n:'Chiamata automatica al tuo sportello',max:1,cost:[900],d:'Il tuo sportello chiama il prossimo da solo, come quelli degli altri.',eff:l=>l?'attiva':'—'},
  {id:'caffe',n:'Macchinetta del caffè',max:3,cost:[350,800,1500],d:'Il caffè costa 0,50 €. La macchinetta ne trattiene 0,60, ma il personale è più veloce.',eff:l=>`+${l*5}% velocità`},
- {id:'formaz',n:'Corso di formazione',max:3,cost:[600,1400,2800],d:'Dura due giorni. Il personale se ne ricorda metà.',eff:l=>`+${l*8}% velocità`},
- {id:'clima',n:'Condizionatore funzionante',max:1,cost:[1200],d:'Funziona. Qualcuno dice sia un errore di consegna.',eff:l=>l?'meno danni dal caldo':'—'},
+ {id:'formaz',n:'Corso di formazione',max:3,cost:[600,1400,2800],d:'',eff:l=>`+${l*8}% velocità`},
+ {id:'clima',n:'Condizionatore',max:1,cost:[1200],d:'',eff:l=>l?'meno danni dal caldo':'—'},
  {id:'moduli',n:'Moduli precompilati',max:2,cost:[500,1200],d:'Meno matite, meno firme del 1974, meno problemi allo sportello.',eff:l=>`−${l*20}% problemi`},
  {id:'server',n:'Server nuovo',max:1,cost:[2200],d:'Il vecchio resta acceso per affetto. Quando il sistema rallenta, rallenta meno.',eff:l=>l?'blocchi meno gravi':'—'},
  {id:'recl',n:'Libro dei reclami digitale',max:1,cost:[800],d:'Raccoglie i reclami in un file che nessuno apre. Ai clienti sembra comunque efficienza.',eff:l=>l?'−25% danno da abbandoni':'—'},
- {id:'sicur',n:'Vigilante all’ingresso',max:1,cost:[1500],d:'Si chiama Tonino. Ferma i furbetti, i piccioni e un cugino ogni tanto.',eff:l=>l?'sblocca scelte':'—'},
+ {id:'sicur',n:'Vigilante all’ingresso',max:1,cost:[1500],d:'',eff:l=>l?'sblocca scelte':'—'},
  {id:'atm',n:'ATM sull’esterno',max:1,cost:[3000],d:'Uno sportello automatico sul muro esterno, accessibile anche a ufficio chiuso. Prelievi fino a 600 €, commissione di 2 € ciascuno, nessuna manutenzione. Le guardie giurate portano una sovvenzione di 5.000 € da caricare. Si carica dalla cassaforte solo a ufficio chiuso; se i contanti finiscono i clienti si lamentano.',eff:l=>l?'prelievi fino a 600 €, commissione 2 €':'—'},
  {id:'shop',n:'UP SHOP',max:1,cost:[1500],d:'Un piccolo angolo vendita accanto agli sportelli: buste e scatole in tre misure, penne e tazze con il logo, libri sui francobolli e scotch per pacchi. Si vende dal PDS, con margini piccoli. Chi spedisce a volte ha bisogno di una busta o di una scatola, il resto è per pochi appassionati.',eff:l=>l?'menu UP SHOP nel PDS':'—'},
- {id:'app',n:'App EraPosta',max:1,cost:[2600],d:'Prenoti il ticket da casa: gli arrivi si distribuiscono meglio e arrivano più clienti.',eff:l=>l?'+12% clienti, meno picchi':'—'}];
+ {id:'app',n:'App ContoPosta',max:1,cost:[1800],d:'Prenoti il ticket da casa: gli arrivi si distribuiscono meglio e arrivano più clienti.',eff:l=>l?'+12% clienti, meno picchi':'—'}];
 
 const POOL=[
  {id:'pas',name:'Pasquale Mancuso',role:'Il Ritardatario',sp:'B',spd:.95,wage:48,hire:260,late:35,abs0:.04,prb:1,quip:'Arriva sempre «un attimo» dopo.'},
@@ -2372,8 +2375,8 @@ const dOG=-(bw>1.05?Math.min(2.6,(bw-1.05)*5):0),tcG=bw<.86?0:bw<1?1:bw<1.16?2:3
     if((!NH||NH==='mech'||NH==='rifl')&&!cap&&hs===12&&back)back=`<g transform="scale(-1 1)">${back}</g>`;
     if((!NH||NH==='mech'||NH==='rifl')&&!cap&&hs===4)ex2=`<ellipse cx="0" cy="-23.2" rx="8.5" ry="6.6" fill="${hq0}" ${hln}/><ellipse cx="0" cy="-17.6" rx="6.8" ry="3.6" fill="${hq0}"/>`;
     back=back.replace(/^<g clip-path="[^"]*">([^]*)<\/g>$/,'$1');{const wi=back.indexOf('<g fill="none" stroke="#3A3F4B"');if(wi>=0){wcS=back.slice(wi);back=back.slice(0,wi);}}let bk2=back;
-    if(back&&/^<path d="M-\d+ -[23]C/.test(back)){const cid3='bk'+String(c.id).replace(/\W/g,'');bk2=`<clipPath id="${cid3}"><rect x="-40" y="-1" width="80" height="90"/></clipPath><g clip-path="url(#${cid3})">${back}</g><path d="M-13.4 -11C-15.6 -8.5 -17.6 -5.5 -19.4 -1L19.4 -1C17.6 -5.5 15.6 -8.5 13.4 -11Z" fill="${hq0}"/><path d="M-13.4 -11C-15.6 -8.5 -17.6 -5.5 -19.4 -1M13.4 -11C15.6 -8.5 17.6 -5.5 19.4 -1" fill="none" ${hln}/>`;}
-    let cl2='';
+    if(back&&/^<path d="M-\d+(?:\.\d+)? -[23]C/.test(back)){bk2=back.replace(/^<path d="M(-[\d.]+) (-[23])C([^"]*?)([\d.]+) (-[23])Z"/,(m,x0,y0,mid,x1,y1)=>`<path d="M0 -14C-11 -14 ${(x0*.8).toFixed(1)} -8 ${x0} ${y0}C${mid}${x1} ${y1}C${(x1*.8).toFixed(1)} -8 11 -14 0 -14Z"`);}
+let cl2='';
     if(!cap&&((NH==='curl')||(!NH&&hs===1))){const big=NH==='curl'?(h3>>>14)%2:1,sz=NH==='curl'?(big?5.6:4.5):5.1,nA=big?9:11,pts=[];for(let i=0;i<nA;i++){const a=Math.PI*(i/(nA-1));pts.push([Math.cos(a)*(16.4+sz*.25),-4+Math.sin(a)*(15+sz*.6),sz]);}[-9,-3,3,9].forEach((x,k)=>pts.push([x,10.5+(k%2?1:0),sz*.95]));for(let i=1;i<nA-1;i++){const a=Math.PI*(1+i/(nA-1));pts.push([Math.cos(a)*(16.2+sz*.2),-6+Math.sin(a)*(17+sz*.5),sz]);}[-11,-5.5,0,5.5,11].forEach(x=>pts.push([x,-17.5+Math.pow(x/11,2)*3.5,sz*.95]));[-8,0,8].forEach(x=>pts.push([x,-9,sz*.9]));[-10,-5,0,5,10].forEach(x=>pts.push([x,2+Math.pow(x/10,2)*-2,sz*.9]));
       const cc=pts.map(p=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="${p[2].toFixed(1)}"/>`).join('');
       cl2=`<g fill="${hq0}" stroke="${mixc(hq0,'#000000',.3)}" stroke-width="1.16" stroke-linejoin="round">${cc}</g><g fill="${hq0}">${cc}</g>`;}
@@ -2426,14 +2429,15 @@ function renderScene(){
     const c=o.c,L=lv[o.i],m=moodOf(c),mq=Math.min(10,Math.round(m*10)),hh=hsh(c.id);
     if(!c._ent||c._ent>now)c._ent=c._ent?now-5000:now;
     const el=now-c._ent,entering=el<2800;
-    const amp=mq<3?0:(mq-2)*3.6,dur=Math.max(2.6,10-mq*.7),dy=0;
+    const amp=mq<6?0:(mq-5)*4.5,dur=Math.max(2.6,10-mq*.7),vert=((hh>>3)%2===0),dy=vert?(mq<6?0:(mq-5)*3+7):0;
     const ex=288-o.p[0],ey=146-o.p[1];
-    let sty=`--dx:${amp}px;--dy:${dy}px;--ex:${ex}px;--ey:${ey}px;`,cls='';
+    let sty=`--dx:${vert?0:amp}px;--dy:${dy}px;--ex:${ex}px;--ey:${ey}px;`,cls='';
     if(entering){cls=' sc-in';sty+=`animation-delay:-${(el/1000).toFixed(1)}s`;}
-    else if(amp>0){cls=' sc-walk';sty+=`animation-duration:${dur.toFixed(1)}s;animation-delay:-${((hh>>6)%100)/100*dur}s`;}
+    else if(amp>0){cls=vert?' sc-walk sc-walkv':' sc-walk';sty+=`animation-duration:${dur.toFixed(1)}s;animation-delay:-${((hh>>6)%100)/100*dur}s`;}
     const s0=o.p[2]||.68,cp=c.comp,dx=cp?s0*(cp.kind==='bim'?24:27):0,cs=cp?(cp.kind==='bim'?s0*.62:s0*(cp.kind==='gen'&&cp.old?.97:1)):0;
     const fF=()=>(cp?custSVG(cp,o.p[0]+dx,o.p[1]-.5,cs,0,false,true,false):'')+custSVG(c,o.p[0]-(cp?dx*.5:0),o.p[1],s0,L,false,true,false);
-    if(cls.includes('sc-walk')){const fB=(cp?custSVGB(cp,o.p[0]+dx,o.p[1]-.5,cs,0,false,true,false):'')+custSVGB(c,o.p[0]-(cp?dx*.5:0),o.p[1],s0,L,false,true,false);return `<g class="${cls.trim()}" style="${sty}"><g class="wk-f">${fF()}</g><g class="wk-b">${fB}</g></g>`;}
+    if(cls.includes('sc-walkv')){const fB=(cp?custSVGB(cp,o.p[0]+dx,o.p[1]-.5,cs,0,false,true,false):'')+custSVGB(c,o.p[0]-(cp?dx*.5:0),o.p[1],s0,L,false,true,false);return `<g class="${cls.trim()}" style="${sty}"><g class="wk-f">${fF()}</g><g class="wk-b">${fB}</g></g>`;}
+    if(cls.includes('sc-walk'))return `<g class="${cls.trim()}" style="${sty}">${fF()}</g>`;
     return `<g class="${cls.trim()}" style="${sty}">${fF()}</g>`;}).join('');
   const clerk=meOK()?(()=>{const av=AVS[S.me.av]||AVS[0],shade=mixc(av.cl,'#000000',.22),qn=S.queue.length,ins=performance.now()-(RT.insAt||-1e9)<3500,mood=ins?'ang':(qn>=12||S.rep<35)?'tired':S.rep>=70?'happy':'neutral';
     const armP=(d,hx,dl)=>`<g class="clk-arm${sv?(qn>=12?' on fast':' on'):''}"${dl?` style="animation-delay:${dl}s"`:''}><path d="${d}" stroke="${shade}" stroke-opacity=".55" stroke-width="9.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="${d}" stroke="${av.cl}" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="${hx}" cy="78.5" rx="4.2" ry="3.3" fill="${av.skin}"/></g>`;
@@ -2458,7 +2462,7 @@ function renderScene(){
    ${crowd}
    ${(()=>{const XS=(RT.exits||[]).filter(X=>now-X.t0<=X.sp+X.W);RT.exits=XS;return XS.map(X=>{const el=now-X.t0,hx=hsh(X.c.id+'ex'),dir=hx%2?1:-1,x0=X.x!=null?X.x:(pos[Math.min(X.idx||0,pos.length-1)]||[214,172])[0],y0=X.y!=null?X.y:(pos[Math.min(X.idx||0,pos.length-1)]||[214,172])[1],sc0=X.sc||.68;
      if(el<X.sp){const tx=esc(X.say),w=Math.min(176,tx.length*3.9+14),bx=Math.max(4,Math.min(356-w,x0-w/2));return `<g>${custSVG(X.c,x0,y0,sc0,X.L,false,true,false)}<g><rect x="${bx.toFixed(1)}" y="78" width="${w.toFixed(1)}" height="15" rx="7" fill="#fff" stroke="${X.L===2?'#C62828':'#4a4a5a'}" stroke-width="1.2"/><text x="${(bx+w/2).toFixed(1)}" y="88.4" text-anchor="middle" font-size="6.6" font-weight="700" fill="${X.L===2?'#B71C1C':'#222'}" font-family="Arial">${tx}</text></g></g>`;}
-     const ox=dir>0?(360-x0)+50:-(x0+50);return `<g class="sc-out" style="--ox:${ox.toFixed(0)}px;animation-duration:${X.W}ms;animation-delay:-${Math.max(0,el-X.sp).toFixed(0)}ms">${custSVGB(X.c,x0,y0,sc0,X.L,false,true,true)}</g>`;}).join('');})()}
+     const ox=dir>0?(360-x0)+50:-(x0+50);return `<g class="sc-out" style="--ox:${ox.toFixed(0)}px;animation-duration:${X.W}ms;animation-delay:-${Math.max(0,el-X.sp).toFixed(0)}ms">${custSVG(X.c,x0,y0,sc0,X.L,false,true,true)}</g>`;}).join('');})()}
    ${S.fault&&S.fault.id==='luce'?'<rect width="360" height="215" fill="#02040f" opacity=".72"/><path d="M180 0L120 215H240z" fill="#FFE9A0" opacity=".05"/>':''}${q.length>pos.length?`<g><rect x="304" y="190" width="48" height="20" rx="10" fill="#FFD54F"/><text x="328" y="204.5" text-anchor="middle" font-size="12" font-weight="800" fill="#16275A" font-family="Arial">+${q.length-pos.length}</text></g>`:''}
   </svg>`;
   setHTML(el,html);
@@ -2660,6 +2664,7 @@ function renderLog(){
   const h=S.log.slice(0,7).map(l=>`<li class="${l.tone}"><time>${l.d}·${hh(l.t)}</time>${esc(l.tx)}</li>`).join('')||'<li>Nessun evento.</li>';
   setHTML($('#logbox'),h);
 }
+const fNm=n=>String(n).replace(/^(Rag\.|Dott\.)\s+/,'').split(' ')[0];
 function renderUff(){
   const lv=id=>S.upg[id]||0;
   const free=S.counters.filter(k=>k.who===null).length;
@@ -2667,15 +2672,15 @@ function renderUff(){
   const aL=atmCanLoad(),atmH=!S.upg.atm?'':`<div class="card"><h2>ATM</h2><p class="muted" style="margin:0;font-size:13px">Contanti nell’ATM: <b>${eur(S.atm||0,0)}</b> (max ${eur(ATMCAP)}), di cui sovvenzione ${eur(S.atmG||0,0)}<br>Prelievi di oggi: <b>${S.st.atmN||0}</b>${S.st.atmF?` · clienti senza contanti: <b class="neg">${S.st.atmF}</b>`:''}<br>${aL?'Puoi caricarlo ora: l’ufficio è chiuso al pubblico.':'Si carica solo a ufficio chiuso: prima dell’apertura o dopo l’orario pubblico.'}</p><div class="row" style="gap:6px;margin-top:8px;flex-wrap:wrap">${[500,1000].map(v=>`<button class="btn" style="flex:1;font-size:12px;padding:6px" data-act="atm" data-v="${v}" ${aL&&(S.vault||0)>=10&&(S.atm||0)<ATMCAP?'':'disabled'}>+ ${eur(v)}</button>`).join('')}<button class="btn" style="flex:1;font-size:12px;padding:6px" data-act="atm" data-v="99999" ${aL&&(S.vault||0)>=10&&(S.atm||0)<ATMCAP?'':'disabled'}>Carica al massimo</button><button class="btn" style="flex:1;font-size:12px;padding:6px" data-act="atm" data-v="-99999" ${aL&&(S.atm||0)-(S.atmG||0)>=10?'':'disabled'}>Svuota → cassaforte</button></div><p class="muted" style="font-size:11.5px;margin:6px 0 0">Prelievi fino a 600 € per volta. I tuoi contanti caricati escono dalla cassa e, quando i clienti li prelevano, tornano in cassaforte a fine giornata. La sovvenzione resta nell’ATM. Commissione di 2 € a prelievo, nessuna manutenzione.</p></div>`;
   let h=(S.fault&&S.fault.open?faultHTML():'')+dcHTML()+`<div class="card"><h2>Cassaforte</h2><p class="muted" style="margin:0;font-size:13px">Cassaforte ufficio: <b>${eur(S.vault||0,2)}</b><br>Safety cash sportello 1: <b>${eur(S.safe||0,2)}</b><br>Cassetto sportello 1: <b>${eur(drw(),2)}</b> (max ${eur(CAP)})<br>Entrate mensili ricorrenti (canoni, linee, finanziamenti): <b>${eur(monthEst(),2)}</b></p><div class="row" style="gap:6px;margin-top:8px;flex-wrap:wrap">${[500,1000].map(v=>`<button class="btn" style="flex:1;font-size:12px;padding:6px" data-act="vault" data-v="-${v}" ${(S.vault||0)>=v?'':'disabled'}>→ Safety ${eur(v)}</button>`).join('')}<button class="btn" style="flex:1;font-size:12px;padding:6px" data-act="vault" data-v="-99999" ${(S.vault||0)>=1?'':'disabled'}>Tutto → Safety</button><button class="btn" style="flex:1;font-size:12px;padding:6px" data-act="vault" data-v="99999" ${(S.safe||0)>=1?'':'disabled'}>Tutto → cassaforte</button></div></div>${atmH}<div class="card"><h2>Servizi su appuntamento</h2><p class="muted" style="margin:0 0 8px;font-size:13px">Assicurazioni, finanziamenti, passaporti e apertura ContoPosta si fanno solo su appuntamento: scegli il servizio e un giorno e quel giorno arriva il cliente (ogni tanto non si è presentato). Ogni giorno hai ${apptDays()[0]?apptDays()[0].cap:2} posti.</p>${(S.appts||[]).length?`<p style="margin:0 0 8px;font-size:13.5px"><b>Fissati:</b> ${(S.appts||[]).slice().sort((a,b)=>a.off-b.off).map(a=>fmtDay(a.off)+' '+APPT[a.kind||'pol'].s).join(' · ')}</p>`:''}<button class="btn gold" data-act="appt">Fissa un appuntamento</button></div>
   <div class="card"><h2>Personale</h2><p class="muted" style="margin:0 0 8px;font-size:13px">${S.counters.length} sportelli · ${S.staff.length} dipendenti${S.angolo?' + angolo informazioni':''}. Gli stipendi si pagano ogni sera, anche quando non vengono.</p>`;
-  h+=`<div class="staff" style="margin-bottom:8px">${meOK()?avSVG(S.me.av,'av'):''}<div class="tt"><b>${meOK()?esc(S.me.nome+' '+S.me.cognome)+' (tu)':'Tu'}</b><small>${meOK()?S.me.eta+' anni · ':''}Sportello 1 · gratis, pagato in gradimento</small></div></div>`;
+  h+=`<div class="staff" style="margin-bottom:8px">${meOK()?avSVG(S.me.av,'av'):''}<div class="tt"><b>${meOK()?esc(S.me.nome+' '+S.me.cognome)+' (tu)':'Tu'}</b><small>${meOK()?S.me.eta+' anni · ':''}Sportello 1</small></div></div>`;
   S.staff.forEach(s=>{const k=S.counters.find(x=>x.who===s.id);
-    h+=`<div class="staff" style="margin-bottom:8px"><div class="tt"><b>${esc(s.name)}</b><small>${esc(s.role)} · sportello ${k?k.id+1:'—'}${S.sub&&S.sub.id===s.id?' (in sostituzione)':''} · veloce con ${s.sp} · ${eur(s.wage)}/giorno</small></div></div>`;});
+    h+=`<div class="staff" style="margin-bottom:8px"><div class="tt"><b>${esc(fNm(s.name))}</b><small>${esc(s.role)} · sportello ${k?k.id+1:'—'}${S.sub&&S.sub.id===s.id?' (in sostituzione)':''} · veloce con ${s.sp} · ${eur(s.wage)}/giorno</small></div></div>`;});
   if(S.angolo)h+=`<div class="staff" style="margin-bottom:8px"><div class="tt"><b>${ANG.name}</b><small>Angolo informazioni · ${eur(ANG.wage)}/giorno${S.angoloAbs?' · oggi assente, domani torna':''}</small></div></div>`;
   const cand=POOL.filter(p=>!S.staff.some(s=>s.id===p.id));
   h+=`</div><div class="card"><h2>Candidati</h2>`;
   if(!cand.length)h+='<p class="muted" style="margin:0">Non resta nessuno da assumere. A Cenide è un record.</p>';
   cand.forEach(p=>{const ok=free>0&&S.cash>=p.hire;
-    h+=`<div class="staff" style="margin-bottom:10px"><div class="tt"><b>${esc(p.name)}</b><small>${esc(p.role)} · ${esc(p.quip)}<br>Veloce con ${p.sp} · ${eur(p.wage)}/giorno</small></div><button class="btn blue" data-act="hire" data-id="${p.id}" ${ok?'':'disabled'}>${eur(p.hire)}</button></div>`;});
+    h+=`<div class="staff" style="margin-bottom:10px"><div class="tt"><b>${esc(fNm(p.name))}</b><small>Veloce con ${p.sp} · ${eur(p.wage)}/giorno</small></div><button class="btn blue" data-act="hire" data-id="${p.id}" ${ok?'':'disabled'}>${eur(p.hire)}</button></div>`;});
   if(cand.length&&!free)h+='<p class="muted" style="margin:0;font-size:13px">Non c’è uno sportello libero: apri prima un nuovo sportello.</p>';
   h+='</div>';
   if(S.life>=3000||(S.post||[]).length){const P=S.post||[];
@@ -2688,7 +2693,7 @@ function renderUff(){
    if(ppl)h+=`<div class="card"><h2>Premio di produttività</h2><p class="muted" style="margin:0 0 8px;font-size:13px">Un bonus di 250 € a testa a tutti (dipendenti, portalettere, angolo). Per 30 giorni: +10% di velocità agli sportelli e alle consegne, meno assenze. ${on?`<b>In corso fino al ${dt0(S.prem.until).getUTCDate()} ${MESI[dt0(S.prem.until).getUTCMonth()].toLowerCase()}.</b>`:''}</p>${on?`<span class="pill good">Scade tra ${Math.max(1,S.prem.until-S.off)} giorni</span>`:ppl?`<button class="btn gold" data-act="prem" ${S.cash>=pc?'':'disabled'}>Paga ${eur(pc)}</button>`:'<span class="muted" style="font-size:12.5px">Serve almeno una persona da premiare.</span>'}</div>`;}
   h+=`<div class="card"><h2>Migliorie</h2><div style="display:flex;flex-direction:column;gap:14px">`;
   UPGS.forEach(u=>{const l=lv(u.id),maxed=l>=u.max,cost=u.cost[l],gate=!maxed&&u.gate?u.gate(l):'',ok=!maxed&&!gate&&S.cash>=cost;
-    h+=`<div class="upg"><div class="upg-h"><h3>${esc(u.n)}</h3><span class="pips" aria-label="livello ${l} di ${u.max}">${'●'.repeat(l)}${'○'.repeat(u.max-l)}</span></div><p>${esc(u.d)}</p><div class="row" style="justify-content:space-between"><span class="muted" style="font-size:12.5px">Ora: ${esc(u.eff(l))}${maxed?'':' · poi: '+esc(u.eff(l+1))}</span>${maxed?'<span class="pill good">Completo</span>':`<button class="btn gold" data-act="buy" data-id="${u.id}" ${ok?'':'disabled'}>${eur(cost)}</button>`}</div>${gate?`<p style="font-size:12.5px;color:var(--warn)">${esc(gate)}</p>`:''}</div>`;});
+    h+=`<div class="upg"><div class="upg-h"><h3>${esc(u.n)}</h3><span class="pips" aria-label="livello ${l} di ${u.max}">${'●'.repeat(l)}${'○'.repeat(u.max-l)}</span></div>${u.d?`<p>${esc(u.d)}</p>`:''}<div class="row" style="justify-content:space-between"><span class="muted" style="font-size:12.5px">Ora: ${esc(u.eff(l))}${maxed?'':' · poi: '+esc(u.eff(l+1))}</span>${maxed?'<span class="pill good">Completo</span>':`<button class="btn gold" data-act="buy" data-id="${u.id}" ${ok?'':'disabled'}>${eur(cost)}</button>`}</div>${gate?`<p style="font-size:12.5px;color:var(--warn)">${esc(gate)}</p>`:''}</div>`;});
   h+='</div></div>';
   setHTML($('#uf'),h);
 }
