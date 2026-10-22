@@ -229,7 +229,9 @@ details.types summary{cursor:pointer;padding:4px 0}
 #start .top{position:absolute;inset:0;z-index:1}
 #start .top img{display:block;width:100%;height:100%;object-fit:cover;object-position:center}
 @media (min-aspect-ratio:1/1){#start .top img{object-fit:fill}}
+@media (max-aspect-ratio:1/1) and (pointer:coarse){#start{grid-template-rows:auto auto;align-content:center}#start .top{position:relative;display:grid;align-content:start;padding-top:0}#start .bot{padding-top:14px;background:none}#start .top img{height:auto;object-fit:initial}}
 #start .bot{position:relative;z-index:2;grid-row:2;display:grid;gap:6px;width:100%;padding:40px max(24px,calc((100% - 420px)/2)) calc(10px + env(safe-area-inset-bottom,0px));box-sizing:border-box;background:linear-gradient(transparent,rgba(0,0,0,.5))}
+@media (max-aspect-ratio:1/1) and (pointer:coarse){#start .bot{padding-top:14px;background:none}}
 #start .sbtn{font:var(--hw) 15px var(--f-display);border:0;border-radius:999px;padding:8px;color:var(--st-pf);background:var(--st-p);box-shadow:0 2px 0 var(--st-sh);width:100%;min-height:0}
 #start .sbtn.sec{background:var(--st-glass);color:var(--st-gt);box-shadow:0 2px 0 rgba(0,0,0,.25)}
 #start .sbtn:disabled{opacity:.5}
@@ -348,9 +350,13 @@ details.types summary{cursor:pointer;padding:4px 0}
 /* Visualizzazione PC */
 :root[data-view="pc"] .app{max-width:1240px}
 :root[data-view="pc"] .nav-in{max-width:1240px}
-:root[data-view="pc"] #tab-sp:not([hidden]){flex-direction:row;align-items:flex-start;gap:18px}
+:root[data-view="pc"] #tab-sp:not([hidden]){flex-direction:column;align-items:stretch;gap:12px}
+:root[data-view="pc"] .colL{position:relative}
+:root[data-view="pc"] #banner{position:absolute;top:12px;left:12px;right:12px;z-index:5}
+:root[data-view="pc"] .colR{display:grid!important;grid-template-columns:1fr 1fr;align-items:start;gap:12px}
+:root[data-view="pc"] #counters{grid-column:1/-1;order:3}
 :root[data-view="pc"] .colL,:root[data-view="pc"] .colR{display:flex;flex-direction:column;gap:10px;min-width:0}
-:root[data-view="pc"] .colL{flex:1.35 1 0}:root[data-view="pc"] .colR{flex:1 1 0}
+:root[data-view="pc"] .colL,:root[data-view="pc"] .colR{flex:none}
 :root[data-view="pc"] .scene{margin-inline:0;border-radius:14px}
 :root[data-view="pc"] #uf,:root[data-view="pc"] #co-dyn{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}
 :root[data-view="pc"] #pc{max-width:none;background:#14171c;padding:2.4vh 2.4vw 3.2vh}
