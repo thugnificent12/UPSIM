@@ -245,6 +245,7 @@ details.types summary{cursor:pointer;padding:4px 0}
 .scene{margin-inline:-16px;border-radius:0;overflow:hidden;border:3px solid var(--sign);background:var(--sign);line-height:0}
 .scene>svg{width:100%;height:auto;display:block}
 .sc-bob{animation:scbob 2.2s ease-in-out infinite;transform-box:fill-box}
+.clk-g,.clk-g *:not(.blink){animation:none!important}
 .sc-shk{animation:scshk .45s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 100%}
 .sc-walk{animation:scwalk 6s ease-in-out infinite}
 @keyframes scwalk{0%,100%{transform:translate(0,0)}25%{transform:translate(var(--dx),var(--dy))}50%{transform:translate(0,0)}75%{transform:translate(calc(var(--dx) * -1),calc(var(--dy) * -1))}}
@@ -319,6 +320,7 @@ details.types summary{cursor:pointer;padding:4px 0}
 .pr .car{position:absolute;right:6px;font-style:normal;font-size:16px;font-weight:800}
 .pr .fk{position:absolute;right:6px;font:700 11px Tahoma,Arial,sans-serif;font-style:normal}
 .pr .cntb{top:50%;right:4px;transform:translateY(-50%);min-width:17px;height:17px;font:800 11px/17px Tahoma,Arial,sans-serif}
+.pmain.t1 .pr{padding-top:1px;padding-bottom:1px;min-height:18px;font-size:10px}.pmain.t1 .pr small{font-size:7.5px;margin-top:0}.pmain.t2 .pr{padding-top:0;padding-bottom:0;min-height:14px;font-size:9px}.pmain.t2 .pr small{font-size:6.5px}
 .pr.bk{background:#E4E4E4;justify-content:center;text-align:center;font-weight:800}.pr:active{background:#2424CC;color:#fff}.pr:disabled{color:#999}.pr.nx{color:#9a9a9a}
 .safei{margin:0;padding:6px 8px;font:600 12.5px/1.35 Tahoma,Arial,sans-serif;background:#fff;border-bottom:1px solid #aaa}
 .pad{padding:8px}
@@ -459,7 +461,7 @@ const LETTERS='PBCFTA', ALLT=LETTERS+'E', ZERO=()=>({P:0,B:0,C:0,F:0,T:0,A:0,E:0
 const NOTK=new Set(['spid','spr','pas','polc','poli','polv','pola','fin','bu1','bu2','bu3','sc1','sc2','sc3','spn','stz','slb','ssc','crt']);
 const tkOne=it=>{const p=it.prod;if(NOTK.has(p))return null;
   if(['bol','bau','f24','pagopa','cva'].includes(p))return 'B';
-  if(['cpv','cpp','cpc','cpa','bon','lba','lbv','lbp','buo','pcn','pcp','pcr'].includes(p))return 'C';
+  if(['cpv','cpi','cpp','cpc','cpa','bon','lba','lbv','lbp','buo','pcn','pcp','pcr'].includes(p))return 'C';
   if(['vag','vagi','scw','pen'].includes(p))return 'F';
   if(p==='tel'||p==='sim'||p==='lin')return 'T';
   return 'P';};
@@ -553,7 +555,7 @@ const fill=s=>String(s).replace(/\{T\}/g,tcog()).replace(/\{N\}/g,meN()||'Dirett
 const PRODS=[
  {id:'bol',l:'Bollettino',t:'A'},{id:'pa3',l:'Pacco entro 5 giorni',t:'B'},{id:'pao',l:'Pacco ordinario',t:'B'},{id:'paeu',l:'Pacco Europa',t:'B'},{id:'pari',l:'Pacco rapido internazionale',t:'B'},{id:'paic',l:'Pacco intercontinentale',t:'B'},
  {id:'rac',l:'Raccomandata',t:'B'},{id:'fra',l:'Francobolli',t:'B'},{id:'tel',l:'Ricarica telefonica',t:'C'},{id:'sim',l:'SIM',t:'C'},{id:'lin',l:'Linea di casa',t:'C'},
- {id:'pcr',l:'Ricarica PostalCard',t:'C'},{id:'pcn',l:'Nuova PostalCard',t:'C'},{id:'pcp',l:'Prelievo PostalCard',t:'C'},{id:'cpa',l:'Apertura conto',t:'C'},{id:'cpc',l:'Carta ContoPosta',t:'C'},{id:'cpp',l:'Prelievo dal conto',t:'C'},{id:'cpv',l:'Versamento sul conto',t:'C'},
+ {id:'pcr',l:'Ricarica PostalCard',t:'C'},{id:'pcn',l:'Nuova PostalCard',t:'C'},{id:'pcp',l:'Prelievo PostalCard',t:'C'},{id:'cpa',l:'Apertura conto',t:'C'},{id:'cpc',l:'Carta ContoPosta',t:'C'},{id:'cpp',l:'Prelievo dal conto',t:'C'},{id:'cpv',l:'Versamento sul conto',t:'C'},{id:'cpi',l:'Incasso assegno (versamento su conto)',t:'C'},
  {id:'pen',l:'Pensione',t:'D'},{id:'lbv',l:'Versamento libretto',t:'D'},{id:'lbp',l:'Prelievo libretto',t:'D'},{id:'lba',l:'Apertura libretto',t:'D'},{id:'buo',l:'Buoni postali',t:'D'},
  {id:'rar',l:'Ritiro raccomandata',t:'B'},{id:'spid',l:'SPID',t:'C'},{id:'spr',l:'Rinnovo SPID',t:'C'},{id:'r1',l:'Raccomandata 1 giorno',t:'B'},{id:'ree',l:'Raccomandata estera',t:'B'},{id:'asc',l:'Assicurata',t:'B'},{id:'ase',l:'Assicurata estera',t:'B'},{id:'poi',l:'Posta ordinaria',t:'B'},{id:'poe',l:'Posta ordinaria estero',t:'B'},{id:'par',l:'Ritiro pacco',t:'B'},{id:'tgm',l:'Telegramma',t:'B'},{id:'vag',l:'Vaglia',t:'A'},{id:'scw',l:'Send Cash Worldwide',t:'A'},
  {id:'polc',l:'Assicurazione casa',t:'E'},{id:'poli',l:'Assicurazione infortuni',t:'E'},{id:'polv',l:'Assicurazione vita',t:'E'},{id:'pola',l:'Assicurazione auto',t:'E'},{id:'fin',l:'Finanziamento',t:'E'},{id:'psg',l:'Permesso di soggiorno',t:'C'},{id:'trk',l:'Cerca spedizioni',t:'B'},{id:'vagi',l:'Incasso vaglia',t:'A'},{id:'bau',l:'Bollo auto',t:'A'},{id:'f24',l:'F24',t:'A'},{id:'pagopa',l:'PagoPA',t:'A'},{id:'cva',l:'Cambiavalute',t:'A'},{id:'att',l:'Atti',t:'F'},{id:'pas',l:'Passaporto',t:'F'},
@@ -592,7 +594,7 @@ const bdg=(t,c)=>`<circle cx="36" cy="36" r="10" fill="${c}" stroke="#fff" strok
 ICO.vagi=(ICO.vag||'')+bdg('I','#E65100');ICO.fin=(ICO.pol||'')+bdg('F','#6A1B9A');ICO.polc=ICO.pol+bdg('C','#E65100');ICO.poli=ICO.pol+bdg('I','#C62828');ICO.polv=ICO.pol+bdg('V','#2E7D32');ICO.pola=ICO.pol+bdg('A','#1E56C8');ICO.bau=ICO.bol+bdg('A','#1E56C8');ICO.f24=ICO.bol+bdg('F24','#2E7D32');ICO.pagopa=ICO.bol+bdg('PA','#0B5FD0');
 Object.assign(ICO,{
  buo:'<rect x="6" y="8" width="36" height="30" rx="3" fill="#FFF8E1" stroke="#B88A00" stroke-width="2"/><rect x="10" y="12" width="28" height="22" rx="1.5" fill="none" stroke="#D4A62A" stroke-width="1.2"/><path d="M14 19h20M14 24h20M14 29h11" stroke="#B88A00" stroke-width="2" stroke-linecap="round"/><path d="M30 36l-2.5 9 5.5-3 5.5 3-2.5-9z" fill="#C62828"/><circle cx="33" cy="34" r="6.5" fill="#E53935" stroke="#8E0000" stroke-width="1.5"/>',
- cpa:ICO.cp+bdg('★','#F9A825'),cpv:ICO.cp+bdg('+','#2E7D32'),cpp:ICO.cp+bdg('–','#C62828'),
+ cpa:ICO.cp+bdg('★','#F9A825'),cpv:ICO.cp+bdg('+','#2E7D32'),cpi:ICO.cp+bdg('+','#2E7D32'),cpp:ICO.cp+bdg('–','#C62828'),
  cpc:'<rect x="4" y="10" width="40" height="27" rx="4" fill="#1E56C8" stroke="#0B2E7A" stroke-width="2"/><rect x="4" y="16" width="40" height="5" fill="#0B2E7A" opacity=".6"/><rect x="9" y="26" width="9" height="7" rx="1.5" fill="#FFC93C"/><path d="M24 29h14" stroke="#90CAF9" stroke-width="2.5" stroke-linecap="round"/><path d="M24 6L11 12h26z" fill="#90CAF9" transform="translate(0 -2) scale(1)" opacity="0"/>',
  pcn:'<rect x="4" y="10" width="40" height="27" rx="4" fill="#FFC93C" stroke="#B88A00" stroke-width="2"/><rect x="4" y="16" width="40" height="5" fill="#3B2A00" opacity=".75"/><rect x="9" y="26" width="9" height="7" rx="1.5" fill="#fff" opacity=".8"/>'+bdg('★','#F9A825'),
  pcp:'<rect x="4" y="10" width="40" height="27" rx="4" fill="#FFC93C" stroke="#B88A00" stroke-width="2"/><rect x="4" y="16" width="40" height="5" fill="#3B2A00" opacity=".75"/><rect x="9" y="26" width="9" height="7" rx="1.5" fill="#fff" opacity=".8"/>'+bdg('–','#C62828'),
@@ -611,15 +613,15 @@ par:ICO.pac+bdg('↓','#2E7D32'),
 const GAME_VER='2.49';
 if(typeof ICO!=='undefined'){if(ICO.pas)ICO.psg=ICO.pas;ICO.trk='<rect x="7" y="14" width="26" height="22" rx="3" fill="#F4D9A8" stroke="#9A6B22" stroke-width="2"/><path d="M7 22h26" stroke="#9A6B22" stroke-width="2"/><circle cx="32" cy="30" r="8" fill="#fff" fill-opacity=".85" stroke="#1F4FB8" stroke-width="3"/><path d="M38 36l6 6" stroke="#1F4FB8" stroke-width="4" stroke-linecap="round"/>';}
 const MT=[
-  {id:'fu',cd:'FUIN',l:'Incassi e pagamenti',sm:'pagamenti',kids:[{id:'bol',cd:'VCYL',l:'Bollettino',key:'F1'},{id:'bau',cd:'FUBA',l:'Bollo auto'},{id:'f24',cd:'FUF2',l:'F24'},{id:'pagopa',cd:'FUPA',l:'PagoPA'}]},
+  {id:'fu',cd:'FUIN',l:'Incassi e pagamenti',kids:[{id:'bol',cd:'VCYL',l:'Bollettino',key:'F1'},{id:'bau',cd:'FUBA',l:'Bollo auto'},{id:'f24',cd:'FUF2',l:'F24'},{id:'pagopa',cd:'FUPA',l:'PagoPA'}]},
  {id:'pp',cd:'FUPP',l:'PostaPhone',sm:'SIM, linea e ricarica',kids:[{id:'pp_lin',cd:'PPLI',l:'Linea di casa'},{id:'pp_tel',cd:'PPRI',l:'Ricarica'},{id:'pp_sim',cd:'PPSI',l:'SIM'}]},
  {id:'xc',cd:'XCOO',l:'Servizi Postali',sm:'pacchi e raccomandate',kids:[
    {id:'ra',cd:'XRAC',l:'Raccomandate',kids:[{id:'trk',cd:'TRAR',l:'Cerca spedizioni',sm:'tracciatura'},{id:'rar',cd:'RITR',l:'Ritiro raccomandata',sm:'avviso di giacenza'},{id:'r1',cd:'RAC1',l:'Raccomandata 1 giorno',sm:'Italia'},{id:'rac',cd:'RACC',l:'Raccomandata',sm:'Italia'},{id:'rra',cd:'RAAR',l:'Raccomandata A/R',sm:'con ricevuta di ritorno'},{id:'ree',cd:'RACE',l:'Raccomandata estera',sm:'estero'}]},
    {id:'as',cd:'XASS',l:'Assicurate',kids:[{id:'asc',cd:'ASSI',l:'Assicurata',sm:'Italia'},{id:'ase',cd:'ASSE',l:'Assicurata estera',sm:'estero'}]},
    {id:'pa',cd:'XPAC',l:'Pacchi',kids:[{id:'trk',cd:'TRAP',l:'Cerca spedizioni',sm:'tracciatura'},{id:'par',cd:'PARI',l:'Ritiro pacco',sm:'avviso di giacenza'},{id:'pa3',cd:'PAC5',l:'Entro 5 giorni'},{id:'pao',cd:'PACO',l:'Ordinario',sm:'Italia · circa 1 settimana'},{id:'paeu',cd:'PAEU',l:'Europa',sm:'5 gg · UE e Schengen'},{id:'pari',cd:'PARX',l:'Rapido internazionale',sm:'12 gg · resto del mondo'},{id:'paic',cd:'PAIC',l:'Intercontinentale',sm:'30 gg · resto del mondo'},{id:'pco',cd:'PACT',l:'Contrassegno',sm:'Italia · paga il destinatario'}]},
-   {id:'att',cd:'ATTI',l:'Atti giudiziari',sm:'ritiro in giacenza'},{id:'tgm',cd:'TELE',l:'Telegramma',sm:'Italia'},{id:'fra',cd:'FRAN',l:'Francobolli'},{id:'fi',cd:'XFIL',l:'Filatelia',sm:'collezione e folder',kids:[{id:'frc',cd:'FICO',l:'Francobolli da collezione'},{id:'fol',cd:'FIFO',l:'Folder filatelici'}]},{id:'cap',cd:'CASP',l:'Casella postale',sm:'abbonamento annuale'},
+   {id:'att',cd:'ATTI',l:'Atti giudiziari',sm:'ritiro in giacenza'},{id:'tgm',cd:'TELE',l:'Telegramma',sm:'Italia'},{id:'fra',cd:'FRAN',l:'Francobolli'},{id:'fi',cd:'XFIL',l:'Filatelia',sm:'collezione e folder',kids:[{id:'frc',cd:'FICO',l:'Francobolli da collezione'},{id:'fol',cd:'FIFO',l:'Folder filatelici'}]},{id:'cap',cd:'CASP',l:'Casella postale'},
    {id:'po',cd:'XPOS',l:'Posta ordinaria',kids:[{id:'poi',cd:'POIT',l:'Lettera in Italia'},{id:'poe',cd:'POES',l:'Lettera all’estero'}]}]},
- {id:'cc',cd:'CCBP',l:'ContoPosta / Assegni',kids:[{id:'cpa',cd:'CCAP',l:'Apertura conto'},{id:'cpp',cd:'CCPR',l:'Prelievo'},{id:'cpc',cd:'CACC',l:'Carta ContoPosta'},{id:'cpv',cd:'CCVE',l:'Versamento'},{id:'bon',cd:'CCBO',l:'Bonifico'}]},
+ {id:'cc',cd:'CCBP',l:'ContoPosta / Assegni',kids:[{id:'cpa',cd:'CCAP',l:'Apertura conto'},{id:'cpp',cd:'CCPR',l:'Prelievo'},{id:'cpc',cd:'CACC',l:'Carta ContoPosta'},{id:'cpv',cd:'CCVE',l:'Versamento'},{id:'cpi',cd:'CCIA',l:'Incasso assegno (versamento su conto)'},{id:'bon',cd:'CCBO',l:'Bonifico'}]},
  {id:'vg',cd:'VAGL',l:'Vaglia / Send Money',kids:[{id:'vag',cd:'VAGI',l:'Emissione vaglia'},{id:'vagi',cd:'VAIN',l:'Incasso vaglia',sm:'in assegno'},{id:'scw',cd:'SCWW',l:'Send Cash Worldwide',sm:'estero'}]},
  {id:'pen',cd:'PESI',l:'Ritiro Pensione'},
  {id:'rs',cd:'RISP',l:'Risparmio Postale',sm:'libretti e buoni',kids:[{id:'lba',cd:'RIAP',l:'Libretto: apertura'},{id:'lbp',cd:'RIPR',l:'Libretto: prelievo'},{id:'lbv',cd:'RIVE',l:'Libretto: versamento'},{id:'buo',cd:'RIBU',l:'Buoni postali'}]},
@@ -774,17 +776,10 @@ const PROBS={
   {l:'Spieghi piano, con gesti e disegni',h:'+6 min',x:6,d:1},
   {l:'Usi il traduttore del telefono',h:'+3 min, a volte traduce male',x:3,r:-.1}]},
  psgd:{for:'',t:'non ha i documenti in regola per il permesso di soggiorno',o:[
-  {l:'Gli spieghi cosa manca e lo rimandi',h:'perde il cliente',go:1,r:.1,d:1},
-  {l:'Provi a risolvere con il suo telefono',h:'+5 min, rischio di multa alta',x:5,risk:.5,fine:300}]},
+  {l:'Gli spieghi cosa manca',h:'esce senza servizio',go:1,d:1}]},
  altrui:{for:'',t:'ha portato il documento di un’altra persona',o:[{l:'Lo mandi via',h:'senza servizio',go:1,r:.1,msg:true}]},
- doc:{for:'',t:'non ha un documento d’identità valido',o:[
-  {l:'Accetti la foto sul telefono',h:'+2 min, rischio multa',x:2,risk:.1,d:1},
-  {l:'Lo rimandi a casa a prenderlo',h:'perde il cliente',go:1,r:-.5},
-  {l:'Chiami il direttore (sei tu)',h:'+5 min',x:5,r:.2}]},
  matita:{for:'PBCFTAE',t:'ha compilato il modulo a matita',o:[
-  {l:'Lo ricompili tu',h:'+4 min',x:4,d:1},
-  {l:'Gli presti una penna',h:'+2 min, a volte non te la ridà',x:2,c:-.5},
-  {l:'Lo rimandi a casa',h:'perde il cliente',go:1,r:-.5}]},
+  {l:'Gli dai una penna',h:'+2 min',x:2,d:1}]},
  barcode:{for:'PB',t:'ha un codice a barre che il lettore rifiuta',o:[
   {l:'Digiti tutto a mano',h:'+4 min',x:4,d:1},
   {l:'Riavvii il terminale',h:'+8 min, poi funziona',x:8,r:.1},
@@ -795,56 +790,18 @@ const PROBS={
   {l:'Gli suggerisci un corriere',h:'perde il cliente',go:1,r:-.2}]},
  tariffa:{for:'PBCFTA',t:'contesta la tariffa e vuole parlare con «chi comanda»',o:[
   {l:'Spieghi con pazienza',h:'+5 min, buona impressione',x:5,r:.5,d:1},
-  {l:'Gli fai uno sconto di tasca tua',h:'−2 €',c:-2,x:1,r:.8},
   {l:'Indichi il cartello con le tariffe',h:'+1 min, sguardo storto',x:1,r:-.8}]},
- scaduto:{for:'B',t:'ha un bollettino scaduto ieri',o:[
-  {l:'Lo accetti con la mora',h:'+3 min, incasso extra',x:3,f:1.5,d:1},
-  {l:'Chiudi un occhio',h:'+1 min, −5 €, simpatia',x:1,c:-5,r:.5},
-  {l:'Rifiuti il pagamento',h:'perde il cliente',go:1,r:-.8}]},
- delega:{for:'',t:'deve ritirare un atto per conto di un parente, ma la delega è su un tovagliolo',o:[
-  {l:'Accetti il tovagliolo',h:'+1 min, rischio multa',x:1,risk:.12,r:.2},
-  {l:'Chiami il destinatario',h:'+6 min, si fa dare la delega',x:6,r:.3,d:1},
-  {l:'Lo rimandi a casa',h:'perde il cliente',go:1,r:-.5}]},
  clausola:{for:'E',t:'vuole leggere tutte le clausole dell’assicurazione, anche quelle in piccolo',o:[
   {l:'Le leggi insieme a lui',h:'+8 min, fiducia eterna',x:8,r:.5,d:1},
   {l:'Gli fai una sintesi',h:'+3 min',x:3,r:.1},
   {l:'Lo rimandi a casa a pensarci',h:'perde il cliente',go:1,r:-.3}]},
- firma:{for:'F',t:'ha una firma diversa da quella registrata nel 1974',o:[
-  {l:'Gli fai rifare la firma tre volte',h:'+5 min',x:5,d:1},
-  {l:'Ti fidi: lo conosci da sempre',h:'+1 min, rischio multa',x:1,risk:.1,r:.3},
-  {l:'Lo mandi in filiale centrale',h:'perde il cliente',go:1,r:-.6}]}};
+ firma:{for:'F',t:'ha una firma diversa o illeggibile',o:[
+  {l:'Gli fai rifirmare più volte',h:'+5 min',x:5,d:1}]}};
 
 Object.values(PROBS).forEach(p=>p.o.forEach(o=>{if(o.x){const nx=Math.max(.5,Math.round(o.x*.5*2)/2);o.x=nx;o.h=o.h.replace(/\+\d+ min/,'+'+String(nx).replace('.',',')+' min');}}));
 /* eventi del giorno */
-const EVS=[
- {id:'sciopero',w:1,n:'Sciopero',txt:'Sciopero dei sindacati: metà del personale è «solidale» da casa.',fx:m=>{m.strike=true;}},
- {id:'sistema',w:1.2,n:'Sistema in manutenzione',txt:'Il sistema informatico è in «manutenzione programmata» dalle 10:00 alle 11:30. La programmazione era di ieri.',fx:m=>{m.sys=[600,690];}},
- {id:'tang',w:1,n:'Tangenziale bloccata',txt:'Un tir di polli ha chiuso la Tangenziale Est. Non è una metafora.',fx:m=>{m.dist.tang=.2;m.dist.res=.6;m.dist.ind=.7;}},
- {id:'caldo',w:.8,n:'Caldo',txt:'Ondata di caldo. Il condizionatore è «in revisione» dal 2019.',ok:m=>m.mon>=4&&m.mon<=8,fx:m=>{m.heat=true;m.pat*=.9;}},
- {id:'isp',w:.8,n:'Ispettore',txt:'Oggi passa l’ispettore sotto copertura. Nessuno sa chi sia. Probabilmente quello che chiede informazioni.',fx:m=>{m.ins=true;}},
- {id:'derby',w:.9,n:'Derby',txt:'Derby cittadino: mezza Cenide è al bar a guardare la partita.',fx:m=>{m.arr*=.78;}},
- {id:'pioggia',w:1,n:'Pioggia',txt:'Pioggia battente: tutti entrano per ripararsi, pochi per spedire. La sala è un acquario.',fx:m=>{m.arr*=1.2;m.pat*=.92;}},
- {id:'tabacchi',w:.9,n:'POS in blocco di fronte',txt:'Il POS del TabacchInes di fronte è fuori uso: i bollettini arrivano tutti da te.',fx:m=>{m.tb.A*=1.6;}},
- {id:'influ',w:.7,n:'Influencer',txt:'Un influencer ha promesso un video su «la fila più lunga di Cenide». Vuole il record.',fx:m=>{m.arr*=1.25;m.pat*=.95;}}];
-
-/* incidenti a metà giornata */
-const INCS={
- furbetto:{n:'Il furbetto della fila',txt:'Un uomo in giacca si avvicina allo sportello: «{T}, sono solo due secondi, devo solo timbrare una cosa». Non ha il ticket. La sala lo guarda.',
-  o:()=>{const o=[
-   {l:'Lo rimandi in coda',h:'la sala applaude (a bassa voce)',fx(){adjRep(.9);log('Cliente che cercava di passare avanti rimandato in coda.','good');}},
-   {l:'Lo servi: «due secondi»',h:'ne passano nove, la coda lo nota',fx(){S.queue.forEach(c=>c.wait+=7);addCash(6,'rev');adjRep(-.9);log('Cliente servito passando avanti: la coda aspetta 7 minuti in più.','bad');}}];
-   if(S.upg.sicur)o.push({l:'Chiami il vigilante',h:'lo accompagna in fondo',fx(){adjRep(1.4);log('Il vigilante riporta in fondo alla coda il cliente che passava avanti.','good');}});
-   return o;}},
- influ:{n:'L’influencer in sala',txt:'Una ragazza filma la sala d’attesa con il telefono: «Ragazzi, eccoci alla fila del secolo». Ti chiede un commento: «{T}, una parola per i miei follower?»',
-  o:()=>[
-   {l:'Le chiedi di smettere',h:'può andare bene o male',fx(){if(chance(.5)){adjRep(1.2);log('L’influencer ha pubblicato un video positivo sull’ufficio.','good');}else{adjRep(-1.8);log('L’influencer ha pubblicato un video negativo sull’ufficio.','bad');}}},
-   {l:'Sorridi in camera',h:'visibilità, ma la coda guarda',fx(){S.queue.forEach(c=>c.wait+=3);adjRep(1.5);log('Hai sorriso in camera: video positivo, la coda aspetta 3 minuti in più.','good');}},
-   {l:'Fai finta di niente',h:'nessun effetto',fx(){log('L’influencer se ne va senza pubblicare nulla.','info');}}]},
- lettera:{n:'La lettera del 1987',txt:'Una signora ti ferma: «{T}, mi scusi, è arrivata una lettera spedita nel 1987?» Non ha il numero della raccomandata. Ha però molta voglia di raccontarti l’intera storia.',
-  o:()=>[
-   {l:'Cerchi nei registri',h:'la coda aspetta 5 minuti, lei è commossa',fx(){S.queue.forEach(c=>c.wait+=5);adjRep(1);log('Lettera non trovata: la cliente ti ringrazia comunque.','good');}},
-   {l:'Le offri un caffè e le spieghi con tatto',h:'2 minuti, stima eterna',fx(){S.queue.forEach(c=>c.wait+=2);adjRep(.6);log('La cliente esce soddisfatta della spiegazione.','good');}},
-   {l:'La inviti a fare reclamo',h:'veloce, un po’ freddo',fx(){adjRep(-.7);S.st.angry++;log('La cliente scrive un reclamo sul libro dei reclami.','warn');}}]}};
+const EVS=[];
+const INCS={};
 
 const UPGS=[
  {id:'sp',n:'Nuovo sportello',max:7,cost:[600,1400,2800,5000,8000,11000,15000],gate:l=>l>=4&&!S.upg.reno?'Oltre 5 sportelli serve la ristrutturazione dell’ufficio':'',d:'',eff:l=>`${l+1} sportelli`},
@@ -866,19 +823,19 @@ const UPGS=[
  {id:'app',n:'App ContoPosta',max:1,cost:[1800],d:'Prenoti il ticket da casa: gli arrivi si distribuiscono meglio e arrivano più clienti.',eff:l=>l?'+12% clienti, meno picchi':'—'}];
 
 const POOL=[
- {id:'pas',name:'Pasquale Mancuso',role:'Il Ritardatario',sp:'B',spd:.95,wage:48,hire:260,late:35,abs0:.04,prb:1},
- {id:'con',f:1,name:'Concetta Sempreinferie',role:'Specialista pacchi',sp:'P',spd:1.05,wage:60,hire:420,late:0,abs0:.14,prb:1},
- {id:'gig',name:'Gigi il Precario',role:'Veloce e distratto',sp:'C',spd:1.15,wage:46,hire:330,late:0,abs0:.03,prb:1.5},
- {id:'fab',name:'Rag. Fabrizio Cavilli',role:'Scrupoloso',sp:'B',spd:1,wage:70,hire:650,late:0,abs0:.04,prb:.4},
- {id:'mar',f:1,name:'Marilena Previdenza',role:'Regina delle pensioni',sp:'F',spd:1.2,wage:78,hire:700,late:0,abs0:.05,prb:.8},
- {id:'ros',f:1,name:'Rosaria la Veterana',role:'Ha visto tre riforme',sp:'P',spd:1.3,wage:105,hire:1400,late:0,abs0:.08,prb:.7},
- {id:'ila',f:1,name:'Ilaria la Stagista',role:'Sorride e impara',sp:'C',spd:1.05,wage:40,hire:200,late:20,abs0:.03,prb:1.3},
- {id:'ott',name:'Dott. Ottavio Polizza',role:'Consulente finanziario',sp:'E',spd:1.2,wage:92,hire:1100,late:0,abs0:.05,prb:.6},
- {id:'lia',f:1,name:'Lia Notifica',role:'Esperta di passaporti',sp:'F',spd:1.2,wage:88,hire:1000,late:0,abs0:.05,prb:.6}];
+ {id:'pas',name:'Pasquale Mancuso',sp:'B',spd:.95,wage:48,hire:260,late:35,abs0:.04,prb:1},
+ {id:'con',f:1,name:'Concetta Greco',sp:'P',spd:1.05,wage:60,hire:420,late:0,abs0:.14,prb:1},
+ {id:'gig',name:'Luigi Ferrara',sp:'C',spd:1.15,wage:46,hire:330,late:0,abs0:.03,prb:1.5},
+ {id:'fab',name:'Fabrizio Bianchi',sp:'B',spd:1,wage:70,hire:650,late:0,abs0:.04,prb:.4},
+ {id:'mar',f:1,name:'Marilena Costa',sp:'F',spd:1.2,wage:78,hire:700,late:0,abs0:.05,prb:.8},
+ {id:'ros',f:1,name:'Rosaria Esposito',sp:'P',spd:1.3,wage:105,hire:1400,late:0,abs0:.08,prb:.7},
+ {id:'ila',f:1,name:'Ilaria Romano',sp:'C',spd:1.05,wage:40,hire:200,late:20,abs0:.03,prb:1.3},
+ {id:'ott',name:'Ottavio Conti',sp:'E',spd:1.2,wage:92,hire:1100,late:0,abs0:.05,prb:.6},
+ {id:'lia',f:1,name:'Lia Marino',sp:'F',spd:1.2,wage:88,hire:1000,late:0,abs0:.05,prb:.6}];
 const exc=()=>chance(.1)?'è in permesso sindacale':chance(.5)?'è in malattia':'è in ferie';
 const RK=[8500,80000,275000,590000];
 const RANKS=[[0,'Videoterminalista Junior (liv. E)'],[RK[0],'Videoterminalista (liv. D)'],[RK[1],'Sportellista (liv. C)'],[RK[2],'Collaboratore (liv. B)'],[RK[3],'Direttore UP (liv. A)']];
-const ANGRY=['«Io qui non ci metto più piede.» (Tornerà giovedì.)','«{T}, così non va!» (Ha ragione, ma se ne va lo stesso.)','«Lo dirò a {N}!» Non sa che {N} sei tu.','«Così ci vuole una settimana!» (Aveva ragione.)','«Chiamerò chi di dovere.» (Non esiste.)','«Qui non cambia mai niente.» Intanto se ne va lui.','«Mi fa un reclamo.» «Lo faccia pure.» «Dov’è?» Se ne va comunque.'];
+const ANGRY=['«Io qui non ci metto più piede.»','«{T}, così non va!»','«Così ci vuole una settimana!»','«Chiamerò chi di dovere.»','«Qui non cambia mai niente.»','«Mi fa un reclamo.» «Lo faccia pure.» «Dov’è?»'];
 
 /* ---------- stato ---------- */
 let S=null;
@@ -946,7 +903,7 @@ function subDay(){
 function prepDay(){
   S.today=calcMods();S.today.N=expected()*1.3;
   S.today.rob=S.day>=5&&chance(.006)?{at:ri(OPEN+40,CLOSE-40),done:false}:null;
-  S.carryIn=S.carry||{};S.carry={};S.clN={};S.cls={};S.queue=[];S.fight=null;S.dogEv=null;S.tk=ZERO();S.t=OPEN0;S.uOpen=false;S.phase='pre';S.speed=0;
+  S.carryIn=S.carry||{};S.carry={};S.clN={};S.cls={};S.queue=[];S.back=[];S.fight=null;S.dogEv=null;S.tk=ZERO();S.t=OPEN0;S.uOpen=false;S.phase='pre';S.speed=0;
   S.counters.forEach(k=>k.cur=null);
   S.st={served:0,left:0,sent:0,rev:0,cost:0,ot:0,fines:0,angry:0,byType:ZERO(),rep0:S.rep,inspect:null,lk:0,info:0,maint:0,pass:0,pp:0,ppb:0,opsMe:0,tk:0};
   S.lkDown=!!S.upg.locker&&chance(.04);S.angoloAbs=!!S.angolo&&chance(.05);
@@ -958,7 +915,7 @@ function prepDay(){
   else{S.ppActive=false;if(S.day>=3&&chance(.05)){S.ppCamp={left:2};S.ppActive=true;log('PostaPhone lancia la promo «Tre giorni, tutto doppio»: per 3 giorni le tue commissioni sulle sue operazioni raddoppiano.','good');}}
   if(S.pcCamp&&S.pcCamp.left>0){S.pcCamp.left--;S.pcActive=true;}
   else{S.pcActive=false;if(S.day>=4&&chance(.05)){S.pcCamp={left:2};S.pcActive=true;log('Promo «Tre giorni, carta + SIM»: chi fa una nuova PostalCard riceve una SIM PostaPhone inclusa.','good');}}
-  S.apptToday=S.appts.filter(a=>a.off===S.off).map(a=>({kind:a.kind||'pol',at:ri(540,760),done:false,show:!chance(.12)}));
+  S.apptToday=S.appts.filter(a=>a.off===S.off).map(a=>({kind:a.kind||'pol',at:ri(540,760),done:false,show:!chance(.01)}));
   S.appts=S.appts.filter(a=>a.off>S.off);
   subDay();
   if(S.fault&&S.fault.open){
@@ -983,22 +940,22 @@ const EUC=['in Germania','in Francia','in Spagna','in Svizzera','in Austria','ne
 const WLD=['negli Stati Uniti','in Giappone','in Brasile','in Australia','in Canada','in Argentina','in India','in Cina','in Sudafrica','in Messico','in Corea del Sud','in Egitto','nel Regno Unito','in Turchia'];
 const LONGP=new Set(['cap','lba','psg','fin','cpa','cpc','pcn','spid','spr','buo','pas','polc','poli','polv','pola','sim','lin']);
 const PAYP=new Set(['bon','bol','bau','f24','pagopa','pcr','tel','vag','scw']);
-const DOCP=new Set(['cap','bon','lba','psg','vagi','fin','spid','spr','pcr','scw','rar','par','buo','lbv','lbp','pen','cpa','cpc','cpp','cpv','pcn','pcp','cva','polc','poli','polv','pola','pas','att']);
+const DOCP=new Set(['cap','bon','lba','psg','vagi','fin','spid','spr','pcr','scw','rar','par','buo','lbv','lbp','pen','cpa','cpc','cpp','cpv','cpi','pcn','pcp','cva','polc','poli','polv','pola','pas','att']);
 const PTYPE={lba:'D',vagi:'A',fin:'E',pao:'B',spid:'C',spr:'C',r1:'B',ree:'B',asc:'B',ase:'B',poi:'B',poe:'B',vag:'A',scw:'A',tgm:'B',rar:'B',par:'B',bol:'A',pa3:'B',paeu:'B',pari:'B',paic:'B',rac:'B',fra:'B',tel:'C',sim:'C',lin:'C',pcr:'C',pcn:'C',pcp:'C',cpa:'C',cpc:'C',cpp:'C',cpv:'C',pen:'D',lbv:'D',lbp:'D',buo:'D',polc:'E',poli:'E',polv:'E',pola:'E',bau:'A',f24:'A',pagopa:'A',cva:'A',att:'F',not:'F',pas:'F',psg:'C',trk:'B',rra:'B',pco:'B',cap:'B',bon:'C',frc:'B',fol:'B',bu1:'B',bu2:'B',bu3:'B',sc1:'B',sc2:'B',sc3:'B',spn:'B',stz:'B',slb:'B',ssc:'B',crt:'B'};
 const COMBO={pa3:['rac'],pae:['rac'],paeu:['rac'],pari:['rac'],paic:['rac'],rac:['pa3','fra'],fra:['rac'],pen:['lbv'],lbv:['pen'],buo:['lbv'],cpp:['pcr'],pcn:['pcr'],sim:['ppt']};
 const rk=n=>Math.round(n/10)*10;
 const SHIP=new Set(['pa3','pao','paeu','pari','paic','rac','r1','ree','asc','ase','poi','poe','rra','pco']);
-const GRP={rra:'s',pco:'s',frc:'s',fol:'s',bon:'b',lba:'p',pao:'s',spid:'t',spr:'t',r1:'s',ree:'s',asc:'s',ase:'s',poi:'s',poe:'s',pa3:'s',paeu:'s',pari:'s',paic:'s',rac:'s',fra:'s',tgm:'s',cpv:'b',cva:'b',cpp:'b',pcr:'b',pcp:'b',pcn:'b',cpc:'b',vag:'b',vagi:'b',scw:'b',pen:'p',lbv:'p',lbp:'p',buo:'p',tel:'t',sim:'t',lin:'t'};
+const GRP={rra:'s',pco:'s',frc:'s',fol:'s',bon:'b',lba:'p',pao:'s',spid:'t',spr:'t',r1:'s',ree:'s',asc:'s',ase:'s',poi:'s',poe:'s',pa3:'s',paeu:'s',pari:'s',paic:'s',rac:'s',fra:'s',tgm:'s',cpv:'b',cpi:'b',cva:'b',cpp:'b',pcr:'b',pcp:'b',pcn:'b',cpc:'b',vag:'b',vagi:'b',scw:'b',pen:'p',lbv:'p',lbp:'p',buo:'p',tel:'t',sim:'t',lin:'t'};
 const PCLS={pens:'old',risp:'old',giov:'young',nodoc:'young',vint:'biz',comm:'biz',noto:'biz',avv:'biz',bollo:'fam',tur:'tur',coll:'coll',info:'gen'};
 const PDIST={young:[.55,.28,.13,.04],old:[.7,.22,.07,.01],biz:[.52,.28,.14,.06],fam:[.58,.28,.11,.03],tur:[.6,.28,.1,.02],coll:[.85,.15,0,0],gen:[.62,.26,.1,.02]};
 const PROF0=1;const PROF={
- young:{tel:1.3,sim:.3,pcr:.9,pcn:.35,pcp:.3,cpv:.6,cpp:.6,cpc:.2,pa3:1.2,paeu:.3,pari:.12,paic:.08,rac:.3,fra:.04,bol:.3,vag:.1,scw:.08,tgm:.03,par:.08,rar:.08},
- old:{pen:1,lbv:.7,lbp:.5,buo:.3,fra:.45,rac:.35,rar:.2,bol:.7,tel:.1,pcr:.15,cpv:.15,cpp:.15,vag:.15,tgm:.1,pa3:.15,par:.06,lin:.04},
- biz:{pa3:1.5,paeu:.35,pari:.15,paic:.1,rac:1,fra:.2,bol:.5,vag:.1,scw:.05,cpv:.2,rar:.12},
- fam:{bol:1.2,pcr:.3,tel:.4,cpv:.3,cpp:.3,rac:.2,fra:.1,pa3:.2,lbv:.15},
+ young:{tel:1.3,sim:.3,pcr:.9,pcn:.35,pcp:.3,cpv:.6,cpi:.1,cpp:.6,cpc:.2,pa3:1.2,paeu:.3,pari:.12,paic:.08,rac:.3,fra:.04,bol:.3,vag:.1,scw:.08,tgm:.03,par:.08,rar:.08},
+ old:{pen:1,lbv:.7,lbp:.5,buo:.3,fra:.45,rac:.35,rar:.2,bol:.7,tel:.1,pcr:.15,cpv:.15,cpi:.1,cpp:.15,vag:.15,tgm:.1,pa3:.15,par:.06,lin:.04},
+ biz:{pa3:1.5,paeu:.35,pari:.15,paic:.1,rac:1,fra:.2,bol:.5,vag:.1,scw:.05,cpv:.2,cpi:.15,rar:.12},
+ fam:{bol:1.2,pcr:.3,tel:.4,cpv:.3,cpi:.1,cpp:.3,rac:.2,fra:.1,pa3:.2,lbv:.15},
  tur:{pa3:.1,paeu:.9,pari:.7,paic:.5,tel:.6,sim:.4,pcn:.2,scw:.3,rac:.1,vag:.1,fra:.15,tgm:.1},
  coll:{fra:1,rac:.2},
- gen:{bol:.4,rac:.3,pa3:.3,tel:.4,pcr:.3,pen:.2,lbv:.2,fra:.1,cpv:.2,cpp:.2,vag:.08,tgm:.05}};
+ gen:{bol:.4,rac:.3,pa3:.3,tel:.4,pcr:.3,pen:.2,lbv:.2,fra:.1,cpv:.2,cpi:.08,cpp:.2,vag:.08,tgm:.05}};
 PROF.biz.rra=.12;PROF.biz.pco=.15;PROF.gen.rra=.02;PROF.coll.frc=.5;PROF.coll.fol=.2;PROF.gen.bon=.05;PROF.young.bon=.08;PROF.fam.bon=.1;PROF.biz.bon=.1;PROF.old.cva=.03;PROF.fam.cva=.05;PROF.biz.cva=.05;PROF.young.cva=.08;PROF.gen.cva=.04;PROF.tur.cva=.5;PROF.old.f24=.05;PROF.biz.f24=.4;PROF.fam.f24=.1;PROF.gen.f24=.05;PROF.old.pagopa=.2;PROF.fam.pagopa=.5;PROF.biz.pagopa=.25;PROF.gen.pagopa=.2;PROF.young.pagopa=.1;PROF.old.bau=.15;PROF.fam.bau=.5;PROF.biz.bau=.2;PROF.gen.bau=.1;PROF.young.bau=.05;PROF.old.spid=.12;PROF.old.spr=.08;PROF.gen.spid=.01;PROF.gen.spr=.01;
 for(const k in PROF){if(PROF[k].vag){PROF[k].vagi=PROF[k].vag;PROF[k].vag*=.6;}}
 for(const k in PROF){if(PROF[k].pa3){PROF[k].pao=.25*PROF[k].pa3;}const w=PROF[k].rac;if(w){const t=k==='tur'?2:1;PROF[k].r1=.2*w;PROF[k].ree=.1*w*t;PROF[k].asc=.03*w;PROF[k].ase=.04*w*t;PROF[k].poi=.05*w;PROF[k].poe=.02*w*t;}}
@@ -1053,7 +1010,7 @@ function pickProd(type,a){
     if(a.id==='comm'||a.id==='vint'){w.rra*=2;w.pco*=a.id==='vint'?5:2;w.cap*=3;w.rac*=.5;w.fra*=.3;w.rar*=.3;w.par*=.3;w.pa3*=2.2;w.pao*=2.2;}
     return W(w);}
   if(type==='C'){
-    const old=a.id==='pens'||a.id==='risp',w={spid:0,spr:0,tel:.27,sim:.06,lin:.03,bon:.05,pcr:.2,pcn:.1*(S.pcActive?4:1),pcp:.07,cpv:.1,cpp:.1,cpc:.07,cpa:.03};
+    const old=a.id==='pens'||a.id==='risp',w={spid:0,spr:0,tel:.27,sim:.06,lin:.03,bon:.05,pcr:.2,pcn:.1*(S.pcActive?4:1),pcp:.07,cpv:.1,cpi:.04,cpp:.1,cpc:.07,cpa:.03};
     if(a.id==='giov'){w.tel=.6;w.sim=.15;w.cpv*=.3;w.cpp*=.3;w.cpc*=.3;}
     return W(w);}
   if(type==='D'){
@@ -1107,7 +1064,7 @@ const monthEst=()=>{const a=accI();return Math.round((a.m*8+(a.ym[a.mi%12]||0)*3
 function monthIncome(){const a=accI(),c1=a.m*8+(a.ym[a.mi%12]||0)*30,c2=a.l*24.9;let c3=0;a.loans.forEach(l=>{const it=l.bal*.099/12;c3+=it*(l.q||LQ);l.bal=Math.max(0,l.bal-(l.rata-it));l.left--;});a.loans=a.loans.filter(l=>l.left>0);a.mi++;const tot=Math.round((c1+c2+c3)*100)/100;if(tot>0){S.cash+=tot;S.vault=Math.round(((S.vault||0)+tot)*100)/100;S.life+=tot;log(`Entrate del mese in cassaforte: ${eur(tot,2)} (canoni conto ${eur(c1,2)}, linee di casa ${eur(c2,2)}, quota interessi finanziamenti ${eur(c3,2)}).`,'good');}}
 const libMem=()=>accI().reg.filter(r=>r.lib!=null);
 const skBal=()=>Math.round((Math.random()<.9?10000*Math.pow(Math.random(),2.2):10000+140000*Math.pow(Math.random(),2.5))*100)/100;
-function accGen(q){const its=q.items||[],ps=its.map(i=>i.prod),hasC=ps.some(p=>['cpv','cpp','cpc'].includes(p)),hasL=ps.some(p=>['lbv','lbp'].includes(p)),nw=ps.includes('cpa'),nl=ps.includes('lba'),fn=its.find(i=>i.fin);
+function accGen(q){const its=q.items||[],ps=its.map(i=>i.prod),hasC=ps.some(p=>['cpv','cpi','cpp','cpc'].includes(p)),hasL=ps.some(p=>['lbv','lbp'].includes(p)),nw=ps.includes('cpa'),nl=ps.includes('lba'),fn=its.find(i=>i.fin);
  if(!(hasC||hasL||nw||nl||fn))return;
  const A=accI(),cc={};
  if(nw)cc.nw=1;if(nl)cc.nl=1;if(fn)cc.fin=fn.fin;
@@ -1126,7 +1083,7 @@ const accPills=c=>{const a=c&&c.cc;if(!a)return '';let h='';
  if(a.lib!=null)h+=` <span class="pill good">libretto - saldo ${eur(a.lib,2)}</span>`;
  if(a.fin)h+=` <span class="pill info">finanziamento ${eur(a.fin.amt)} in ${a.fin.mo>=24&&a.fin.mo%12===0?a.fin.mo/12+' anni':a.fin.mo+' mesi'} · rata ${eur(a.fin.rata,2)} · TAN 9,90% · TAEG 10,42%</span>`;
  return h;};
-const FIXP=new Set(['bu1','bu2','bu3','sc1','sc2','sc3','spn','stz','slb','ssc','crt','att','vagi','cpc','fra','cva','psg','cap','frc','pco','sim','scw','pcr','pcp','pcn','pen','cpv','cpp','lbv','lbp','cpa','lba','buo','spid','spr','tgm','bon','rar','par','tel','lin','fol','polc','poli','polv','pola']);
+const FIXP=new Set(['bu1','bu2','bu3','sc1','sc2','sc3','spn','stz','slb','ssc','crt','att','vagi','cpc','fra','cva','psg','cap','frc','pco','sim','scw','pcr','pcp','pcn','pen','cpv','cpi','cpp','lbv','lbp','cpa','lba','buo','spid','spr','tgm','bon','rar','par','tel','lin','fol','polc','poli','polv','pola']);
 function mkProd(prod,a,qty,forceOp){
   let det,fee,base,pass=0,uq=qty,op=null,hi=1.8;const x={};
   switch(prod){
@@ -1155,11 +1112,11 @@ function mkProd(prod,a,qty,forceOp){
    case 'spr':{uq=1;pass=20;det='rinnovare lo SPID (devo pagare)';fee=6;base=4;break;}
    case 'rar':{const q=qty;uq=q;det=q>1?'ritirare due raccomandate (ho gli avvisi nella cassetta)':'ritirare una raccomandata (ho l’avviso nella cassetta)';fee=0;base=2.4*q;break;}
    case 'par':{const q=qty;uq=q;det=q>1?'ritirare due pacchi (ho gli avvisi)':'ritirare un pacco (ho l’avviso)';fee=0;base=3*q;break;}
-   case 'tgm':{uq=1;det=`spedire un telegramma a ${pick(CITIES)} ${pick(['per gli auguri','per le condoglianze','per un anniversario','per una laurea','per un compleanno'])}`;fee=pick([4.97,7.12,10.74]);base=3;break;}
+   case 'tgm':{uq=1;det='spedire un telegramma';fee=pick([4.97,7.12,10.74]);base=3;break;}
    case 'vag':{uq=1;pass=amtDen();det=`fare un vaglia da ${pass} €`;fee=12;base=4;break;}
    case 'scw':{uq=1;pass=scwAmt();const c=wpick(SCWC,x=>x[2]);det=`mandare ${pass} € ${c[0]}`;fee=scwFee(pass,c[0]);base=5;break;}
    case 'vagi':{uq=1;const m=amtDen();det=`incassare un vaglia da ${m} € (mi date un assegno)`;x.chk=m;fee=12;base=3.5;break;}
-   case 'psg':{uq=1;pass=146.46;det=pick(['fare il permesso di soggiorno','fare il permesso di soggiorno (ho passaporto e contratto)','rinnovare il permesso di soggiorno']);fee=30;base=7;hi=3;break;}
+   case 'psg':{uq=1;pass=146.46;det='fare il permesso di soggiorno';fee=30;base=7;hi=3;break;}
    case 'trk':{uq=1;const T=genTrack();x.trk=T;det=T.kind==='rac'?pick(['sapere dov’è la mia raccomandata (non è mai arrivata)','controllare una raccomandata che aspetto da giorni','sapere che fine ha fatto la raccomandata che mi hanno annunciato']):pick(['sapere dov’è il mio pacco (non è ancora arrivato)','controllare dove si trova il pacco che aspetto','sapere che fine ha fatto il pacco che ho ordinato']);fee=0;base=3;break;}
    case 'fin':{uq=1;det='chiedere un finanziamento';fee=0;base=2;x.fin=finGen();break;}
    case 'fra':{const n=Math.min(10,qty*3);uq=n;det=`comprare ${n} francobolli`;fee=1.3*n;base=.7*n;break;}
@@ -1169,6 +1126,7 @@ function mkProd(prod,a,qty,forceOp){
    case 'pcr':{const q=Math.min(qty,3);uq=q;det=q>1?`fare ${q} ricariche della PostalCard`:'ricaricare la PostalCard';fee=1*q;base=4*q;for(let i=0;i<q;i++)pass+=ri(10,80);break;}
    case 'pcn':{const pr=!!S.pcActive;uq=1;det='fare una nuova PostalCard'+(pr?' (ho visto la promo con la SIM)':'');fee=20+(pr?5:0);base=7+(pr?2:0);if(pr){x.sim=true;x.simFee=5;}break;}
    case 'pcp':{uq=1;const m=rk(ri(30,250));det=`prelevare ${m} € dalla PostalCard`;x.out=m;fee=1;base=3.5;break;}
+   case 'cpi':{uq=1;pass=rk(ri(100,1500));det=`incassare un assegno da ${pass} € e versarli sul conto`;fee=0;base=4;break;}
    case 'cpv':{uq=1;pass=rk(ri(50,600));det=`versare ${pass} € sul conto`;fee=0;base=3.5;break;}
    case 'cpp':{uq=1;const m=rk(ri(40,400));det=`prelevare ${m} € dal conto`;x.out=m;fee=0;base=3.5;break;}
    case 'cpc':{uq=1;det='fare la carta ContoPosta';fee=0;base=6;break;}
@@ -1180,7 +1138,7 @@ function mkProd(prod,a,qty,forceOp){
    case 'buo':{uq=1;det=`sottoscrivere un buono postale da ${pick([500,1000,1500,2000,3000,5000]).toLocaleString('it-IT')} € per ${pick(['mio nipote','mia nipote','mio figlio','mia figlia','la mia nipotina'])}`;fee=0;base=13;hi=2.8;break;}
    case 'rra':{const q=qty;uq=q;det=`spedire ${q>1?q+' raccomandate con ricevuta di ritorno':'una raccomandata con ricevuta di ritorno'}`;fee=Math.round((tarSum(TAR_RC,q)+1.05*q)*100)/100;base=3.2*q;break;}
    case 'pco':{const q=Math.min(qty,2);uq=q;const m=ri(2,18)*5;det=`spedire ${q>1?q+' pacchi':'un pacco'} in contrassegno (il destinatario paga ${m*q} €)`;fee=3.05*q+(chance(.8)?pa5Sum(q):paoSum(q));base=4.4*q;break;}
-   case 'cap':{uq=1;det=pick(['aprire una casella postale','prendere una casella postale per la mia attività','aprire una casella postale per un anno']);fee=125;base=6;hi=3;break;}
+   case 'cap':{uq=1;det='aprire una casella postale';fee=125;base=6;hi=3;break;}
    case 'bon':{uq=1;pass=amtDen();det=`fare un bonifico da ${pass} €`;fee=1;base=3.8;break;}
    case 'frc':{const q=qty;uq=q;det=`comprare ${q>1?q+' francobolli da collezione':'un francobollo da collezione'}, ${pick(['la serie commemorativa dell’anno','l’emissione celebrativa','la serie «Borghi d’Italia»','l’emissione sui trasporti storici','la serie sugli uccelli'])}`;fee=8*q;base=.9*q;break;}
    case 'fol':{const q=qty;uq=q;det=`comprare ${q>1?q+' folder filatelici':'un folder filatelico'}`;fee=ri(19,25)*q;base=1.2*q;break;}
@@ -1191,7 +1149,7 @@ function mkProd(prod,a,qty,forceOp){
    case 'stz':{uq=1;det='comprare una tazza con il logo';fee=8;base=.5;break;}
    case 'slb':{uq=1;det='comprare un libro sui francobolli';fee=15;base=.7;break;}
    case 'ssc':{uq=1;det='comprare un rotolo di scotch per pacchi';fee=3.8;base=.4;break;}
-   case 'att':{const q=Math.min(qty,3);uq=q;det=q>1?`ritirare ${q} atti giudiziari (sono in giacenza)`:'ritirare un atto giudiziario (è in giacenza)';fee=tarSum(TAR_ATT,q);base=3.5*q;break;}
+   case 'att':{const q=Math.min(qty,3);uq=q;det=q>1?`ritirare ${q} atti giudiziari`:'ritirare un atto giudiziario';fee=tarSum(TAR_ATT,q);base=3.5*q;break;}
    default:det='una cosa che non esiste';fee=1;base=1;
   }
   return Object.assign({type:PTYPE[prod],prod,op,qty:uq,det,fee:fee*((FIXP.has(prod)||prod==='poi'||prod==='rac'||prod==='asc'||prod==='rra'||prod==='ree'||prod==='pao'||prod==='ase'||prod==='poe'||prod==='paic'||prod==='pari'||prod==='paeu'||prod==='pa3'||prod==='r1'||prod==='bol'||prod==='bau'||prod==='f24'||prod==='pagopa'||prod==='vag')?1:a.pay),pass,base:clamp(base*a.slow*rnd(.8,1.25)*.25,.5,hi),done:false,doc:DOCP.has(prod)||(op==='pp'&&(prod==='sim'||prod==='lin'))},x);
@@ -1355,7 +1313,7 @@ function genDocPsg(c){
   const d=dt0(S.off+(kind==='exp'?-ri(3,300):ri(60,1800)));
   const stu=chance(.25),ind=!stu&&chance(.35),ce=dt0(S.off+(kind==='conexp'?-ri(3,200):ri(30,700)));
   const con=kind==='nocon'?null:{tp:stu?'stu':'lav',ent:stu?pick(['Università di Cenide','Istituto tecnico «Fermi»','Accademia di Belle Arti','Scuola di formazione Cenide']):pick(['Edil Rossi S.r.l.','Cooperativa Sole','Ristorante Da Gino','Azienda agricola Bianchi','Casa di riposo San Luigi','Impresa di pulizie Lucida']),ind,exp:ind?null:fmtD(ce)};
-  return {kind,tp:'pasf',nat:pick(NAZ),num:L()+L()+ri(1000000,9999999),exp:fmtD(d),p,con};
+  return {kind,tp:'pasf',nat:pick(NAZ.filter(x=>x!=='Romania')),num:L()+L()+ri(1000000,9999999),exp:fmtD(d),p,con};
 }
 function genDoc(c){
   if(c.items&&c.items.some(i=>i.prod==='psg'))return genDocPsg(c);
@@ -1410,13 +1368,18 @@ function tryCall(k,manual){const c=pickFor(k);if(c)callCustomer(k,c,manual);retu
 function pickProblem(c){
   if(c.lang===1)return 'lingua';
   if(c.arch==='vint'&&c.type==='P'&&chance(.6))return 'grande';
-  if(c.arch==='bollo'&&c.type==='B'&&chance(.5))return 'scaduto';
   return pick(Object.keys(PROBS).filter(id=>PROBS[id].for.includes(c.type)));
+}
+function sendHome(k,c){
+  S.st.sent++;
+  const rem=(c.items||[]).filter(i=>!i.done);
+  if(rem.length&&chance(.5)){S.back=S.back||[];S.back.push({t:S.t+ri(25,70),c:Object.assign({},c),rem});}
+  k.cur=null;k.menu=null;
 }
 function applyOpt(k,i){
   const c=k.cur,p=PROBS[c.problem.id],o=p.o[i];
   c.problem.done=true;
-  if(o.go){if(k.who==='tu')angryAt(c,.7);S.st.sent++;adjRep(o.r||0);log(o.msg?`${c.name} (${c.tk}) aveva il documento di un’altra persona: mandato via senza servizio.`:`${c.name} (${c.tk}) viene rimandato a casa: ${c.det} non spediti.`,'warn');k.cur=null;return;}
+  if(o.go){if(o.msg){if(k.who==='tu')angryAt(c,.7);S.st.sent++;adjRep(o.r||0);log(`${c.name} (${c.tk}) aveva il documento di un’altra persona: mandato via senza servizio.`,'warn');k.cur=null;return;}sendHome(k,c);return;}
   c.left+=o.x||0;c.total+=o.x||0;if(c.act)c.itemLeft+=o.x||0;if(o.f)c.feeMul*=o.f;
   if(o.c)addCash(o.c,o.c<0?'fines':'rev');
   adjRep(o.r||0);
@@ -1435,7 +1398,7 @@ function finish(k){
       if(it.prod==='cpa'){m.bal=m.bal||0;if(chance(.65))ac.m++;else ac.ym[ac.mi%12]++;}else m.lib=m.lib||0;}
     if(it.prod==='lin')ac.l++;if(it.fin)ac.loans.push({bal:it.fin.amt,rata:it.fin.rata,left:it.fin.mo,q:finQ(it.fin.mo)});}
    const mm=c.cc&&c.cc.mid?ac.reg.find(r=>r.id===c.cc.mid):null;
-   if(mm){for(const it of c.items||[]){if(it.prod==='cpv')mm.bal+=it.pass||0;else if(it.prod==='cpp')mm.bal-=it.out||0;else if(it.prod==='lbv')mm.lib+=it.pass||0;else if(it.prod==='lbp')mm.lib-=it.out||0;}mm.bal=mm.bal==null?null:Math.round(Math.max(0,mm.bal)*100)/100;mm.lib=mm.lib==null?null:Math.round(Math.max(0,mm.lib)*100)/100;}}
+   if(mm){for(const it of c.items||[]){if(it.prod==='cpv'||it.prod==='cpi')mm.bal+=it.pass||0;else if(it.prod==='cpp')mm.bal-=it.out||0;else if(it.prod==='lbv')mm.lib+=it.pass||0;else if(it.prod==='lbp')mm.lib-=it.out||0;}mm.bal=mm.bal==null?null:Math.round(Math.max(0,mm.bal)*100)/100;mm.lib=mm.lib==null?null:Math.round(Math.max(0,mm.lib)*100)/100;}}
   S.st.inc=(S.st.inc||0)+fee+Math.max(0,pass);addCash(fee,'rev');S.cash+=pass;S.st.pass=(S.st.pass||0)+pass;if(cp&&pass>0)S.vault=Math.round(((S.vault||0)+pass)*100)/100;S.life+=fee;S.st.served++;S.servedTot++;S.st.byType[c.type]++;
   const ppi=(c.items||[]).filter(i=>i.op==='pp'||i.sim),npp=ppi.length;
   if(npp){
@@ -1473,10 +1436,18 @@ function insult(c,where){
   log(`${c.name} (${c.tk}) ${where==='cnt'?'ti insulta allo sportello':'insulta l’operatore dalla sala'}: ${tx}`,'bad');
   toast(`${c.tk}: ${tx}`,'bad');
 }
+function backCust(){
+  if(!S.back||!S.back.length||!S.uOpen)return;
+  for(const b of S.back.slice()){if(S.t<b.t)continue;S.back=S.back.filter(x=>x!==b);if(S.t>=CLOSE-15)continue;
+    const its=b.rem.map(i=>Object.assign({},i,{done:false})),TL=tkLetter(its),n=++S.tk[TL],sum=k=>its.reduce((a,i)=>a+(i[k]||0),0),q=Object.assign({},b.c);
+    ['doc','docOk','feeMul','total','left','hasProb','probAt','problem','ntOk','prodOk','opOk','qtyOk','act','itemLeft','cnt','ask','_ent'].forEach(f=>{delete q[f];});
+    Object.assign(q,{items:its,tk:TL+String(n).padStart(3,'0'),noTk:false,type:TL,wait:0,det:its.map(i=>i.det).join(' + '),qty:its[0].qty,pass:sum('pass'),fee:sum('fee'),base:sum('base')});
+    S.queue.push(q);}
+}
 function step(dt){
-  S.t+=dt;
+  S.t+=dt;backCust();
   if(S.t>=OPEN&&S.t<CLOSE){let lam=S.today.N*prof(S.t)/PSUM*dt;while(lam>0){if(Math.random()<Math.min(lam,1))addCustomer();lam-=1;}}
-  if(S.apptToday)for(const a of S.apptToday){if(!a.done&&S.t>=a.at&&S.t<CLOSE-15){a.done=true;if(a.show)addApptCustomer(a.kind);else log(`Cliente con appuntamento per ${a.kind==='cp'?'il ContoPosta':a.kind==='pas'?'il passaporto':'l’assicurazione'} non si è presentato.`,'warn');}}
+  if(S.apptToday)for(const a of S.apptToday){if(!a.done&&S.t>=a.at&&S.t<CLOSE-15){a.done=true;if(a.show)addApptCustomer(a.kind);;}}
   if(S.upg.atm&&S.uOpen&&S.t>=OPEN&&S.t<CLOSE){let l2=S.today.N*.3*prof(S.t)/PSUM*dt;while(l2>0){if(Math.random()<Math.min(l2,1))atmUse();l2-=1;}}
   const pm=patMult();
   {const dis=S.queue.some(x=>x.prov)?.92:1;for(const c of S.queue)c.wait+=c.prov?dt:dt*dis;}
@@ -1511,6 +1482,7 @@ function step(dt){
         continue;
       }
       const vv=speedOf(k,c);
+      {const key=k.who==='tu'?(c.act?c.items.indexOf(c.act)+1:0):1,typ=k.who==='tu'?!!(c.act&&TYPS.has(c.act.prod)):(c.items||[]).some(i=>TYPS.has(i.prod));if(key&&c._snd!==key&&!(c.problem&&!c.problem.done)){c._snd=key;const rl=k.who==='tu'?c.itemLeft:c.left;opSnd(k.who==='tu',rl/(vv*BASE*(S.uOpen?Math.max(1,S.speed):.5)),!typ);}}
       c.left-=dt*vv;
       if(k.who==='tu'&&c.act)c.itemLeft-=dt*vv;
       if(c.hasProb&&!c.problem&&c.left<=c.total-c.probAt){c.problem={id:pickProblem(c),t:0,done:false};continue;}
@@ -1535,8 +1507,8 @@ function step(dt){
 /* portalettere: incassano a consegna, ma costano stipendio, benzina, assicurazione, riparazioni e qualche multa */
 const ANG={name:'Armando Dipende',wage:58};
 const POSTMEN=[
- {id:'p1',name:'Nino Sciarra',role:'Il veterano del Borgo',route:'Centro Storico e Borgo Vecchio Nuovo',base:34,fee:3.8,wage:70,fuel:7,upk:6,hire:500,moto:1800,ztl:true},
- {id:'p2',name:'Debora Cuccurullo',role:'Scattista di Satellite 7',route:'Satellite 7, Le Palme e Zona Industriale',base:46,fee:3.6,wage:76,fuel:13,upk:6,hire:500,moto:1800,tang:true}];
+ {id:'p1',name:'Nino Sciarra',route:'Centro Storico e Borgo Vecchio Nuovo',base:34,fee:3.8,wage:70,fuel:7,upk:6,hire:500,moto:1800,ztl:true},
+ {id:'p2',name:'Debora Cuccurullo',route:'Satellite 7, Le Palme e Zona Industriale',base:46,fee:3.6,wage:76,fuel:13,upk:6,hire:500,moto:1800,tang:true}];
 function postDay(){
   const r={rev:0,veh:0,wages:0,fines:0,n:0};
   (S.post||[]).forEach(p=>{
@@ -1629,6 +1601,38 @@ function ding(){
   if(!RT.snd)return;
   try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const t=AC.currentTime;
     [[880,0],[660,.16]].forEach(([f,d])=>{const o=AC.createOscillator(),g=AC.createGain();o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(.0001,t+d);g.gain.exponentialRampToValueAtTime(.07,t+d+.02);g.gain.exponentialRampToValueAtTime(.0001,t+d+.22);o.connect(g);g.connect(AC.destination);o.start(t+d);o.stop(t+d+.25);});}catch(e){}
+}
+function errSnd(){
+  if(!RT.snd||!AC)return;
+  try{const t=AC.currentTime+.02,o=AC.createOscillator(),o2=AC.createOscillator(),g=AC.createGain(),g2=AC.createGain(),lp=AC.createBiquadFilter();
+    o.type='triangle';o.frequency.value=196;o2.type='sine';o2.frequency.value=196*2.01;g2.gain.value=.25;lp.type='lowpass';lp.frequency.value=2400;
+    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.3*.7,t+.01);g.gain.exponentialRampToValueAtTime(.001,t+.55);
+    o.connect(lp);o2.connect(g2);g2.connect(lp);lp.connect(g);g.connect(AC.destination);o.start(t);o2.start(t);o.stop(t+.6);o2.stop(t+.6);}catch(e){}
+}
+const ITSHIP=new Set(['pa3','pao','pco','r1','rac','rra','asc','poi']);
+const TYPS=new Set(['cpa','cpp','cpc','cpv','cpi','bon','pcn','pcp','pcr','lin','tel','sim','cva','pola','polc','poli','polv','fin','lba','lbp','lbv','buo','vag','vagi','scw','fra','tgm','bau','frc','fol','cap','bu1','bu2','bu3','sc1','sc2','sc3','spn','stz','slb','ssc','crt']);
+let OPLAST=0;
+function opBeepAt(manual){
+  if(!RT.snd||!AC)return;
+  try{const t0=AC.currentTime+.02,vol=manual?1.45:.8,M=AC.createGain();M.gain.value=.7*vol;M.connect(AC.destination);
+    const bo=AC.createOscillator(),bf=AC.createBiquadFilter(),bg=AC.createGain();
+    bo.type='square';bo.frequency.value=2600;bf.type='lowpass';bf.frequency.value=4200;
+    bg.gain.setValueAtTime(0,t0);bg.gain.linearRampToValueAtTime(.16,t0+.004);bg.gain.setValueAtTime(.16,t0+.075);bg.gain.linearRampToValueAtTime(0,t0+.085);
+    bo.connect(bf);bf.connect(bg);bg.connect(M);bo.start(t0);bo.stop(t0+.1);}catch(e){}
+}
+function opSnd(manual,dur,beep){
+  if(!RT.snd||!AC)return;
+  const now=Date.now();if(!manual&&now-OPLAST<400)return;if(!manual)OPLAST=now;
+  dur=Math.max(.5,Math.min(40,dur||2));
+  const lead=beep?Math.min(.35,dur*.3):0;if(beep)opBeepAt(manual);
+  try{const t0=AC.currentTime+.02,vol=manual?1.45:.8,ns=AC.createBuffer(1,AC.sampleRate,AC.sampleRate),nd=ns.getChannelData(0);let l=0;for(let i=0;i<nd.length;i++){l=(l+.04*(Math.random()*2-1))/1.04;nd[i]=l*9;}
+    const M=AC.createGain();M.gain.value=.7*vol;M.connect(AC.destination);
+    const ts=t0+lead,te=t0+dur,gap=.075;let t=ts;
+    while(true){t+=gap*(.5+Math.random())+(Math.random()<.12?gap*2:0);if(t>te)break;
+      const s=AC.createBufferSource();s.buffer=ns;const f=AC.createBiquadFilter();f.type='highpass';f.frequency.value=1800+Math.random()*1400;
+      const g=AC.createGain();g.gain.setValueAtTime(.35+Math.random()*.25,t);g.gain.exponentialRampToValueAtTime(.0008,t+.03);s.connect(f);f.connect(g);g.connect(M);s.start(t,Math.random()*1.5);s.stop(t+.05);
+      const o=AC.createOscillator(),og=AC.createGain();o.type='sine';o.frequency.setValueAtTime(160+Math.random()*70,t);o.frequency.exponentialRampToValueAtTime(90,t+.04);og.gain.setValueAtTime(.12,t);og.gain.exponentialRampToValueAtTime(.0008,t+.04);o.connect(og);og.connect(M);o.start(t);o.stop(t+.06);}
+  }catch(e){}
 }
 function toast(msg,tone){
   const d=document.createElement('div');d.className='toast '+(tone||'');d.textContent=msg;$('#toasts').appendChild(d);
@@ -2433,7 +2437,7 @@ function renderScene(){
     const c=o.c,L=lv[o.i],m=moodOf(c),mq=Math.min(10,Math.round(m*10)),hh=hsh(c.id);
     if(!c._ent||c._ent>now)c._ent=c._ent?now-5000:now;
     const el=now-c._ent,entering=el<2800;
-    const amp=mq<6?0:(mq-5)*4.5,dur=Math.max(2.6,10-mq*.7),vert=((hh>>3)%2===0),dy=vert?(mq<6?0:(mq-5)*3+7):0;
+    const s00=o.p[2]||.68,ampR=mq<6?0:(mq-5)*4.5,amp=Math.min(ampR,Math.max(0,o.p[0]-(41+22*s00+3+(c.comp?s00*13:0)))),dur=Math.max(2.6,10-mq*.7),vert=((hh>>3)%2===0),dy=vert?(mq<6?0:(mq-5)*3+7):0;
     const ex=288-o.p[0],ey=146-o.p[1];
     let sty=`--dx:${vert?0:amp}px;--dy:${dy}px;--ex:${ex}px;--ey:${ey}px;`,cls='';
     if(entering){cls=' sc-in';sty+=`animation-delay:-${(el/1000).toFixed(1)}s`;}
@@ -2464,7 +2468,7 @@ function renderScene(){
    ${stress?'<g class="sc-sw"><path d="M142 58q-3 6 0 8q3-2 0-8z" fill="#9AD8FF"/></g><g class="sc-sw" style="animation-delay:.8s"><path d="M218 54q-3 6 0 8q3-2 0-8z" fill="#9AD8FF"/></g>':''}
    <g><rect x="3" y="197" width="38" height="5" rx="2" fill="${PAL.tots}"/><rect x="6" y="126" width="32" height="72" rx="4" fill="${PAL.tot}" stroke="${PAL.totd}" stroke-width="1.5"/><rect x="9" y="130" width="26" height="33" rx="1.5" fill="#06122E" stroke="${PAL.totl}" stroke-width=".8"/><text x="22" y="134.6" text-anchor="middle" font-size="2.6" font-weight="700" font-family="monospace" fill="#FFD54F">PRENDI IL NUMERO</text>${LETTERS.split('').map((L,i)=>`<text x="${15+(i%2)*11}" y="${143+Math.floor(i/2)*7}" font-size="5" font-weight="700" font-family="monospace" fill="#9CD0FF">${L}</text>`).join('')}<rect x="12" y="167" width="20" height="7" rx="1.5" fill="${PAL.totb}" stroke="#CFE0FF" stroke-width=".6"/><text x="22" y="171.8" text-anchor="middle" font-size="3" font-weight="700" font-family="monospace" fill="#fff">TICKET</text><rect x="14" y="178" width="16" height="3" rx="1" fill="${PAL.totk}"/><rect x="14" y="184" width="16" height="6" rx="1" fill="${PAL.totm}"/></g>
    ${crowd}
-   ${(()=>{const XS=(RT.exits||[]).filter(X=>now-X.t0<=X.sp+X.W);RT.exits=XS;return XS.map(X=>{const el=now-X.t0,hx=hsh(X.c.id+'ex'),dir=hx%2?1:-1,x0=X.x!=null?X.x:(pos[Math.min(X.idx||0,pos.length-1)]||[214,172])[0],y0=X.y!=null?X.y:(pos[Math.min(X.idx||0,pos.length-1)]||[214,172])[1],sc0=X.sc||.68;
+   ${(()=>{const XS=(RT.exits||[]).filter(X=>now-X.t0<=X.sp+X.W);RT.exits=XS;return XS.map(X=>{const el=now-X.t0,hx=hsh(X.c.id+'ex'),dir=1,x0=X.x!=null?X.x:(pos[Math.min(X.idx||0,pos.length-1)]||[214,172])[0],y0=X.y!=null?X.y:(pos[Math.min(X.idx||0,pos.length-1)]||[214,172])[1],sc0=X.sc||.68;
      if(el<X.sp){const tx=esc(X.say),w=Math.min(176,tx.length*3.9+14),bx=Math.max(4,Math.min(356-w,x0-w/2));return `<g>${custSVG(X.c,x0,y0,sc0,X.L,false,true,false)}<g><rect x="${bx.toFixed(1)}" y="78" width="${w.toFixed(1)}" height="15" rx="7" fill="#fff" stroke="${X.L===2?'#C62828':'#4a4a5a'}" stroke-width="1.2"/><text x="${(bx+w/2).toFixed(1)}" y="88.4" text-anchor="middle" font-size="6.6" font-weight="700" fill="${X.L===2?'#B71C1C':'#222'}" font-family="Arial">${tx}</text></g></g>`;}
      const ox=dir>0?(360-x0)+50:-(x0+50);return `<g class="sc-out" style="--ox:${ox.toFixed(0)}px;animation-duration:${X.W}ms;animation-delay:-${Math.max(0,el-X.sp).toFixed(0)}ms">${custSVG(X.c,x0,y0,sc0,X.L,false,true,true)}</g>`;}).join('');})()}
    ${S.fault&&S.fault.id==='luce'?'<rect width="360" height="215" fill="#02040f" opacity=".72"/><path d="M180 0L120 215H240z" fill="#FFE9A0" opacity=".05"/>':''}${q.length>pos.length?`<g><rect x="304" y="190" width="48" height="20" rx="10" fill="#FFD54F"/><text x="328" y="204.5" text-anchor="middle" font-size="12" font-weight="800" fill="#16275A" font-family="Arial">+${q.length-pos.length}</text></g>`:''}
@@ -2484,17 +2488,12 @@ function traitsOf(c){
 }
 function skIdx(c){const r=(hsh(c.id)>>15)%100;return c.fr?(r<20?0:r<35?1:r<50?2:r<65?3:r<80?4:r<92?5:6):(r<42?0:r<72?1:2);}
 function skinOf(c){return SK[skIdx(c)];}
-function gestHTML(c,lvl){const I=ARMI[c.id]||{},cx0=c.comp?160:180,dx=I.sw?cx0+(I.sw-4.5)*I.sc-227:0;GNS=0;const R=gestRaw(c,lvl,I.sl);let b=R[0],f=R[1];if(!I.sw)return {b,f};const sl=I.sl||CL[(hsh(c.id)>>6)%8],sd=mixc(sl,'#000000',.25),stub=`<path d="M227 184Q229 196 236 201" stroke="${sl}" stroke-width="17" fill="none" stroke-linecap="round"/>`,lx=2*(cx0-180)-dx;f=f.replace(/(<g class="ges gtap2">.*?<\/g>)/,`<g transform="translate(${lx.toFixed(1)} 0)">$1</g>`);b=b.replace(/(<g class="ges gtap2">.*?<\/g>)/,`<g transform="translate(${lx.toFixed(1)} 0)">$1</g>`);return {b:`<g transform="translate(${dx.toFixed(1)} 0)">${b}</g>`,f:`<g transform="translate(${dx.toFixed(1)} 0)">${GNS?'':stub}${f||''}</g>`};}
+function gestHTML(c,lvl){GNS=0;const R=gestRaw(c,lvl,null);return {b:'',f:R[1]};}
 function gestRaw(c,lvl,slc){
   const h=hsh(c.id),sk=skinOf(c),sl=slc||CL[(h>>6)%8],sd=mixc(sl,'#000000',.25),T=traitsOf(c),BC=['#8C2F2F','#2F5F8C','#5A7A3A','#7A4A2A'][(h>>9)%4];
   const cnt=T.bag?`<g class="ges"><path d="M96 176q14-22 28 0" fill="none" stroke="#222" stroke-width="4"/><rect x="82" y="172" width="56" height="34" rx="7" fill="${BC}" stroke="#00000066" stroke-width="2"/></g>`:T.folder?`<g class="ges"><rect x="84" y="166" width="48" height="34" rx="3" fill="#E8D8A8" stroke="#8a7a50" stroke-width="2"/><path d="M92 176h32M92 184h32M92 192h22" stroke="#8a7a50" stroke-width="2"/></g>`:'';
   const arm=(d,w)=>`<path d="${d}" stroke="${sl}" stroke-width="${w}" fill="none" stroke-linecap="round"/>`;
-  if(c.diff&&lvl<2)return [`<g class="ges gwag" style="transform-origin:236px 200px">${arm('M236 202Q248 178 251 152',17)}<circle cx="252" cy="146" r="11" fill="${sk}" stroke="#00000033"/><path d="M252 138V108" stroke="${sk}" stroke-width="7" stroke-linecap="round"/></g>`,`<g class="ges gtap2"><ellipse cx="127" cy="190" rx="12" ry="7" fill="${sk}" stroke="#00000033"/>${arm('M124 204Q116 198 108 192',16)}</g>`];
-  if(T.phone&&lvl<2)return [`<g class="ges gphone" style="transform-origin:236px 198px">${arm('M236 200Q252 186 248 166',17)}<rect x="234" y="120" width="34" height="58" rx="7" fill="#1c1c22" stroke="#777" stroke-width="1.5"/><rect x="238" y="126" width="26" height="42" rx="3" fill="${lvl===1?'#ffe9a8':'#9fd3ff'}" class="ges gscr"/><ellipse cx="250" cy="176" rx="13" ry="9" fill="${sk}" stroke="#00000033"/></g>`,cnt];
-  if(T.watch&&lvl===1)return [`<g class="ges gwatch" style="transform-origin:236px 200px">${arm('M236 204Q246 186 244 168',16)}<ellipse cx="245" cy="160" rx="12" ry="9" fill="${sk}" stroke="#00000033"/><rect x="236" y="172" width="20" height="8" rx="3" fill="#2a2a2a"/><circle cx="246" cy="176" r="3.4" fill="#e8e8e8"/></g>`,cnt];
-  if(lvl===0)return [`<g class="ges gfade"><g class="ges gwave" style="transform-origin:236px 198px">${(GNS=1,arm('M227 187Q247 196 250 172Q252 160 256 148',17))}<circle cx="257" cy="142" r="11" fill="${sk}" /><path d="M251 134v-6M257 133v-8M263 135v-6" stroke="${sk}" stroke-width="4" stroke-linecap="round"/></g></g>`,cnt];
-  if(lvl===1)return ['',cnt+`<g class="ges gtap">${arm('M236 204Q244 198 252 192',16)}<ellipse cx="255" cy="190" rx="12" ry="7" fill="${sk}" stroke="#00000033"/></g><g class="ges gtap2"><ellipse cx="127" cy="190" rx="12" ry="7" fill="${sk}" stroke="#00000033"/>${arm('M124 204Q116 198 108 192',16)}</g>`];
-  return [`<g class="ges gslam" style="transform-origin:236px 200px">${arm('M236 202Q250 176 254 156',18)}<circle cx="255" cy="150" r="12" fill="${sk}" stroke="#00000044" stroke-width="1.5"/><path d="M247 146h16M248 152h14" stroke="#00000033" stroke-width="1.4"/></g>`,cnt];
+  return ['',cnt];
 }
 function showArrive(k){
   const c=k.cur;if(!c)return;RT.arrive={k:k.id,id:c.id};RT.pcHide=null;
@@ -2577,10 +2576,11 @@ function renderPC(){
      ${c?`<div class="pcf"><button class="away${armed?' arm':''}" data-act="away" data-k="${k.id}" type="button">${armed?'Sicuro? Gradimento in picchiata: tocca ancora':'Manda via il cliente'}</button></div>`:''}</div>`;
     {const pb2=$('.pmain',el),mm=k.menu||'';if(pb2)pb2.scrollTop=el._menu===mm?sc:0;el._menu=mm;}
     el._sig=sig;el.hidden=false;
+    {const pm2=$('.pmain',el);if(pm2){pm2.classList.remove('t1','t2');if(pm2.scrollHeight>pm2.clientHeight+1){pm2.classList.add('t1');if(pm2.scrollHeight>pm2.clientHeight+1)pm2.classList.add('t2');}}}
   }
   const T=(id,t)=>{const e=$('#'+id,el);if(e&&e.textContent!==t)e.textContent=t;};
   T('pc-t',pdsClock());T('pc-o',String(S.st.opsMe||0));T('pc-i',eur(S.st.inc||0,2));
-  {const e=$('#pc-s',el);if(e){const on=S.uOpen&&S.phase==='open',tx=on?'SESS. ATTIVA':'SESS. CHIUSA · apri';if(e.textContent!==tx)e.textContent=tx;e.className='ses '+(on?'ok':'ko');e.disabled=on;}
+  {const e=$('#pc-s',el);if(e){const on=S.uOpen&&S.phase==='open',tx=on?'SESS. ATTIVA':'SESS. CHIUSA · apri';if(e.textContent!==tx)e.textContent=tx;e.className='ses '+(on?'ok':'ko');e.disabled=on;e.style.display=on?'none':'';}
     {const e2=$('#pc-i',el);if(e2)e2.className=drw()>CAP+.01?'neg':'';}}
   for(const p of PERI){const e=$('#pe-'+p[0],el);if(e){const ko=!!(S.fault&&(S.fault.id===p[0]||S.fault.id==='luce'));e.classList.toggle('ko',ko);}}
   if(!c)return;
@@ -2678,7 +2678,7 @@ function renderUff(){
   <div class="card"><h2>Personale</h2><p class="muted" style="margin:0 0 8px;font-size:13px">${S.counters.length} sportelli · ${S.staff.length} dipendenti${S.angolo?' + angolo informazioni':''}. Gli stipendi si pagano ogni sera, anche quando non vengono.</p>`;
   h+=`<div class="staff" style="margin-bottom:8px">${meOK()?avSVG(S.me.av,'av'):''}<div class="tt"><b>${meOK()?esc(S.me.nome+' '+S.me.cognome)+' (tu)':'Tu'}</b><small>${meOK()?S.me.eta+' anni · ':''}Sportello 1</small></div></div>`;
   S.staff.forEach(s=>{const k=S.counters.find(x=>x.who===s.id);
-    h+=`<div class="staff" style="margin-bottom:8px"><div class="tt"><b>${esc(fNm(s.name))}</b><small>${esc(s.role)} · sportello ${k?k.id+1:'—'}${S.sub&&S.sub.id===s.id?' (in sostituzione)':''} · veloce con ${s.sp} · ${eur(s.wage)}/giorno</small></div></div>`;});
+    h+=`<div class="staff" style="margin-bottom:8px"><div class="tt"><b>${esc(fNm(s.name))}</b><small>sportello ${k?k.id+1:'—'}${S.sub&&S.sub.id===s.id?' (in sostituzione)':''} · veloce con ${s.sp} · ${eur(s.wage)}/giorno</small></div></div>`;});
   if(S.angolo)h+=`<div class="staff" style="margin-bottom:8px"><div class="tt"><b>${ANG.name}</b><small>Angolo informazioni · ${eur(ANG.wage)}/giorno${S.angoloAbs?' · oggi assente, domani torna':''}</small></div></div>`;
   const cand=POOL.filter(p=>!S.staff.some(s=>s.id===p.id));
   h+=`</div><div class="card"><h2>Candidati</h2>`;
@@ -2690,8 +2690,8 @@ function renderUff(){
   if(S.life>=3000||(S.post||[]).length){const P=S.post||[];
    h+=`<div class="card"><h2>Portalettere</h2><p class="muted" style="margin:0 0 8px;font-size:13px">Fino a due. Consegnano in giro per Cenide e incassano a consegna, ma costano stipendio, benzina, assicurazione, riparazioni e qualche multa.</p>`;
    POSTMEN.forEach(pm=>{const h0=P.find(x=>x.id===pm.id),daily=pm.wage+pm.fuel+pm.upk;
-     if(h0){h+=`<div class="staff" style="margin-bottom:10px"><div class="tt"><b>${esc(pm.name)}</b><small>${esc(pm.role)} · ${esc(pm.route)}<br>Costo al giorno: ${eur(daily)} (stipendio ${eur(pm.wage)}, benzina ${eur(pm.fuel)}, assicurazione e manutenzione ${eur(pm.upk)})<br>${h0.last?`Ultima giornata: ${h0.last.n} consegne, ${eur(h0.last.rev,2)} incassati${h0.last.note?' · '+esc(h0.last.note):''}`:'Non ha ancora fatto il giro.'}</small></div></div>`;}
-     else{const tot=pm.hire+pm.moto,ok=S.cash>=tot;h+=`<div class="staff" style="margin-bottom:10px"><div class="tt"><b>${esc(pm.name)}</b><small>${esc(pm.role)} · ${esc(pm.route)}<br>Circa ${pm.base} consegne al giorno a ${eur(pm.fee,2)} l’una. Costo al giorno: ${eur(daily)}. All’inizio: assunzione, divisa e casco ${eur(pm.hire)} più motorino ${eur(pm.moto)}.</small></div><button class="btn blue" data-act="hirep" data-id="${pm.id}" ${ok?'':'disabled'}>${eur(tot)}</button></div>`;}});
+     if(h0){h+=`<div class="staff" style="margin-bottom:10px"><div class="tt"><b>${esc(pm.name)}</b><small>${esc(pm.route)}<br>Costo al giorno: ${eur(daily)} (stipendio ${eur(pm.wage)}, benzina ${eur(pm.fuel)}, assicurazione e manutenzione ${eur(pm.upk)})<br>${h0.last?`Ultima giornata: ${h0.last.n} consegne, ${eur(h0.last.rev,2)} incassati${h0.last.note?' · '+esc(h0.last.note):''}`:'Non ha ancora fatto il giro.'}</small></div></div>`;}
+     else{const tot=pm.hire+pm.moto,ok=S.cash>=tot;h+=`<div class="staff" style="margin-bottom:10px"><div class="tt"><b>${esc(pm.name)}</b><small>${esc(pm.route)}<br>Circa ${pm.base} consegne al giorno a ${eur(pm.fee,2)} l’una. Costo al giorno: ${eur(daily)}. All’inizio: assunzione, divisa e casco ${eur(pm.hire)} più motorino ${eur(pm.moto)}.</small></div><button class="btn blue" data-act="hirep" data-id="${pm.id}" ${ok?'':'disabled'}>${eur(tot)}</button></div>`;}});
    h+='</div>';}
   {const ppl=S.staff.length+(S.post||[]).length+(S.angolo?1:0),pc=250*ppl,on=premOn();
    if(ppl)h+=`<div class="card"><h2>Premio di produttività</h2><p class="muted" style="margin:0 0 8px;font-size:13px">Un bonus di 250 € a testa a tutti (dipendenti, portalettere, angolo). Per 30 giorni: +10% di velocità agli sportelli e alle consegne, meno assenze. ${on?`<b>In corso fino al ${dt0(S.prem.until).getUTCDate()} ${MESI[dt0(S.prem.until).getUTCMonth()].toLowerCase()}.</b>`:''}</p>${on?`<span class="pill good">Scade tra ${Math.max(1,S.prem.until-S.off)} giorni</span>`:ppl?`<button class="btn gold" data-act="prem" ${S.cash>=pc?'':'disabled'}>Paga ${eur(pc)}</button>`:'<span class="muted" style="font-size:12.5px">Serve almeno una persona da premiare.</span>'}</div>`;}
@@ -2719,7 +2719,7 @@ function calHTML(){
   cal+='</div>';
   const riv=[[`Tu`,S.rep,true],...Object.keys(S.rivals).map(id=>[RIVN[id].replace(/^./,c=>c.toUpperCase()),S.rivals[id],false])];
   const rivH=riv.map(r=>`<div class="rv ${r[2]?'me':''}"><span>${esc(r[0])}</span><b class="mono">${Math.round(r[1])}</b><div class="prog"><i style="width:${clamp(r[1],0,100)}%"></i></div></div>`).join('');
-  const evs=m.ev.map(e=>`<div class="evt"><b>${esc(e.n)}.</b> ${esc(e.txt)}</div>`).join('')||'<p class="muted" style="margin:6px 0 0">Oggi niente di insolito. Cioè niente di nuovo.</p>';
+  const evs=m.ev.map(e=>`<div class="evt"><b>${esc(e.n)}.</b> ${esc(e.txt)}</div>`).join('');
   return `<div class="card"><h2>${MESI[m.mon]} ${m.yr}</h2>${cal}<p class="muted" style="margin:8px 0 0;font-size:12.5px">pens = giorni delle pensioni · F24 = scadenza fiscale · bol = bollette di fine mese · giorni sbiaditi: ufficio chiuso (domeniche e festivi)</p></div>`;
 }
 function niceMax(v){v=Math.max(v,50);const p=Math.pow(10,Math.floor(Math.log10(v))),n=v/p;return (n<=1?1:n<=2?2:n<=5?5:10)*p;}
@@ -2750,7 +2750,7 @@ function renderConti(){
 }
 function updSettings(){
   const bt=$('#b-theme');if(bt)bt.textContent='Stile: '+styleName();
-  const bs=$('#b-sound');if(bs)bs.textContent='Suono del ticket: '+(RT.snd?'attivo':'spento');
+  const bs=$('#b-sound');if(bs)bs.textContent='Suoni: '+(RT.snd?'attivo':'spento');
 }
 function menuModal(){
   modal({title:'Menu',html:'',opts:[
@@ -2758,7 +2758,7 @@ function menuModal(){
     {l:'Stile: '+styleName(),h:'Tocca per cambiare',fn(){const i=STYLES.findIndex(x=>x[0]===curStyle());setStyle(STYLES[(i+1)%3][0]);menuModal();return false;}},
     {l:'Visualizzazione: '+(curView()==='pc'?'PC':'Cellulare'),h:'Tocca per cambiare',fn(){setView(curView()==='pc'?'mobile':'pc');menuModal();return false;}},
     ...(meOK()&&!S.meEdited?[{l:'Nome ed età',h:'Modificabili una sola volta',fn(){meEditModal();return false;}}]:[]),
-    {l:'Suono del ticket: '+(RT.snd?'attivo':'spento'),fn(){RT.snd=!RT.snd;lsSet(SNDKEY,RT.snd?'1':'0');if(RT.snd)ding();menuModal();return false;}},
+    {l:'Suoni: '+(RT.snd?'attivo':'spento'),fn(){RT.snd=!RT.snd;lsSet(SNDKEY,RT.snd?'1':'0');if(RT.snd)ding();menuModal();return false;}},
     {l:'Torna al gioco'}]});
 }
 function confirmRestart(){
@@ -2895,7 +2895,7 @@ function selectProd(k,pid){
     c.cnt.n++;
     if(c.cnt.n<it.qty)return true;
     c.cnt=null;if(it.out){S.cash-=it.out;S.st.pass=(S.st.pass||0)-it.out;normCash();}c.prodOk=true;c.act=it;c.itemLeft=it.base;c.opOk=fromPP||!it.op;c.qtyOk=true;k.menu=null;
-    if((it.doc||c.card)&&c.docOk===undefined)c.docOk=false;
+    if((it.doc||(c.card&&!ITSHIP.has(it.prod)))&&c.docOk===undefined)c.docOk=false;
     if(it.sim)toast('Promo: la SIM PostaPhone è inclusa nella nuova PostalCard.','good');
     if(prod==='trk')openTrack(k,c,it);
     return true;
@@ -2927,7 +2927,7 @@ function answerDoc(k,v){
   const good=c.doc.kind==='ok';c.docOk=true;
   if(good&&v)return true;
   if(good&&!v){adjRep(-.6);angryAt(c,.5);c.left+=1;c.total+=1;if(c.act)c.itemLeft+=1;toast('Il documento era valido: il cliente è offeso (+1 min).','bad');return true;}
-  if(!good&&!v){c.problem={id:c.doc.kind==='other'?'altrui':c.doc.tp==='pasf'?'psgd':'doc',t:0,done:false};return true;}
+  if(!good&&!v){if(c.doc.kind==='other'||c.doc.tp==='pasf'){c.problem={id:c.doc.kind==='other'?'altrui':'psgd',t:0,done:false};return true;}sendHome(k,c);return true;}
   const HI=c.doc.tp==='pasf';
   if(c.doc.kind==='other'){const m=HI?400:90;adjRep(-2);addCash(-m,'fines');log(`Hai accettato il documento di un’altra persona per ${c.name}: multa di ${eur(m)}.`,'bad');toast(`Documento di un’altra persona! Multa ${m} €`,'bad');return true;}
   adjRep(-.8);toast('Il documento non era valido! Hai accettato lo stesso.','bad');
@@ -2937,15 +2937,20 @@ function answerDoc(k,v){
 function sendAway(k){
   const c=k&&k.cur;if(!c)return false;
   if(c.lang===2){adjRep(-.2);S.st.sent++;log(`${c.name} (${c.tk}) parla una lingua che non capisci: lo mandi via.`,'warn');k.cur=null;k.menu=null;RT.awayArm=0;return true;}
-  const pen=3.5+(c.prio?1.5:0);
-  adjRep(-pen);S.st.sent++;S.st.angry++;S.angryTot++;angryAt(c,.75);
-  log(`Hai mandato via ${c.name} (${c.tk}) con ${c.items&&c.items.length>1?'le richieste':'la richiesta'} ancora aperta.  Gradimento −${pen.toFixed(1).replace('.',',')}.`,'bad');
+  S.st.sent++;
+  const rem=(c.items||[]).filter(i=>!i.done);
+  if(rem.length&&chance(.5)){
+    S.back=S.back||[];S.back.push({t:S.t+ri(25,70),c:Object.assign({},c),rem});
+  }else{
+    const pen=3.5+(c.prio?1.5:0);adjRep(-pen);S.st.angry++;S.angryTot++;angryAt(c,.75);
+    log(`${c.name} (${c.tk}) se ne va insultandoti e non torna: ${pick(INS_CNT.slice(6))} Gradimento −${pen.toFixed(1).replace('.',',')}.`,'bad');
+  }
   k.cur=null;k.menu=null;RT.awayArm=0;return true;
 }
 function selectOp(k,oid){
   const c=k&&k.cur;if(!c||c.prodOk===false||c.opOk!==false)return false;
   if(c.act&&oid===c.act.op){c.opOk=true;return true;}
-  c.left+=1;c.total+=1;if(c.act)c.itemLeft+=1;adjRep(-.2);angryAt(c,.35);toast('Non è l’operatore giusto: rileggi cosa chiede il cliente (+1 min).','bad');return false;
+  errSnd();c.left+=1;c.total+=1;if(c.act)c.itemLeft+=1;adjRep(-.2);angryAt(c,.35);toast('Non è l’operatore giusto: rileggi cosa chiede il cliente (+1 min).','bad');return false;
 }
 function selectQty(k,n){
   const c=k&&k.cur;if(!c||c.prodOk===false||c.opOk===false||c.qtyOk!==false)return false;
@@ -3003,7 +3008,7 @@ document.addEventListener('click',e=>{
   if(sp){if(S.phase==='pre'&&+sp.dataset.sp>0){openDay();}if(S.phase==='open')S.speed=+sp.dataset.sp;render(true);return;}
   const b=e.target.closest('[data-act]');if(!b||!S)return;
   const a=b.dataset.act;
-  if(S.phase==='open'&&S.speed===0&&a==='prod'&&b.closest('#pc'))S.speed=RT.prevSpeed||1;
+  if(S.phase==='open'&&S.speed===0&&a!=='pz'&&b.closest('#pc'))S.speed=RT.prevSpeed||1;
   if(b.closest('#pc')&&!['dps','dpsx','pz'].includes(a))S.st.opsMe=(S.st.opsMe||0)+1;
   if(a==='open')openDay();
   else if(a==='uopen')openUP();
@@ -3028,7 +3033,7 @@ document.addEventListener('click',e=>{
   else if(a==='away'){const k=S.counters[+b.dataset.k];if(Date.now()-(RT.awayArm||0)<3500)sendAway(k);else RT.awayArm=Date.now();}
   else if(a==='sub'){const k=S.counters[+b.dataset.k];if(k){k.menu=b.dataset.sub||null;render(true);}}
   else if(a==='prod'){const k=S.counters[+b.dataset.k];selectProd(k,b.dataset.prod);}
-  else if(a==='chiu'){doClosure(b.dataset.cl);render(true);}
+  else if(a==='chiu'){if(doClosure(b.dataset.cl))opSnd(true,1.8);render(true);}
   else if(a==='menu')menuModal();
   else if(a==='call'){const k=S.counters[+b.dataset.k];if(!S.uOpen){toast('Prima apri la giornata dal PDS.');return;}if(k&&!k.cur&&S.phase==='open')tryCall(k,true);}
   else if(a==='callTk'){
