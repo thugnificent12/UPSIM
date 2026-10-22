@@ -228,7 +228,7 @@ details.types summary{cursor:pointer;padding:4px 0}
 #start .tintl{position:absolute;inset:0;background:var(--st-tint)}
 #start .top{position:absolute;inset:0;z-index:1}
 #start .top img{display:block;width:100%;height:100%;object-fit:cover;object-position:center}
-@media (min-aspect-ratio:1/1){#start .top img{object-fit:contain;object-position:center}#start .tintl{background:rgba(0,0,0,.18)}}
+@media (min-aspect-ratio:1/1){#start .top img{object-fit:fill}}
 #start .bot{position:relative;z-index:2;grid-row:2;display:grid;gap:6px;width:100%;padding:40px max(24px,calc((100% - 420px)/2)) calc(10px + env(safe-area-inset-bottom,0px));box-sizing:border-box;background:linear-gradient(transparent,rgba(0,0,0,.5))}
 #start .sbtn{font:var(--hw) 15px var(--f-display);border:0;border-radius:999px;padding:8px;color:var(--st-pf);background:var(--st-p);box-shadow:0 2px 0 var(--st-sh);width:100%;min-height:0}
 #start .sbtn.sec{background:var(--st-glass);color:var(--st-gt);box-shadow:0 2px 0 rgba(0,0,0,.25)}
