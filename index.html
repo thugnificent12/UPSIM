@@ -909,7 +909,7 @@ function subDay(){
 function prepDay(){
   S.today=calcMods();S.today.N=expected()*1.3;
   S.today.rob=S.day>=5&&chance(.006)?{at:ri(OPEN+40,CLOSE-40),done:false}:null;
-  S.carryIn=S.carry||{};S.carry={};S.clN={};S.cls={};S.queue=[];S.arr=[];S.back=[];S.fight=null;S.dogEv=null;S.tk=ZERO();S.t=OPEN0;S.uOpen=false;S.phase='pre';S.speed=0;
+  S.carryIn=S.carry||{};S.carry={};S.clN={};S.cls={};S.queue=[];S.arr=[];RT.wk={};RT.wl=[];S.back=[];S.fight=null;S.dogEv=null;S.tk=ZERO();S.t=OPEN0;S.uOpen=false;S.phase='pre';S.speed=0;
   S.counters.forEach(k=>k.cur=null);
   S.st={served:0,left:0,sent:0,rev:0,cost:0,ot:0,fines:0,angry:0,byType:ZERO(),rep0:S.rep,inspect:null,lk:0,info:0,maint:0,pass:0,pp:0,ppb:0,opsMe:0,tk:0};
   S.lkDown=!!S.upg.locker&&chance(.04);S.angoloAbs=!!S.angolo&&chance(.05);
@@ -1234,7 +1234,7 @@ function addCustomer(){
     if(fem0&&!q.trans&&!q.prov&&!q.pri&&!q.work&&!q.lang&&q.age>=20&&q.age<=45&&chance(.2)){q.mus=true;if(!q.sumF&&[6,7].includes(dt0(S.day).getUTCMonth())&&chance(.3))q.sumF=true;}
     if(!q.pri&&!q.trans&&!q.prov&&!q.work&&!q.shless&&!q.sumF&&!q.sumT&&!q.lang&&q.arch!=='tur'&&chance(.1))q.comp=mkComp(q,fem0);
     if(!q.comp&&!q.pri&&!q.prov&&!q.work&&!q.shless&&!q.sumF&&!q.sumT&&!q.lang&&q.arch!=='tur'&&q.age>=16&&chance(.035)){const r=Math.random();q.dog={br:ri(0,4),sz:ri(0,2),beh:r<.5?'calm':r<.75?'dist':r<.95?'op':'bite',ev:S.t+rnd(1,4),done:false};}}
-  {const q=S.queue[S.queue.length-1];if(q&&!q.noTk){S.queue.pop();(S.arr=S.arr||[]).push({c:q,rem:4.6,tot:4.6});}}
+  {const q=S.queue[S.queue.length-1];if(q&&!q.noTk){S.queue.pop();(S.arr=S.arr||[]).push({c:q,rem:4.6,tot:4.6});}else if(q)q._from='door';}
 }
 function arrivals(dt){
   if(!S.arr||!S.arr.length)return;
@@ -1252,7 +1252,7 @@ function addApptCustomer(kind){
   const dist=pick(DISTS),PP=ri(A.pass[0],A.pass[1]),BB=rnd(A.base[0],A.base[1]);
   const age=A.prod==='fin'?ri(26,69):A.prod==='polv'?ri(25,64):ri(19,80),den=A.prod==='fin'&&(age>=60?chance(.8):chance(.12)),FE=den?0:(/^pol/.test(A.prod)?Math.round(PP*.0258*100)/100:A.fee);
   S.queue.unshift({id:'c'+(S.cid++),age,tk:'—',appt:true,type:'E',arch:'appt',archN:'Cliente con appuntamento',name:`${pick(FN)} ${pick(SN)}`,district:dist.n,prod:A.prod,
-    prio:true,pre:'Devo ',pat:85*rnd(.9,1.1),wait:0,det:A.det,qty:1,pass:PP,fee:FE,base:BB,prob:.12,items:[{type:A.type,prod:A.prod,op:null,qty:1,det:A.det,fee:FE,pass:PP,base:BB,done:false,doc:true,den,fin:A.prod==='fin'?finGen():undefined}]});accGen(S.queue[0]);
+    prio:true,pre:'Devo ',pat:85*rnd(.9,1.1),wait:0,det:A.det,qty:1,pass:PP,fee:FE,base:BB,prob:.12,items:[{type:A.type,prod:A.prod,op:null,qty:1,det:A.det,fee:FE,pass:PP,base:BB,done:false,doc:true,den,fin:A.prod==='fin'?finGen():undefined}]});accGen(S.queue[0]);S.queue[0]._from='door';S.queue[0]._from='door';
   if(A.prod==='spid'){const q0=S.queue[0],pr=chance(.8)?'spid':'spr',it=mkProd(pr,{pay:1},1);it.doc=true;if(age>=75)it.fee=0;it.done=false;it.det=pr==='spid'?'fare lo SPID (ho l’appuntamento)':'rinnovare lo SPID (ho l’appuntamento)';q0.items=[it];q0.prod=pr;q0.det=it.det;q0.pass=it.pass;q0.fee=it.fee;q0.base=it.base;}
 }
 const fmtDay=off=>{const d=dt0(off);return `${WD[(d.getUTCDay()+6)%7]} ${d.getUTCDate()} ${MESI[d.getUTCMonth()].slice(0,3)}`;};
@@ -1451,10 +1451,10 @@ function insult(c,where){
 function backCust(){
   if(!S.back||!S.back.length||!S.uOpen)return;
   for(const b of S.back.slice()){if(S.t<b.t)continue;S.back=S.back.filter(x=>x!==b);if(S.t>=CLOSE-15)continue;
-    const its=b.rem.map(i=>Object.assign({},i,{done:false})),TL=tkLetter(its),n=++S.tk[TL],sum=k=>its.reduce((a,i)=>a+(i[k]||0),0),q=Object.assign({},b.c);
-    ['doc','docOk','feeMul','total','left','hasProb','probAt','problem','ntOk','prodOk','opOk','qtyOk','act','itemLeft','cnt','ask','_ent'].forEach(f=>{delete q[f];});
-    Object.assign(q,{items:its,tk:TL+String(n).padStart(3,'0'),noTk:false,type:TL,wait:0,det:its.map(i=>i.det).join(' + '),qty:its[0].qty,pass:sum('pass'),fee:sum('fee'),base:sum('base')});
-    S.queue.push(q);}
+    const its=b.rem.map(i=>Object.assign({},i,{done:false})),TL=tkLetter(its),n=0,sum=k=>its.reduce((a,i)=>a+(i[k]||0),0),q=Object.assign({},b.c);
+    ['doc','docOk','feeMul','total','left','hasProb','probAt','problem','ntOk','prodOk','opOk','qtyOk','act','itemLeft','cnt','ask','_ent','_from','_arrived','_goal'].forEach(f=>{delete q[f];});
+    Object.assign(q,{items:its,tk:'—',noTk:false,type:TL,wait:0,det:its.map(i=>i.det).join(' + '),qty:its[0].qty,pass:sum('pass'),fee:sum('fee'),base:sum('base')});
+    (S.arr=S.arr||[]).push({c:q,rem:4.6,tot:4.6});}
 }
 function step(dt){
   S.t+=dt;arrivals(dt);backCust();
@@ -2434,6 +2434,52 @@ function scenePal(){
   if(rn)ac='#C3C8CF';
   return{dor:ac.trim(),dord:mixc(ac,'#000000',.4),tot:mixc(sg,'#000000',.0),totd:mixc(sg,'#000000',.4),totl:mixc(sg,'#ffffff',.45),totb:mixc(sg,'#ffffff',.2),tots:mixc(sg,'#000000',.65),totk:mixc(sg,'#000000',.7),totm:mixc(sg,'#000000',.15),wall,door:mixc(wall,'#000000',.07),dst:mixc(wall,'#000000',.45),top:mixc(wall,'#ffffff',.25),hdl:mixc(wall,'#ffffff',.6),ctop:mixc(wall,'#ffffff',.5),band,floor:mixc(band,'#000000',.3)};
 }
+
+function walkersHTML(wl,seatP){
+  (S.arr||[]).forEach((a,k)=>wl.push({c:a.c,goal:[66+k*18,176+(k%2?6:0)],s:.68,comp:!!a.c.comp,arr:true,rem:a.rem,L:0}));
+  RT.seat=seatP;RT.wl=wl;
+  const wk=RT.wk=RT.wk||{},alive=new Set(wl.map(w=>w.c.id));
+  for(const id in wk)if(!alive.has(id))delete wk[id];
+  wl.forEach(w=>{const id=w.c.id;if(!wk[id]){const h=hsh(id);wk[id]=w.c._from==='tot'?{x:66,y:176,gh:0,st:0}:{x:290+(h%7),y:146+((h>>3)%9)-3,gh:0,st:0};}});
+  return wl.slice().sort((a,b)=>wk[a.c.id].y-wk[b.c.id].y).map(w=>{
+    const c=w.arr?Object.assign({},w.c,{hideTk:true}):w.c,p=wk[w.c.id],cp=c.comp,dxl=cp?(cp.kind==='bim'?24:27):0,csl=cp?(cp.kind==='bim'?.62:(cp.kind==='gen'&&cp.old?.97:1)):0;
+    const inner=(cp?custSVG(cp,dxl,-.5,csl,0,false,true,false):'')+custSVG(c,-(cp?dxl*.5:0),0,1,w.L||0,false,true,false);
+    return `<g class="wkr" data-w="${w.c.id}" transform="translate(${p.x.toFixed(1)} ${p.y.toFixed(1)}) scale(${w.s})">${inner}</g>`;}).join('');
+}
+function walkTick(dt){
+  const wl=RT.wl;if(!wl||!wl.length||!dt||!RT.wk)return;
+  const seat=RT.seat||[],wk=RT.wk;
+  const rad=w=>w.s*(w.comp?34:20);
+  for(const w of wl){
+    const p=wk[w.c.id];if(!p)continue;
+    const g=w.goal;let dx=g[0]-p.x,dy=g[1]-p.y,dist=Math.hypot(dx,dy);
+    if(dist<(w.arr?1.5:3)){if(!w.arr){w.c._arrived=true;w.c._ent=performance.now()-9000;}continue;}
+    const sp=w.arr?Math.max(40,Math.min(140,dist/Math.max(.4,(w.rem||3)-1.4))):75;
+    let vx=dx/dist*sp,vy=dy/dist*sp;
+    const r0=rad(w),obs=[];
+    seat.forEach(o=>obs.push(o));
+    for(const b of wl){if(b===w)continue;const q=wk[b.c.id];if(q)obs.push([q.x,q.y,rad(b)]);}
+    obs.push([Math.max(-7,Math.min(51,p.x)),Math.max(124,Math.min(208,p.y)),4]);
+    if(!(p.gh>0)){
+      const vl=Math.hypot(vx,vy)||1;
+      for(const o of obs){
+        const ox=p.x-o[0],oy=p.y-o[1],dd=Math.hypot(ox,oy)||.01,R=r0+o[2]+5;
+        if(dd>=R*2.2)continue;
+        const ux=ox/dd,uy=oy/dd;
+        if(dd<R){const k=(R-dd)/R*2.2*sp;vx+=ux*k;vy+=uy*k;}
+        const ahead=(-ox*vx-oy*vy)/vl;
+        if(ahead>0){const cr=(-vx*oy+vy*ox)/vl,nx=-vy/vl,ny=vx/vl,sg=Math.abs(cr)<.5?((hsh(w.c.id)&1)?1:-1):(cr>0?-1:1),k=sp*.9*(1-dd/(R*2.2));vx+=nx*sg*k;vy+=ny*sg*k;}
+      }
+    }
+    const vm=Math.hypot(vx,vy),mx=1.7*sp;if(vm>mx){vx*=mx/vm;vy*=mx/vm;}
+    const nx=p.x+vx*dt,ny=p.y+vy*dt,mv=Math.hypot(nx-p.x,ny-p.y);
+    p.x=Math.max(12,Math.min(352,nx));p.y=Math.max(140,Math.min(212,ny));
+    if(p.gh>0)p.gh-=dt;
+    if(mv<.15*sp*dt){p.st+=dt;if(p.st>2.5){p.gh=1.2;p.st=0;}}else p.st=Math.max(0,p.st-dt);
+  }
+  const sc=document.getElementById('scene');if(!sc)return;
+  for(const w of wl){const p=wk[w.c.id],e=p&&sc.querySelector('[data-w="'+w.c.id+'"]');if(e)e.setAttribute('transform','translate('+p.x.toFixed(1)+' '+p.y.toFixed(1)+') scale('+w.s+')');}
+}
 function renderScene(){
   const el=$('#scene');if(!el)return;PAL=scenePal();
   const dd0=dt0(S.off),dlab=fmtDay(S.off),q=S.queue,shown=q.slice(0,72),sv=S.counters.find(k=>k.cur),tk=RT.lastTk||'—';
@@ -2445,8 +2491,12 @@ function renderScene(){
     return sl;})();
   const nowR=performance.now();if(!RT._scLast)RT._scLast=nowR;if(!(S.speed===0||S.phase!=='open'))RT.scT=(RT.scT||1000)+(nowR-RT._scLast);RT._scLast=nowR;
   const now=RT.scT||1000;
+  const wl=[],seatP=[];
   const crowd=shown.map((c,i)=>({c,i,p:pos[i]||pos[pos.length-1]})).sort((a,b)=>a.p[1]-b.p[1]).map(o=>{
     const c=o.c,L=lv[o.i],m=moodOf(c),mq=Math.min(10,Math.round(m*10)),hh=hsh(c.id);
+    c._goal=[o.p[0],o.p[1],o.p[2]||.68];
+    if(c._from&&!c._arrived){wl.push({c,goal:c._goal,s:c._goal[2],comp:!!c.comp,L});return '';}
+    seatP.push([o.p[0]+(c.comp?(o.p[2]||.68)*13:0),o.p[1],(o.p[2]||.68)*(c.comp?34:20)]);
     if(!c._ent||c._ent>now)c._ent=c._ent?now-5000:now;
     const el=now-c._ent,entering=el<2800;
     const s00=o.p[2]||.68,ampR=mq<6?0:(mq-5)*4.5,amp=Math.min(ampR,Math.max(0,o.p[0]-(41+22*s00+3+(c.comp?s00*13:0)))),dur=Math.max(2.6,10-mq*.7),vert=((hh>>3)%2===0),dy=vert?(mq<6?0:(mq-5)*3+7):0;
@@ -2458,7 +2508,7 @@ function renderScene(){
     const fF=()=>(cp?custSVG(cp,o.p[0]+dx,o.p[1]-.5,cs,0,false,true,false):'')+custSVG(c,o.p[0]-(cp?dx*.5:0),o.p[1],s0,L,false,true,false);
     if(cls.includes('sc-walkv')){const fB=(cp?custSVGB(cp,o.p[0]+dx,o.p[1]-.5,cs,0,false,true,false):'')+custSVGB(c,o.p[0]-(cp?dx*.5:0),o.p[1],s0,L,false,true,false);return `<g class="${cls.trim()}" style="${sty}"><g class="wk-f">${fF()}</g><g class="wk-b">${fB}</g></g>`;}
     if(cls.includes('sc-walk'))return `<g class="${cls.trim()}" style="${sty}">${fF()}</g>`;
-    return `<g class="${cls.trim()}" style="${sty}">${fF()}</g>`;}).join('')+(S.arr||[]).map(a=>{const c=a.c,el=Math.max(0,a.tot-a.rem);return `<g class="sc-tk" style="--ex:222px;--ey:-30px;animation-delay:-${el.toFixed(2)}s">${custSVG(c,66,176,.68,0,false,true,false)}</g>`;}).join('');
+    return `<g class="${cls.trim()}" style="${sty}">${fF()}</g>`;}).join('')+walkersHTML(wl,seatP);
   const clerk=meOK()?(()=>{const av=AVS[S.me.av]||AVS[0],shade=mixc(av.cl,'#000000',.22),qn=S.queue.length,ins=performance.now()-(RT.insAt||-1e9)<3500,mood=ins?'ang':(qn>=12||S.rep<35)?'tired':S.rep>=70?'happy':'neutral';
     const armP=(d,hx,dl)=>`<g class="clk-arm${sv?(qn>=12?' on fast':' on'):''}"${dl?` style="animation-delay:${dl}s"`:''}><path d="${d}" stroke="${shade}" stroke-opacity=".55" stroke-width="9.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="${d}" stroke="${av.cl}" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="${hx}" cy="78.5" rx="4.2" ry="3.3" fill="${av.skin}"/></g>`;
     const hnd=(hx,dl)=>`<g class="clk-arm${sv?(qn>=12?' on fast':' on'):''}" style="animation-delay:${dl}s"><ellipse cx="${hx}" cy="78.5" rx="4.2" ry="3.3" fill="${av.skin}"/></g>`;
@@ -2583,12 +2633,14 @@ function renderPC(){
      ${req}
      <div class="pbody"><div class="pl">
        <div class="pfh">Preferiti-Menu-Utility</div>
-       ${pref('dpsopen','Apertura giornata',aprSm,!S.uOpen||S.phase==='pre')}${pref('dpsx','Torna a ufficio',c?'Prima servi il cliente':'Chiudi il PDS',!c)}${pref('safe','Versamento/prelievo denaro (Safety cash)',eur(drw())+' · Safety '+eur(S.safe||0),true)}${pref('dpsclose','Chiusura giornata contabile',chiSm,!!S.closeReady)}</div>
+       ${pref('dpsopen','Apertura giornata',aprSm,!S.uOpen||S.phase==='pre')}${pref('safe','Versamento/prelievo denaro (Safety cash)',eur(drw())+' · Safety '+eur(S.safe||0),true)}${pref('dpsclose','Chiusura giornata contabile',chiSm,!!S.closeReady)}${pref('dpsx','Torna a ufficio',c?'Prima servi il cliente':'Chiudi il PDS',!c)}</div>
        <div class="pmain">${pm.main}</div></div>
      <div class="pst" id="pc-st">${pm.st}</div>
      ${c?`<div class="pcf"><button class="away${armed?' arm':''}" data-act="away" data-k="${k.id}" type="button">${armed?'Sicuro? Gradimento in picchiata: tocca ancora':'Manda via il cliente'}</button></div>`:''}</div>`;
     {const pb2=$('.pmain',el),mm=k.menu||'';if(pb2)pb2.scrollTop=el._menu===mm?sc:0;el._menu=mm;}
     el._sig=sig;el.hidden=false;
+    requestAnimationFrame(()=>{const o=el.querySelector('.opsel');if(o){let f=8.5;o.style.fontSize=f+'px';while(o.scrollWidth>o.clientWidth&&f>4){f-=.5;o.style.fontSize=f+'px';}}});
+    requestAnimationFrame(()=>{{const bx=el.querySelector('.pf[data-act="dpsx"]'),ch=[...el.querySelectorAll('.pmain .pr')].find(r=>/^\s*Chiusure/.test(r.textContent));if(bx&&ch){bx.style.marginTop='';const d=ch.getBoundingClientRect().top-bx.getBoundingClientRect().top;const sc=bx.offsetWidth?bx.getBoundingClientRect().width/bx.offsetWidth:1;if(d>0)bx.style.marginTop=(d/(sc||1)).toFixed(1)+'px';}}});
     {const pm2=$('.pmain',el);if(pm2){pm2.classList.remove('t1','t2');if(pm2.scrollHeight>pm2.clientHeight+1){pm2.classList.add('t1');if(pm2.scrollHeight>pm2.clientHeight+1)pm2.classList.add('t2');}}}
   }
   const T=(id,t)=>{const e=$('#'+id,el);if(e&&e.textContent!==t)e.textContent=t;};
@@ -3081,6 +3133,7 @@ function frame(now){
     let rem=dt*BASE*(S.uOpen?S.speed:.5);
     while(rem>0&&S.phase==='open'&&!RT.modal&&!RT.startUp&&!RT.arrive){const d=Math.min(.5,rem);step(d);rem-=d;}
   }
+  if(S&&S.phase==='open'&&S.speed>0&&!RT.modal&&!RT.startUp&&!RT.arrive)walkTick(dt);
   RT.acc+=dt;
   if(RT.acc>=.2){RT.acc=0;render();if(Date.now()-RT.lastSave>10000&&S&&S.phase!=='post'&&!RT.startUp)save();}
   requestAnimationFrame(frame);
