@@ -254,6 +254,7 @@ details.types summary{cursor:pointer;padding:4px 0}
 .sc-walk{animation:scwalk 6s ease-in-out infinite}
 @keyframes scwalk{0%,100%{transform:translate(0,0)}25%{transform:translate(var(--dx),var(--dy))}50%{transform:translate(0,0)}75%{transform:translate(calc(var(--dx) * -1),calc(var(--dy) * -1))}}
 .sc-in{animation:scin 2.8s ease-out both}
+.sc-tk{animation:sctk 3.2s linear both}@keyframes sctk{from{transform:translate(var(--ex),var(--ey));opacity:0}6%{opacity:1}to{transform:translate(0,0);opacity:1}}
 @keyframes scin{from{transform:translate(var(--ex),var(--ey));opacity:0}15%{opacity:1}to{transform:translate(0,0);opacity:1}}
 .sc-sw{animation:scsw 1.6s ease-in infinite}
 .wk-f,.wk-b{animation-duration:inherit;animation-delay:inherit;animation-iteration-count:infinite;animation-timing-function:linear}
@@ -270,7 +271,7 @@ details.types summary{cursor:pointer;padding:4px 0}
 .blink{animation:clkBl 4.6s infinite;transform-box:fill-box;transform-origin:50% 50%}@keyframes clkBl{0%,93%,100%{transform:scaleY(1)}96%{transform:scaleY(.08)}}.clk-g{animation:clkBr 3.6s ease-in-out infinite}@keyframes clkBr{0%,100%{transform:translateY(0)}50%{transform:translateY(-.7px)}}.clk-arm.on.fast{animation-duration:.22s}.clk-g.sc-shk{animation:scshk .45s ease-in-out infinite}
 .glance{animation:glc 5.2s ease-in-out infinite}@keyframes glc{0%,35%,100%{transform:translateX(0)}45%,60%{transform:translateX(-1.3px)}70%,85%{transform:translateX(1.3px)}}.lgB.tap{animation:tapf .55s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 0}@keyframes tapf{0%,100%{transform:rotate(0)}50%{transform:rotate(5deg)}}
 @keyframes clkType{0%,100%{transform:translateY(0)}35%{transform:translateY(-1.4px)}70%{transform:translateY(.6px)}}.clk-arm.on{animation:clkType .42s ease-in-out infinite}
-@media (prefers-reduced-motion:reduce){.wk-b{display:none}.sc-bob,.sc-shk,.sc-sw,.sc-walk,.sc-in,.clk-arm.on,.blink,.clk-g,.glance,.lgB.tap,.gwave,.gfade,.gtap,.gtap2,.gslam,.gphone,.gscr,.gwatch,.gwag{animation:none}}
+@media (prefers-reduced-motion:reduce){.wk-b{display:none}.sc-bob,.sc-shk,.sc-sw,.sc-walk,.sc-in,.sc-tk,.clk-arm.on,.blink,.clk-g,.glance,.lgB.tap,.gwave,.gfade,.gtap,.gtap2,.gslam,.gphone,.gscr,.gwatch,.gwag{animation:none}}
 
 #arrive,#pc{position:fixed;inset:0;z-index:44;max-width:600px;margin:0 auto;display:flex;flex-direction:column;overflow:hidden}
 #arrive[hidden],#pc[hidden]{display:none!important}
@@ -908,7 +909,7 @@ function subDay(){
 function prepDay(){
   S.today=calcMods();S.today.N=expected()*1.3;
   S.today.rob=S.day>=5&&chance(.006)?{at:ri(OPEN+40,CLOSE-40),done:false}:null;
-  S.carryIn=S.carry||{};S.carry={};S.clN={};S.cls={};S.queue=[];S.back=[];S.fight=null;S.dogEv=null;S.tk=ZERO();S.t=OPEN0;S.uOpen=false;S.phase='pre';S.speed=0;
+  S.carryIn=S.carry||{};S.carry={};S.clN={};S.cls={};S.queue=[];S.arr=[];S.back=[];S.fight=null;S.dogEv=null;S.tk=ZERO();S.t=OPEN0;S.uOpen=false;S.phase='pre';S.speed=0;
   S.counters.forEach(k=>k.cur=null);
   S.st={served:0,left:0,sent:0,rev:0,cost:0,ot:0,fines:0,angry:0,byType:ZERO(),rep0:S.rep,inspect:null,lk:0,info:0,maint:0,pass:0,pp:0,ppb:0,opsMe:0,tk:0};
   S.lkDown=!!S.upg.locker&&chance(.04);S.angoloAbs=!!S.angolo&&chance(.05);
@@ -1216,8 +1217,8 @@ function addCustomer(){
   const idle=!S.queue.length&&!S.counters.some(k=>k.cur),nt=(first.prod==='bol'||NTB.has(first.prod))&&items.length===1&&(first.qty||1)<=1&&chance(idle?.09:.025),sum=k=>items.reduce((s,i)=>s+i[k],0);
   const fr=frX&&first.prod!=='pen',lang=fr?lang0:0;
   if(lang===2&&items.length>1)items.length=1;
-  const TL=tkLetter(items),n=nt?0:++S.tk[TL];
-  S.queue.push({id:cid,age,tk:nt?'—':TL+String(n).padStart(3,'0'),noTk:nt,type:TL,arch:a.id,archN:a.n,name:fr?`${pick(chance(.5)?FNF_M:FNF_F)} ${pick(SNF)}`:`${pick(FN)} ${pick(SN)}`,fr,lang,inc:lang>0&&psg,fphr:lang===2?fPhrase(first.prod):'',district:dist.n,prod:first.prod,pre:lang===2?'… ':lang?'Io volere ':first.prod==='pen'?'Devo ':pick(['Devo ','Dovrei ','Vorrei ','Avrei bisogno di ']),
+  const TL=tkLetter(items),n=0;
+  S.queue.push({id:cid,age,tk:'—',noTk:nt,type:TL,arch:a.id,archN:a.n,name:fr?`${pick(chance(.5)?FNF_M:FNF_F)} ${pick(SNF)}`:`${pick(FN)} ${pick(SN)}`,fr,lang,inc:lang>0&&psg,fphr:lang===2?fPhrase(first.prod):'',district:dist.n,prod:first.prod,pre:lang===2?'… ':lang?'Io volere ':first.prod==='pen'?'Devo ':pick(['Devo ','Dovrei ','Vorrei ','Avrei bisogno di ']),
     diff:chance(.004),card:age>=18&&!items.some(i=>i.out)&&chance(.2),prio:false,pat:a.pat*rnd(.85,1.15)*agP,wait:0,det:items.map(i=>i.det).join(' + '),qty:first.qty,pass:sum('pass'),fee:sum('fee'),base:sum('base'),prob:a.prob,items});
   {const q=S.queue[S.queue.length-1];accGen(q);if(q.diff)q.pat*=.7;if(q.noTk&&idle&&chance(.05))q.ask=true;
     const fn0=String(q.name).split(' ')[0],fem0=FEM.has(fn0),r0=Math.random();
@@ -1233,6 +1234,12 @@ function addCustomer(){
     if(fem0&&!q.trans&&!q.prov&&!q.pri&&!q.work&&!q.lang&&q.age>=20&&q.age<=45&&chance(.2)){q.mus=true;if(!q.sumF&&[6,7].includes(dt0(S.day).getUTCMonth())&&chance(.3))q.sumF=true;}
     if(!q.pri&&!q.trans&&!q.prov&&!q.work&&!q.shless&&!q.sumF&&!q.sumT&&!q.lang&&q.arch!=='tur'&&chance(.1))q.comp=mkComp(q,fem0);
     if(!q.comp&&!q.pri&&!q.prov&&!q.work&&!q.shless&&!q.sumF&&!q.sumT&&!q.lang&&q.arch!=='tur'&&q.age>=16&&chance(.035)){const r=Math.random();q.dog={br:ri(0,4),sz:ri(0,2),beh:r<.5?'calm':r<.75?'dist':r<.95?'op':'bite',ev:S.t+rnd(1,4),done:false};}}
+  {const q=S.queue[S.queue.length-1];if(q&&!q.noTk){S.queue.pop();(S.arr=S.arr||[]).push({c:q,rem:4.6,tot:4.6});}}
+}
+function arrivals(dt){
+  if(!S.arr||!S.arr.length)return;
+  const rs=dt/(BASE*Math.max(1,S.speed||1));
+  for(const a of S.arr.slice()){a.rem-=rs;if(a.rem>0)continue;S.arr=S.arr.filter(x=>x!==a);const c=a.c;c.tk=c.type+String(++S.tk[c.type]).padStart(3,'0');c.wait=0;c._ent=undefined;c._from='tot';S.queue.push(c);}
 }
 const APPT={
  pol:{n:'Assicurazione',s:'assicurazione',type:'E',prod:'polc',det:'sottoscrivere un’assicurazione (ho l’appuntamento)',fee:0,pass:[120,800],base:[1.2,1.8],arr:'il cliente con l’appuntamento per l’assicurazione. Ha la cartellina e un po’ di fretta'},
@@ -1450,7 +1457,7 @@ function backCust(){
     S.queue.push(q);}
 }
 function step(dt){
-  S.t+=dt;backCust();
+  S.t+=dt;arrivals(dt);backCust();
   if(S.t>=OPEN&&S.t<CLOSE){let lam=S.today.N*prof(S.t)/PSUM*dt;while(lam>0){if(Math.random()<Math.min(lam,1))addCustomer();lam-=1;}}
   if(S.apptToday)for(const a of S.apptToday){if(!a.done&&S.t>=a.at&&S.t<CLOSE-15){a.done=true;if(a.show)addApptCustomer(a.kind);;}}
   if(S.upg.atm&&S.uOpen&&S.t>=OPEN&&S.t<CLOSE){let l2=S.today.N*.3*prof(S.t)/PSUM*dt;while(l2>0){if(Math.random()<Math.min(l2,1))atmUse();l2-=1;}}
@@ -1500,7 +1507,7 @@ function step(dt){
   if(S.t>CLOSE&&(S.queue.length||S.counters.some(k=>k.cur)))S.st.ot+=dt*.45*staffed;
   if(S.fault&&S.fault.open&&FAULTS.find(x=>x.id===S.fault.id).same&&S.fault.fixDay===S.day&&S.t>=S.fault.fixAt)resolveFault(false);
   if(false&&S.inc&&!S.inc.done&&S.t>=S.inc.at&&S.t<CLOSE-20&&S.queue.length>=3){S.inc.done=true;fireIncident(S.inc.id);}
-  const rdy=S.uOpen&&S.t>=CLOSE&&!S.queue.length&&S.counters.every(k=>!k.cur);
+  const rdy=S.uOpen&&S.t>=CLOSE&&!S.queue.length&&!(S.arr&&S.arr.length)&&S.counters.every(k=>!k.cur);
   if(rdy&&!S.closeReady){S.speed=Math.min(S.speed,1);RT.dps=true;}
   if(!S.uOpen&&S.t>=DPS0&&!S.today.dpsAuto){S.today.dpsAuto=true;RT.dps=true;}
   normCash();
@@ -1540,7 +1547,7 @@ function endDay(forced){
   {const ms=clPend();if(ms.length){const f=80*ms.length;addCash(-f,'fines');adjRep(-.4*ms.length);log(`Chiusure non effettuate (${ms.map(x=>CLN[x]).join(', ')}): multa di ${eur(f)}.`,'bad');}}
   const rest=S.queue.length+S.counters.filter(k=>k.cur).length;
   if(rest){S.st.angry+=rest;adjRep(-.8*rest);log(`Alle ${hh(HARD)} la giornata finisce comunque: ${rest} clienti restano senza servizio.`,'bad');}
-  S.queue=[];S.counters.forEach(k=>k.cur=null);
+  S.queue=[];S.arr=[];S.counters.forEach(k=>k.cur=null);
   {const lt=S.t-CLOSEOK;if(lt>0){const f=Math.min(200,Math.round(30+6*lt));addCash(-f,'fines');adjRep(-.5);log(`Chiudi l’ufficio alle ${hh(S.t)}, oltre le ${hh(CLOSEOK)}: multa di ${eur(f)}.`,'bad');}}
   const rem=S.st.pass||0;if(rem>0){S.cash-=rem;log(`A fine giornata versi agli enti ${eur(rem,2)} (bollettini, ricariche, libretti, assicurazioni). A te restano le commissioni.`,'info');}else if(rem<0){S.cash-=rem;log(`A fine giornata gli enti ti rimborsano ${eur(-rem,2)} di prelievi e pensioni pagati allo sportello.`,'info');}
   if((S.st.atmOut||0)>0){const o=S.st.atmOwn||0;if(o>0){S.cash+=o;S.vault=Math.round(((S.vault||0)+o)*100)/100;}log(`Prelievi ATM della giornata: ${S.st.atmN} operazioni, ${eur(S.st.atmOut)}.${o>0?` ${eur(o)} dei tuoi contanti riaccreditati in cassaforte.`:' Erano contanti della sovvenzione.'}`,'info');}
@@ -2443,7 +2450,7 @@ function renderScene(){
     if(!c._ent||c._ent>now)c._ent=c._ent?now-5000:now;
     const el=now-c._ent,entering=el<2800;
     const s00=o.p[2]||.68,ampR=mq<6?0:(mq-5)*4.5,amp=Math.min(ampR,Math.max(0,o.p[0]-(41+22*s00+3+(c.comp?s00*13:0)))),dur=Math.max(2.6,10-mq*.7),vert=((hh>>3)%2===0),dy=vert?(mq<6?0:(mq-5)*3+7):0;
-    const ex=288-o.p[0],ey=146-o.p[1];
+    const ex=(c._from==='tot'?66:288)-o.p[0],ey=(c._from==='tot'?176:146)-o.p[1];
     let sty=`--dx:${vert?0:amp}px;--dy:${dy}px;--ex:${ex}px;--ey:${ey}px;`,cls='';
     if(entering){cls=' sc-in';sty+=`animation-delay:-${(el/1000).toFixed(1)}s`;}
     else if(amp>0){cls=vert?' sc-walk sc-walkv':' sc-walk';sty+=`animation-duration:${dur.toFixed(1)}s;animation-delay:-${((hh>>6)%100)/100*dur}s`;}
@@ -2451,7 +2458,7 @@ function renderScene(){
     const fF=()=>(cp?custSVG(cp,o.p[0]+dx,o.p[1]-.5,cs,0,false,true,false):'')+custSVG(c,o.p[0]-(cp?dx*.5:0),o.p[1],s0,L,false,true,false);
     if(cls.includes('sc-walkv')){const fB=(cp?custSVGB(cp,o.p[0]+dx,o.p[1]-.5,cs,0,false,true,false):'')+custSVGB(c,o.p[0]-(cp?dx*.5:0),o.p[1],s0,L,false,true,false);return `<g class="${cls.trim()}" style="${sty}"><g class="wk-f">${fF()}</g><g class="wk-b">${fB}</g></g>`;}
     if(cls.includes('sc-walk'))return `<g class="${cls.trim()}" style="${sty}">${fF()}</g>`;
-    return `<g class="${cls.trim()}" style="${sty}">${fF()}</g>`;}).join('');
+    return `<g class="${cls.trim()}" style="${sty}">${fF()}</g>`;}).join('')+(S.arr||[]).map(a=>{const c=a.c,el=Math.max(0,a.tot-a.rem);return `<g class="sc-tk" style="--ex:222px;--ey:-30px;animation-delay:-${el.toFixed(2)}s">${custSVG(c,66,176,.68,0,false,true,false)}</g>`;}).join('');
   const clerk=meOK()?(()=>{const av=AVS[S.me.av]||AVS[0],shade=mixc(av.cl,'#000000',.22),qn=S.queue.length,ins=performance.now()-(RT.insAt||-1e9)<3500,mood=ins?'ang':(qn>=12||S.rep<35)?'tired':S.rep>=70?'happy':'neutral';
     const armP=(d,hx,dl)=>`<g class="clk-arm${sv?(qn>=12?' on fast':' on'):''}"${dl?` style="animation-delay:${dl}s"`:''}><path d="${d}" stroke="${shade}" stroke-opacity=".55" stroke-width="9.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="${d}" stroke="${av.cl}" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="${hx}" cy="78.5" rx="4.2" ry="3.3" fill="${av.skin}"/></g>`;
     const hnd=(hx,dl)=>`<g class="clk-arm${sv?(qn>=12?' on fast':' on'):''}" style="animation-delay:${dl}s"><ellipse cx="${hx}" cy="78.5" rx="4.2" ry="3.3" fill="${av.skin}"/></g>`;
