@@ -888,8 +888,9 @@ function expected(){
   const repF=.75+.6*S.rep/100;
   return 26*growth*repF*rivalMult()*S.today.arr*(S.upg.app?1.12:1)*distAvg()*boostAvg();
 }
-function prof(t){let v=t<570?1.35:t<690?1.15:t<750?.8:t<800?1.05:.9;if(S.upg&&S.upg.app)v=v*.6+.4;return v;}
-let PSUM=0;for(let t=OPEN;t<CLOSE;t++)PSUM+=(t<570?1.35:t<690?1.15:t<750?.8:t<800?1.05:.9);
+const PF0=t=>t<570?1.4:t<690?1:1.3;
+function prof(t){let v=PF0(t);if(S.upg&&S.upg.app)v=v*.6+.4;return v;}
+let PSUM=0;for(let t=OPEN;t<CLOSE;t++)PSUM+=PF0(t);
 
 const SUBPL=[{a:'all’ufficio di Via Roma 9',da:'dall’ufficio di Via Roma 9'},{a:'alla filiale di Satellite 7',da:'dalla filiale di Satellite 7'},{a:'all’ufficio della Collina dei Notai',da:'dall’ufficio della Collina dei Notai'},{a:'alla filiale di Le Palme',da:'dalla filiale di Le Palme'}];
 const subBack=n=>n===1?'rientra domani':`rientra tra ${n} giorni`;
@@ -1116,8 +1117,8 @@ function mkProd(prod,a,qty,forceOp){
    case 'poe':{const q=qty;uq=q;const dd=pickEE();x.zone=dd[1];det=`spedire ${q>1?q+' lettere':'una lettera'} all’estero, ${dd[0]}`;fee=poeSum(q,dd[1]);base=1*q;break;}
    case 'spid':{uq=1;det='fare lo SPID';fee=12;base=8;break;}
    case 'spr':{uq=1;pass=20;det='rinnovare lo SPID (devo pagare)';fee=6;base=4;break;}
-   case 'rar':{const q=qty;uq=q;det=q>1?'ritirare due raccomandate (ho gli avvisi nella cassetta)':'ritirare una raccomandata (ho l’avviso nella cassetta)';fee=0;base=2.4*q;break;}
-   case 'par':{const q=qty;uq=q;det=q>1?'ritirare due pacchi (ho gli avvisi)':'ritirare un pacco (ho l’avviso)';fee=0;base=3*q;break;}
+   case 'rar':{const q=qty;uq=q;det=q>1?'ritirare due raccomandate':'ritirare una raccomandata';fee=0;base=2.4*q;break;}
+   case 'par':{const q=qty;uq=q;det=q>1?'ritirare due pacchi':'ritirare un pacco';fee=0;base=3*q;break;}
    case 'tgm':{uq=1;det='spedire un telegramma';fee=pick([4.97,7.12,10.74]);base=3;break;}
    case 'vag':{uq=1;pass=amtDen();det=`fare un vaglia da ${pass} €`;fee=12;base=4;break;}
    case 'scw':{uq=1;pass=scwAmt();const c=wpick(SCWC,x=>x[2]);det=`mandare ${pass} € ${c[0]}`;fee=scwFee(pass,c[0]);base=5;break;}
@@ -1213,7 +1214,7 @@ function addCustomer(){
   if(psg)age=ri(20,55);
   if(items.some(i=>i.prod==='polv')&&age>=65)age=ri(28,64);
   const agP=age<30?1.35:age<56?1.12:age<65?.95:age<71?.85:.78;
-  if(age>=70)items.forEach(i=>{if(i.prod==='bol')i.fee=1*(i.qty||1);});if(age>=75)items.forEach(i=>{if(i.prod==='spid'||i.prod==='spr')i.fee=0;});
+  if(age>=70)items.forEach(i=>{if(i.prod==='bol'){i.fee=1*(i.qty||1);i.det+=', ho più di 70 anni';}});if(age>=75)items.forEach(i=>{if(i.prod==='spid'||i.prod==='spr')i.fee=0;});
   const idle=!S.queue.length&&!S.counters.some(k=>k.cur),nt=(first.prod==='bol'||NTB.has(first.prod))&&items.length===1&&(first.qty||1)<=1&&chance(idle?.09:.025),sum=k=>items.reduce((s,i)=>s+i[k],0);
   const fr=frX&&first.prod!=='pen',lang=fr?lang0:0;
   if(lang===2&&items.length>1)items.length=1;
@@ -1361,13 +1362,27 @@ function docCard(c){
     <div class="idb">${photoSVG(p.ph,0)}<div class="idd"><div><small>cognome</small>${esc(sn)}</div><div><small>nome</small>${esc(fn)}</div><div><small>nato/a il</small>${p.birth}</div><div><small>residenza</small>${esc(p.addr)}, ${esc(p.city)}</div></div></div>
     <div class="idf">N° ${d.num} · scadenza <b>${d.exp}</b></div></div>`;
 }
+const AVVP=new Set(['rar','par','att']);
+function genAvv(c){
+  const it=(c.items||[]).find(i=>AVVP.has(i.prod));if(!it)return null;
+  const r=Math.random(),kind=r<.05?'none':r<.1?'other':'ok';
+  let nm=c.name;
+  if(kind==='other'){const fn=c.name.split(' ')[0],sn=c.name.split(' ').slice(1).join(' ');nm=chance(.5)?pick(FN.filter(x=>x!==fn))+' '+sn:fn+' '+pick(SN.filter(x=>x!==sn));}
+  return {kind,name:nm,pr:it.prod,n:ri(100000,999999)};
+}
+function avvCard(c){
+  const a=c.avv;if(!a)return '';
+  if(a.kind==='none')return `<div class="idc2 none" style="margin-top:6px"><b>Nessun avviso</b><div>Il cliente non ha portato l’avviso di giacenza.</div></div>`;
+  const T={rar:'Raccomandata',par:'Pacco',att:'Atto giudiziario'}[a.pr],nm=a.name.split(' ');
+  return `<div class="idc2 ci" style="margin-top:6px;background:#FFF6D6;border-color:#B58A1E"><div class="idh">AVVISO DI GIACENZA<small>${T} n. ${a.n}</small></div><div class="idd"><div><small>cognome</small>${esc(nm.slice(1).join(' '))}</div><div><small>nome</small>${esc(nm[0])}</div></div></div>`;
+}
 function callCustomer(k,c,manual){
   if(manual&&!c.prio){const p=S.queue.find(x=>x.prio&&x!==c&&k.types.includes(x.type));if(p){adjRep(-.7);log(`${p.name} ha la precedenza ma hai chiamato ${c.tk}.`,'bad');}}
   S.queue=S.queue.filter(x=>x!==c);RT.lastTk=c.tk;
   const s=k.who==='tu'?null:staffOf(k);
   const pm=(s?s.prb:1)*(1-.2*(S.upg.moduli||0))*(S.angolo&&!S.angoloAbs?.85:1)*probRamp();
   const hasProb=c.diff||c.lang===1||chance(clamp(c.prob*pm,0,.95));
-  k.cur=Object.assign({},c,{doc:genDoc(c),docOk:undefined,feeMul:1,total:c.diff?c.base*1.4:c.base,left:c.diff?c.base*1.4:c.base,hasProb,probAt:c.base*rnd(.3,.65),problem:null,ntOk:c.noTk?false:true,prodOk:k.who!=='tu',opOk:true,qtyOk:true,act:null,itemLeft:0,items:(c.items||[]).map(i=>Object.assign({},i))});
+  k.cur=Object.assign({},c,{doc:genDoc(c),avv:genAvv(c),docOk:undefined,feeMul:1,total:c.diff?c.base*1.4:c.base,left:c.diff?c.base*1.4:c.base,hasProb,probAt:c.base*rnd(.3,.65),problem:null,ntOk:c.noTk?false:true,prodOk:k.who!=='tu',opOk:true,qtyOk:true,act:null,itemLeft:0,items:(c.items||[]).map(i=>Object.assign({},i))});
   k.menu=null;
   if(S.dogEv&&S.dogEv.id===c.id)S.dogEv=null;
   if(c.dog&&c.dog.beh==='op'){k.cur.left+=1.6;k.cur.total+=1.6;if(!c.dog.done){c.dog.done=true;S.st.cani=(S.st.cani||0)+1;log(`Il cane di ${c.name} (${c.tk}) salta sul bancone e distrae ${k.who==='tu'?'te':'l’operatore'}: il servizio si allunga.`,'warn');}}
@@ -1621,7 +1636,7 @@ function errSnd(){
     g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.3*.7,t+.01);g.gain.exponentialRampToValueAtTime(.001,t+.55);
     o.connect(lp);o2.connect(g2);g2.connect(lp);lp.connect(g);g.connect(AC.destination);o.start(t);o2.start(t);o.stop(t+.6);o2.stop(t+.6);}catch(e){}
 }
-const ITSHIP=new Set(['pa3','pao','pco','r1','rac','rra','asc','poi']);
+const ITSHIP=new Set(['bol','pa3','pao','pco','r1','rac','rra','asc','poi']);
 const TYPS=new Set(['cpa','cpp','cpc','cpv','cpi','bon','pcn','pcp','pcr','lin','tel','sim','cva','pola','polc','poli','polv','fin','lba','lbp','lbv','buo','vag','vagi','scw','fra','tgm','bau','frc','fol','cap','bu1','bu2','bu3','sc1','sc2','sc3','spn','stz','slb','ssc','crt']);
 let OPLAST=0;
 function opBeepAt(manual){
@@ -2437,11 +2452,11 @@ function scenePal(){
 }
 
 function walkersHTML(wl,seatP){
-  (S.arr||[]).forEach((a,k)=>wl.push({c:a.c,goal:[66+k*18,176+(k%2?6:0)],s:.68,comp:!!a.c.comp,arr:true,rem:a.rem,L:0}));
+  (S.arr||[]).forEach((a,k)=>wl.push({c:a.c,goal:[62+k*18,150+(k%2?6:0)],s:.68,comp:!!a.c.comp,arr:true,rem:a.rem,L:0}));
   RT.seat=seatP;RT.wl=wl;
   const wk=RT.wk=RT.wk||{},alive=new Set(wl.map(w=>w.c.id));
   for(const id in wk)if(!alive.has(id))delete wk[id];
-  wl.forEach(w=>{const id=w.c.id;if(!wk[id]){const h=hsh(id);wk[id]=w.c._from==='tot'?{x:66,y:176,gh:0,st:0}:{x:290+(h%7),y:146+((h>>3)%9)-3,gh:0,st:0};}});
+  wl.forEach(w=>{const id=w.c.id;if(!wk[id]){const h=hsh(id);wk[id]=w.c._from==='tot'?{x:66,y:150,gh:0,st:0}:{x:290+(h%7),y:146+((h>>3)%9)-3,gh:0,st:0};}});
   return wl.slice().sort((a,b)=>wk[a.c.id].y-wk[b.c.id].y).map(w=>{
     const c=w.arr?Object.assign({},w.c,{hideTk:true}):w.c,p=wk[w.c.id],cp=c.comp,dxl=cp?(cp.kind==='bim'?24:27):0,csl=cp?(cp.kind==='bim'?.62:(cp.kind==='gen'&&cp.old?.97:1)):0;
     const inner=(cp?custSVG(cp,dxl,-.5,csl,0,false,true,false):'')+custSVG(c,-(cp?dxl*.5:0),0,1,w.L||0,false,true,false);
@@ -2460,7 +2475,7 @@ function walkTick(dt){
     const r0=rad(w),obs=[];
     seat.forEach(o=>obs.push(o));
     for(const b of wl){if(b===w)continue;const q=wk[b.c.id];if(q)obs.push([q.x,q.y,rad(b)]);}
-    obs.push([Math.max(-7,Math.min(51,p.x)),Math.max(124,Math.min(208,p.y)),4]);
+    obs.push([Math.max(-7,Math.min(51,p.x)),Math.max(100,Math.min(170,p.y)),4]);
     if(!(p.gh>0)){
       const vl=Math.hypot(vx,vy)||1;
       for(const o of obs){
@@ -2501,7 +2516,7 @@ function renderScene(){
     if(!c._ent||c._ent>now)c._ent=c._ent?now-5000:now;
     const el=now-c._ent,entering=el<2800;
     const s00=o.p[2]||.68,ampR=mq<6?0:(mq-5)*4.5,amp=Math.min(ampR,Math.max(0,o.p[0]-(41+22*s00+3+(c.comp?s00*13:0)))),dur=Math.max(2.6,10-mq*.7),vert=((hh>>3)%2===0),dy=vert?(mq<6?0:(mq-5)*3+7):0;
-    const ex=(c._from==='tot'?66:288)-o.p[0],ey=(c._from==='tot'?176:146)-o.p[1];
+    const ex=(c._from==='tot'?66:288)-o.p[0],ey=(c._from==='tot'?150:146)-o.p[1];
     let sty=`--dx:${vert?0:amp}px;--dy:${dy}px;--ex:${ex}px;--ey:${ey}px;`,cls='';
     if(entering){cls=' sc-in';sty+=`animation-delay:-${(el/1000).toFixed(1)}s`;}
     else if(amp>0){cls=vert?' sc-walk sc-walkv':' sc-walk';sty+=`animation-duration:${dur.toFixed(1)}s;animation-delay:-${((hh>>6)%100)/100*dur}s`;}
@@ -2530,7 +2545,7 @@ function renderScene(){
    <g fill="#fff" stroke="#9AA8C6"><rect x="30" y="96" width="34" height="9" rx="1"/><rect x="34" y="90" width="30" height="8" rx="1" fill="#F6E7A8"/><rect x="290" y="94" width="38" height="11" rx="1"/><rect x="294" y="88" width="30" height="8" rx="1" fill="#F6E7A8"/></g><g transform="translate(8 4)"><rect x="244" y="97" width="16" height="3" rx="1" fill="#C9CED6" stroke="#8A93A3" stroke-width=".8"/><rect x="249" y="88" width="6" height="10" fill="#B8BFCA" stroke="#8A93A3" stroke-width=".8"/><rect x="232" y="62" width="40" height="29" rx="3" fill="#E6E9EE" stroke="#8A93A3" stroke-width="1.2"/><path d="M237 68h30M237 72h30M237 76h30" stroke="#CDD2DA" stroke-width="1.2"/><circle cx="252" cy="82" r="3" fill="#C4C9D2" stroke="#9AA3B2" stroke-width=".8"/><rect x="236" y="97" width="32" height="5" rx="1.5" fill="#D5D9E0" stroke="#8A93A3" stroke-width=".8"/></g>
    ${(()=>{const fo=id=>S.fault&&(S.fault.id===id||S.fault.id==='luce')?' opacity=".35"':'';return `<g transform="translate(164 36) scale(.7)"><g${fo('pos')}><rect x="108" y="91" width="15" height="14" rx="2.5" fill="#3A3F4B" stroke="#1F232B" stroke-width="1"/><rect x="110" y="93" width="11" height="4.5" rx="1" fill="#9BE3A8"/><g fill="#9AA3B2"><rect x="110.5" y="99" width="2.4" height="1.8"/><rect x="114.3" y="99" width="2.4" height="1.8"/><rect x="118" y="99" width="2.4" height="1.8"/><rect x="110.5" y="102" width="2.4" height="1.8"/><rect x="114.3" y="102" width="2.4" height="1.8"/><rect x="118" y="102" width="2.4" height="1.8"/></g></g><g${fo('pad')}><rect x="130" y="96" width="22" height="9" rx="1.8" fill="#1E2430" stroke="#0E121A" stroke-width="1"/><rect x="132" y="97.5" width="18" height="6" rx="1" fill="#DDE6F5"/><path d="M134 101q2-3 4 0t4 0t4-1" fill="none" stroke="#2B4C9B" stroke-width=".8" stroke-linecap="round"/><path d="M150 95l4-3" stroke="#555" stroke-width="1.2" stroke-linecap="round"/></g><g${fo('lettore')}><rect x="158" y="96" width="15" height="9" rx="2" fill="#D9DDE4" stroke="#8A93A3" stroke-width="1"/><circle cx="165.5" cy="100.5" r="3" fill="#B9D6FF" stroke="#3F7BE0" stroke-width=".8"/><circle cx="165.5" cy="100.5" r="1.2" fill="none" stroke="#3F7BE0" stroke-width=".6"/></g></g>`;})()}
    ${stress?'<g class="sc-sw"><path d="M142 58q-3 6 0 8q3-2 0-8z" fill="#9AD8FF"/></g><g class="sc-sw" style="animation-delay:.8s"><path d="M218 54q-3 6 0 8q3-2 0-8z" fill="#9AD8FF"/></g>':''}
-   <g><rect x="3" y="197" width="38" height="5" rx="2" fill="${PAL.tots}"/><rect x="6" y="126" width="32" height="72" rx="4" fill="${PAL.tot}" stroke="${PAL.totd}" stroke-width="1.5"/><rect x="9" y="130" width="26" height="33" rx="1.5" fill="#06122E" stroke="${PAL.totl}" stroke-width=".8"/><text x="22" y="134.6" text-anchor="middle" font-size="2.6" font-weight="700" font-family="monospace" fill="#FFD54F">PRENDI IL NUMERO</text>${LETTERS.split('').map((L,i)=>`<text x="${15+(i%2)*11}" y="${143+Math.floor(i/2)*7}" font-size="5" font-weight="700" font-family="monospace" fill="#9CD0FF">${L}</text>`).join('')}<rect x="12" y="167" width="20" height="7" rx="1.5" fill="${PAL.totb}" stroke="#CFE0FF" stroke-width=".6"/><text x="22" y="171.8" text-anchor="middle" font-size="3" font-weight="700" font-family="monospace" fill="#fff">TICKET</text><rect x="14" y="178" width="16" height="3" rx="1" fill="${PAL.totk}"/><rect x="14" y="184" width="16" height="6" rx="1" fill="${PAL.totm}"/></g>
+   <g transform="translate(0 -34)"><rect x="3" y="197" width="38" height="5" rx="2" fill="${PAL.tots}"/><rect x="6" y="126" width="32" height="72" rx="4" fill="${PAL.tot}" stroke="${PAL.totd}" stroke-width="1.5"/><rect x="9" y="130" width="26" height="33" rx="1.5" fill="#06122E" stroke="${PAL.totl}" stroke-width=".8"/><text x="22" y="134.6" text-anchor="middle" font-size="2.6" font-weight="700" font-family="monospace" fill="#FFD54F">PRENDI IL NUMERO</text>${LETTERS.split('').map((L,i)=>`<text x="${15+(i%2)*11}" y="${143+Math.floor(i/2)*7}" font-size="5" font-weight="700" font-family="monospace" fill="#9CD0FF">${L}</text>`).join('')}<rect x="12" y="167" width="20" height="7" rx="1.5" fill="${PAL.totb}" stroke="#CFE0FF" stroke-width=".6"/><text x="22" y="171.8" text-anchor="middle" font-size="3" font-weight="700" font-family="monospace" fill="#fff">TICKET</text><rect x="14" y="178" width="16" height="3" rx="1" fill="${PAL.totk}"/><rect x="14" y="184" width="16" height="6" rx="1" fill="${PAL.totm}"/></g>
    ${crowd}
    ${(()=>{const XS=(RT.exits||[]).filter(X=>now-X.t0<=X.sp+X.W);RT.exits=XS;return XS.map(X=>{const el=now-X.t0,hx=hsh(X.c.id+'ex'),dir=1,x0=X.x!=null?X.x:(pos[Math.min(X.idx||0,pos.length-1)]||[214,172])[0],y0=X.y!=null?X.y:(pos[Math.min(X.idx||0,pos.length-1)]||[214,172])[1],sc0=X.sc||.68;
      if(el<X.sp){const tx=esc(X.say),w=Math.min(176,tx.length*3.9+14),bx=Math.max(4,Math.min(356-w,x0-w/2));return `<g>${custSVG(X.c,x0,y0,sc0,X.L,false,true,false)}<g><rect x="${bx.toFixed(1)}" y="78" width="${w.toFixed(1)}" height="15" rx="7" fill="#fff" stroke="${X.L===2?'#C62828':'#4a4a5a'}" stroke-width="1.2"/><text x="${(bx+w/2).toFixed(1)}" y="88.4" text-anchor="middle" font-size="6.6" font-weight="700" fill="${X.L===2?'#B71C1C':'#222'}" font-family="Arial">${tx}</text></g></g>`;}
@@ -2594,8 +2609,8 @@ function pdsMain(k,c,down,av){
   if(c.opOk===false)return{main:`<div class="ops pad">${OPS.filter(o=>o.id!=='pp').map(o=>`<button class="opb" data-act="op" data-k="${k.id}" data-o="${o.id}">${opLogo(o)}<span>${esc(o.n)}</span></button>`).join('')}</div>`,st:'Seleziona l’operatore.'};
   if(c.docOk===false){
     return{main:`<div class="pad"><div class="muted" style="font-size:11px;margin:0 0 4px">Controlla il documento (oggi è ${esc(fmtDay(S.off))} ${dt0(S.off).getUTCFullYear()}):</div>
-     ${docCard(c)}
-     <div class="row" style="gap:6px;margin-top:6px"><button class="btn" style="flex:1" data-act="doc" data-k="${k.id}" data-v="1">Documento valido</button><button class="btn" style="flex:1" data-act="doc" data-k="${k.id}" data-v="0">Non valido</button></div></div>`,st:'Verifica il documento.'};
+     ${docCard(c)}${avvCard(c)}
+     <div class="row" style="gap:6px;margin-top:6px"><button class="btn" style="flex:1" data-act="doc" data-k="${k.id}" data-v="1">${c.avv?'Tutto in regola':'Documento valido'}</button><button class="btn" style="flex:1" data-act="doc" data-k="${k.id}" data-v="0">${c.avv?'Non in regola':'Non valido'}</button></div></div>`,st:c.avv?'Verifica documento e avviso: il nome deve combaciare.':'Verifica il documento.'};
   }
   return{main:prodStrip(k,true),st:`<div class="prog"><i data-p></i></div><div data-r style="font-size:11.5px"></div>`};
 }
@@ -2818,9 +2833,16 @@ function updSettings(){
   const bt=$('#b-theme');if(bt)bt.textContent='Stile: '+styleName();
   const bs=$('#b-sound');if(bs)bs.textContent='Suoni: '+(RT.snd?'attivo':'spento');
 }
+const BKKEY='postalino.backup';
+function bkGet(){try{const o=JSON.parse(localStorage.getItem(BKKEY));return o&&o.s?o:null;}catch(e){return null;}}
+function bkInfo(){const o=bkGet();return o?'Backup: giorno '+o.d+' · '+new Date(o.ts).toLocaleString('it-IT',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'';}
+function bkSave(){try{localStorage.setItem(BKKEY,JSON.stringify({ts:Date.now(),d:S.day+1,s:JSON.stringify(S,(k,v)=>k==='_ent'?undefined:v)}));toast('Backup salvato.','good');}catch(e){toast('Impossibile salvare il backup.','bad');}menuModal();}
+function bkConfirm(){modal({title:'Caricare il backup?',html:'<p>La partita attuale viene sostituita dal backup ('+bkInfo().replace('Backup: ','')+').</p>',opts:[{l:'Sì, carica',cls:'gold',fn(){const o=bkGet();if(o){try{localStorage.setItem(KEY,o.s);}catch(e){}location.reload();}return false;}},{l:'No, torna al gioco'}]});}
 function menuModal(){
   modal({title:'Menu',html:'',opts:[
     {l:'Ricomincia la partita',h:'Cancella i progressi e torna all’inizio',cls:'gold',fn(){confirmRestart();return false;}},
+    {l:'Salva backup',h:bkInfo()||'Nessun backup salvato',fn(){bkSave();return false;}},
+    ...(bkInfo()?[{l:'Carica backup',h:bkInfo(),fn(){bkConfirm();return false;}}]:[]),
     {l:'Stile: '+styleName(),h:'Tocca per cambiare',fn(){const i=STYLES.findIndex(x=>x[0]===curStyle());setStyle(STYLES[(i+1)%3][0]);menuModal();return false;}},
     {l:'Visualizzazione: '+(curView()==='pc'?'PC':'Cellulare'),h:'Tocca per cambiare',fn(){setView(curView()==='pc'?'mobile':'pc');menuModal();return false;}},
     ...(meOK()&&!S.meEdited?[{l:'Nome ed età',h:'Modificabili una sola volta',fn(){meEditModal();return false;}}]:[]),
@@ -2990,10 +3012,11 @@ function answerNt(k,inv){
 }
 function answerDoc(k,v){
   const c=k&&k.cur;if(!c||c.docOk!==false)return false;
-  const good=c.doc.kind==='ok';c.docOk=true;
+  const avBad=!!(c.avv&&c.avv.kind!=='ok'),good=c.doc.kind==='ok'&&!avBad;c.docOk=true;
   if(good&&v)return true;
-  if(good&&!v){adjRep(-.6);angryAt(c,.5);c.left+=1;c.total+=1;if(c.act)c.itemLeft+=1;toast('Il documento era valido: il cliente è offeso (+1 min).','bad');return true;}
+  if(good&&!v){adjRep(-.6);angryAt(c,.5);c.left+=1;c.total+=1;if(c.act)c.itemLeft+=1;toast(c.avv?'Documento e avviso erano in regola: il cliente è offeso (+1 min).':'Il documento era valido: il cliente è offeso (+1 min).','bad');return true;}
   if(!good&&!v){if(c.doc.kind==='other'||c.doc.tp==='pasf'){c.problem={id:c.doc.kind==='other'?'altrui':'psgd',t:0,done:false};return true;}sendHome(k,c);return true;}
+  if(c.doc.kind==='ok'&&avBad){adjRep(-2);addCash(-90,'fines');log(`Hai consegnato a ${c.name} senza che avviso e documento combaciassero: multa di ${eur(90)}.`,'bad');toast('Avviso non conforme! Multa 90 €','bad');return true;}
   const HI=c.doc.tp==='pasf';
   if(c.doc.kind==='other'){const m=HI?400:90;adjRep(-2);addCash(-m,'fines');log(`Hai accettato il documento di un’altra persona per ${c.name}: multa di ${eur(m)}.`,'bad');toast(`Documento di un’altra persona! Multa ${m} €`,'bad');return true;}
   adjRep(-.8);toast('Il documento non era valido! Hai accettato lo stesso.','bad');
