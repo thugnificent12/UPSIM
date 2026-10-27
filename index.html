@@ -540,9 +540,10 @@ const AVC={};
 function avCust(i,cls,ext){
   if(!ext&&AVC[i])return AVC[i].replace('class="AVCLS"','class="'+(cls||'av')+'"');
   const a=AVS[i],v=AVO[i];
-  const c={id:'av'+i,age:a.age,arch:'',name:a.n,work:null,pri:null,prov:false,trans:null,mus:false,diff:false,_bt:['','atl','amg','ob','mel','','bas','amg','ob','atl','amg','mel','','ob','bas',''][i]||'',_no:v.no||'',_ov:Object.assign({},v,{gl:!!v.gl,be:!!v.be,er:v.er?1:0,fk:v.fk||0})};
-  const fig=custSVG(c,0,0,1,0,true,false,false).replace('class="sc-bob"','class=""').replace(/^(<g transform="translate\([^)]*\) scale\()[0-9.]+/,'$11.02');
-  const o=`<svg class="AVCLS" viewBox="0 0 64 64" aria-hidden="true"><defs><clipPath id="avb${i}"><rect x="-40" y="-42" width="80" height="${ext?130:94}"/></clipPath></defs>${ext?'':`<circle cx="32" cy="32" r="32" fill="${a.bg}"/>`}<g transform="translate(32 31) scale(.75)" clip-path="url(#avb${i})">${fig}</g></svg>`;
+  const c={id:'av'+i,age:a.age,arch:'',name:a.n,work:null,pri:null,prov:false,trans:null,mus:false,diff:false,_bt:['','atl','amg','ob','mel','','bas','amg','amg','atl','amg','mel','','ob','bas',''][i]||'',_no:v.no||'',_ov:Object.assign({},v,{gl:!!v.gl,be:!!v.be,er:v.er?1:0,fk:v.fk||0})};
+  let fig=custSVG(c,0,0,1,0,true,false,false).replace('class="sc-bob"','class=""').replace(/^(<g transform="translate\([^)]*\) scale\()[0-9.]+/,'$11.02');
+  if(ext&&i!==6&&i!==7)fig=fig.replace(/([-\d.]+) (\d+(?:\.\d+)?)Q0 [\d.]+ ([-\d.]+) \2Z/g,'$1 92L$3 92Z');
+  const o=`<svg class="AVCLS" viewBox="0 0 64 64" aria-hidden="true"><defs><clipPath id="avb${i}"><rect x="-40" y="-42" width="80" height="${ext?130:94}"/></clipPath></defs>${ext?'':`<circle cx="32" cy="32" r="32" fill="${a.bg}"/>`}<g transform="translate(32 31) scale(.75)" clip-path="url(#avb${i})">${ext&&(i===6||i===7)?(()=>{const m=fig.match(/Z" fill="(#[0-9a-fA-F]{6})"\/><path d="[^"]*" fill="none"\s+style="stroke/);return m?`<rect x="-14.2" y="48" width="28.4" height="50" fill="${m[1]}"/>`:'';})():''}${fig}</g></svg>`;
   if(ext)return o.replace('class="AVCLS"','class="'+(cls||'av')+'"');
   AVC[i]=o;return o.replace('class="AVCLS"','class="'+(cls||'av')+'"');
 }
@@ -3170,6 +3171,6 @@ render(true);
 showStart(HAD);
 if(S.phase==='post'){if(S.over)startMenu();else if(S.fin)showFinal();else{nextDay();render(true);}}
 requestAnimationFrame(frame);
-window.__P={avSVG,AVS,custSVGB,FEM,callCustomer,hsh,finish,doClosure,clPend,atmXfer,atmUse,atmCanLoad,vaultXfer,endDay,calcMods,expected,addCustomer,addApptCustomer,answerNt,genDoc,safeXfer,drw,normCash,fireRobbery,custSVG,get S(){return S;},POSTMEN,postDay,nextDay,goals,showFinal,isOpen,isOpenMs,dt0,LAST,nextOpen,prepDay,subDay,step,endDay,render,openDay,tryCall,callCustomer,applyOpt,fireIncident,closeModal,newState,selectQty,selectOp,bookAppt,apptDays,selectProd,answerDoc,sendAway,addCustomer,openTicket,AVS,openUP,closeUP,UPGS,POOL,PROBS,RT,openUP,buyUpg,hireStaff,hirePost,givePrem,LETTERS,mkCounter};
+window.__P={avCust,avSVG,AVS,custSVGB,FEM,callCustomer,hsh,finish,doClosure,clPend,atmXfer,atmUse,atmCanLoad,vaultXfer,endDay,calcMods,expected,addCustomer,addApptCustomer,answerNt,genDoc,safeXfer,drw,normCash,fireRobbery,custSVG,get S(){return S;},POSTMEN,postDay,nextDay,goals,showFinal,isOpen,isOpenMs,dt0,LAST,nextOpen,prepDay,subDay,step,endDay,render,openDay,tryCall,callCustomer,applyOpt,fireIncident,closeModal,newState,selectQty,selectOp,bookAppt,apptDays,selectProd,answerDoc,sendAway,addCustomer,openTicket,AVS,openUP,closeUP,UPGS,POOL,PROBS,RT,openUP,buyUpg,hireStaff,hirePost,givePrem,LETTERS,mkCounter};
 })();
 </script>
