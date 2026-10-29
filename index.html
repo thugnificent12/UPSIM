@@ -2518,7 +2518,7 @@ function renderScene(){
     c._goal=[o.p[0],o.p[1],o.p[2]||.68];
     if(c._from&&!c._arrived){wl.push({c,goal:c._goal,s:c._goal[2],comp:!!c.comp,L});return '';}
     seatP.push([o.p[0]+(c.comp?(o.p[2]||.68)*13:0),o.p[1],(o.p[2]||.68)*(c.comp?34:20)]);
-    if(!c._ent||c._ent>now)c._ent=c._ent?now-5000:now;
+    if(!c._ent||c._ent>now)c._ent=(c._ent||S.speed===0||S.phase!=='open')?now-5000:now;
     const el=now-c._ent,entering=el<2800;
     const s00=o.p[2]||.68,ampR=mq<6?0:(mq-5)*4.5,amp=Math.min(ampR,Math.max(0,o.p[0]-(41+22*s00+3+(c.comp?s00*13:0)))),dur=Math.max(2.6,10-mq*.7),vert=((hh>>3)%2===0),dy=vert?(mq<6?0:(mq-5)*3+7):0;
     const ex=(c._from==='tot'?66:288)-o.p[0],ey=(c._from==='tot'?150:146)-o.p[1];
