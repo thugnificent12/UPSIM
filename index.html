@@ -1146,7 +1146,7 @@ function mkProd(prod,a,qty,forceOp){
    case 'lba':{uq=1;det='aprire un libretto di risparmio';fee=0;base=7;break;}
    case 'lbv':{uq=1;pass=rk(ri(50,900));det=`versare ${pass} € sul libretto`;fee=0;base=3.5;break;}
    case 'lbp':{uq=1;const m=rk(ri(20,200));det=`ritirare ${m} € dal libretto`;x.out=m;fee=0;base=3.5;break;}
-   case 'buo':{uq=1;det=`sottoscrivere un buono postale da ${pick([500,1000,1500,2000,3000,5000]).toLocaleString('it-IT')} € per ${pick(['mio nipote','mia nipote','mio figlio','mia figlia','la mia nipotina'])}`;fee=0;base=13;hi=2.8;break;}
+   case 'buo':{uq=1;pass=pick([500,1000,1500,2000,3000,5000]);det=`sottoscrivere un buono postale da ${pass.toLocaleString('it-IT')} € per ${pick(['mio nipote','mia nipote','mio figlio','mia figlia','la mia nipotina'])}`;fee=0;base=13;hi=2.8;break;}
    case 'rra':{const q=qty;uq=q;det=`spedire ${q>1?q+' raccomandate con ricevuta di ritorno':'una raccomandata con ricevuta di ritorno'}`;fee=Math.round((tarSum(TAR_RC,q)+1.05*q)*100)/100;base=3.2*q;break;}
    case 'pco':{const q=Math.min(qty,2);uq=q;const m=ri(2,18)*5;det=`spedire ${q>1?q+' pacchi':'un pacco'} in contrassegno (il destinatario paga ${m*q} €)`;fee=3.05*q+(chance(.8)?pa5Sum(q):paoSum(q));base=4.4*q;break;}
    case 'cap':{uq=1;det='aprire una casella postale';fee=125;base=6;hi=3;break;}
@@ -3175,6 +3175,6 @@ render(true);
 showStart(HAD);
 if(S.phase==='post'){if(S.over)startMenu();else if(S.fin)showFinal();else{nextDay();render(true);}}
 requestAnimationFrame(frame);
-window.__P={avCust,avSVG,AVS,custSVGB,FEM,callCustomer,hsh,finish,doClosure,clPend,atmXfer,atmUse,atmCanLoad,vaultXfer,endDay,calcMods,expected,addCustomer,addApptCustomer,answerNt,genDoc,safeXfer,drw,normCash,fireRobbery,custSVG,get S(){return S;},POSTMEN,postDay,nextDay,goals,showFinal,isOpen,isOpenMs,dt0,LAST,nextOpen,prepDay,subDay,step,endDay,render,openDay,tryCall,callCustomer,applyOpt,fireIncident,closeModal,newState,selectQty,selectOp,bookAppt,apptDays,selectProd,answerDoc,sendAway,addCustomer,openTicket,AVS,openUP,closeUP,UPGS,POOL,PROBS,RT,openUP,buyUpg,hireStaff,hirePost,givePrem,LETTERS,mkCounter};
+window.__P={mkProd,avCust,avSVG,AVS,custSVGB,FEM,callCustomer,hsh,finish,doClosure,clPend,atmXfer,atmUse,atmCanLoad,vaultXfer,endDay,calcMods,expected,addCustomer,addApptCustomer,answerNt,genDoc,safeXfer,drw,normCash,fireRobbery,custSVG,get S(){return S;},POSTMEN,postDay,nextDay,goals,showFinal,isOpen,isOpenMs,dt0,LAST,nextOpen,prepDay,subDay,step,endDay,render,openDay,tryCall,callCustomer,applyOpt,fireIncident,closeModal,newState,selectQty,selectOp,bookAppt,apptDays,selectProd,answerDoc,sendAway,addCustomer,openTicket,AVS,openUP,closeUP,UPGS,POOL,PROBS,RT,openUP,buyUpg,hireStaff,hirePost,givePrem,LETTERS,mkCounter};
 })();
 </script>
