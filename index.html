@@ -2840,7 +2840,7 @@ function updSettings(){
 const BKKEY='postalino.backup';
 function bkGet(){try{const o=JSON.parse(localStorage.getItem(BKKEY));return o&&o.s?o:null;}catch(e){return null;}}
 function bkInfo(){const o=bkGet();return o?'Backup: giorno '+o.d+' · '+new Date(o.ts).toLocaleString('it-IT',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'';}
-function bkSave(){try{localStorage.setItem(BKKEY,JSON.stringify({ts:Date.now(),d:S.day+1,s:JSON.stringify(S,(k,v)=>k==='_ent'?undefined:v)}));toast('Backup salvato.','good');}catch(e){toast('Impossibile salvare il backup.','bad');}menuModal();}
+function bkSave(){try{localStorage.setItem(BKKEY,JSON.stringify({ts:Date.now(),d:S.day,s:JSON.stringify(S,(k,v)=>k==='_ent'?undefined:v)}));toast('Backup salvato.','good');}catch(e){toast('Impossibile salvare il backup.','bad');}menuModal();}
 function bkConfirm(){modal({title:'Caricare il backup?',html:'<p>La partita attuale viene sostituita dal backup ('+bkInfo().replace('Backup: ','')+').</p>',opts:[{l:'Sì, carica',cls:'gold',fn(){const o=bkGet();if(o){try{localStorage.setItem(KEY,o.s);}catch(e){}location.reload();}return false;}},{l:'No, torna al gioco'}]});}
 function menuModal(){
   modal({title:'Menu',html:'',opts:[
