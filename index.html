@@ -805,6 +805,8 @@ const PROBS={
   {l:'Le leggi insieme a lui',h:'+8 min, fiducia eterna',x:8,r:.5,d:1},
   {l:'Gli fai una sintesi',h:'+3 min',x:3,r:.1},
   {l:'Lo rimandi a casa a pensarci',h:'perde il cliente',go:1,r:-.3}]},
+ nomod:{for:'',t:'non ha compilato nessun modulo',o:[
+  {l:'Glieli fai compilare allo sportello',h:'+16 min',x:16,d:1}]},
  firma:{for:'F',t:'ha una firma diversa o illeggibile',o:[
   {l:'Gli fai rifirmare più volte',h:'+5 min',x:5,d:1}]}};
 
@@ -1225,7 +1227,7 @@ function addCustomer(){
   const TL=tkLetter(items),n=0;
   S.queue.push({id:cid,age,tk:'—',noTk:nt,type:TL,arch:a.id,archN:a.n,name:fr?FG.name:(()=>{const f=pick(FN);return f+' '+pick(SN.filter(x=>x!==f));})(),nat:fr?FG.nat:undefined,fr,lang,inc:lang>0&&psg,fphr:lang===2?fPhrase(first.prod,fr?FG.nat:null):'',district:dist.n,prod:first.prod,pre:lang===2?'… ':lang?'Io volere ':first.prod==='pen'?'Devo ':pick(['Devo ','Dovrei ','Vorrei ','Avrei bisogno di ']),
     diff:chance(.004),card:age>=18&&!items.some(i=>i.out)&&chance(.2),prio:false,pat:a.pat*rnd(.85,1.15)*agP,wait:0,det:items.map(i=>i.det).join(' + '),qty:first.qty,pass:sum('pass'),fee:sum('fee'),base:sum('base'),prob:a.prob,items});
-  {const q=S.queue[S.queue.length-1];accGen(q);if(q.diff)q.pat*=.7;if(q.noTk&&idle&&chance(.05))q.ask=true;
+  {const q=S.queue[S.queue.length-1];if(!q.diff&&q.items.some(i=>['bol','rac','pao','pa3','paeu','pari','paic'].includes(i.prod))&&chance(1/68))q.noMod=true;accGen(q);if(q.diff)q.pat*=.7;if(q.noTk&&idle&&chance(.05))q.ask=true;
     const fn0=String(q.name).split(' ')[0],fem0=FEM.has(fn0),r0=Math.random();
     if(chance(.008)&&r0>=.055){q.trans=fem0?'fm':'mf';q.age=chance(.75)?ri(18,34):ri(35,q.trans==='fm'?50:65);}
     if(fem0&&!q.trans&&q.age>=22&&q.age<=45&&chance(.04))q.prov=true;
@@ -1385,7 +1387,7 @@ function callCustomer(k,c,manual){
   S.queue=S.queue.filter(x=>x!==c);RT.lastTk=c.tk;
   const s=k.who==='tu'?null:staffOf(k);
   const pm=(s?s.prb:1)*(1-.2*(S.upg.moduli||0))*(S.angolo&&!S.angoloAbs?.85:1)*probRamp();
-  const hasProb=c.diff||c.lang===1||chance(clamp(c.prob*pm,0,.95));
+  const hasProb=c.noMod||c.diff||c.lang===1||chance(clamp(c.prob*pm,0,.95));
   k.cur=Object.assign({},c,{doc:genDoc(c),avv:genAvv(c),docOk:undefined,feeMul:1,total:c.diff?c.base*1.4:c.base,left:c.diff?c.base*1.4:c.base,hasProb,probAt:c.base*rnd(.3,.65),problem:null,ntOk:c.noTk?false:true,prodOk:k.who!=='tu',opOk:true,qtyOk:true,act:null,itemLeft:0,items:(c.items||[]).map(i=>Object.assign({},i))});
   k.menu=null;
   if(S.dogEv&&S.dogEv.id===c.id)S.dogEv=null;
@@ -1397,6 +1399,7 @@ function callCustomer(k,c,manual){
 }
 function tryCall(k,manual){const c=pickFor(k);if(c)callCustomer(k,c,manual);return !!c;}
 function pickProblem(c){
+  if(c.noMod)return 'nomod';
   if(c.lang===1)return 'lingua';
   if(c.arch==='vint'&&c.type==='P'&&chance(.6))return 'grande';
   return pick(Object.keys(PROBS).filter(id=>PROBS[id].for.includes(c.type)));
