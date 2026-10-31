@@ -933,8 +933,10 @@ function subDay(){
   }
   if(S.sub){const s=S.staff.find(x=>x.id===S.sub.id);if(s){s.today.sub=true;s.today.abs=false;}}
 }
+const ORD={sim:{b:4,u:12,l:'SIM'},pcn:{b:3,u:10,l:'nuove PostalCard'},pa3:{b:6,u:6,l:'pacchi entro 5 giorni'},r1:{b:5,u:8,l:'raccomandate 1 giorno'}};
+function newOrder(){if(S.day<3||!chance(.3))return null;const p=pick(Object.keys(ORD)),o=ORD[p],n=Math.max(2,Math.round(o.b*clamp(expected()/40,.7,1.6)*rnd(.85,1.15)));return{p,n,done:0,prem:Math.round(n*o.u),paid:false};}
 function prepDay(){
-  S.today=calcMods();S.today.N=expected()*1.3;
+  S.today=calcMods();S.today.N=expected()*1.3;S.today.ord=newOrder();
   S.today.rob=S.day>=5&&chance(.006)?{at:ri(OPEN+40,CLOSE-40),done:false}:null;
   S.carryIn=S.carry||{};S.carry={};S.clN={};S.cls={};S.queue=[];S.arr=[];RT.wk={};RT.wl=[];S.back=[];S.fight=null;S.dogEv=null;S.tk=ZERO();S.t=OPEN0;S.uOpen=false;S.phase='pre';S.speed=0;
   S.counters.forEach(k=>k.cur=null);
@@ -1458,6 +1460,7 @@ function finish(k){
    const mm=c.cc&&c.cc.mid?ac.reg.find(r=>r.id===c.cc.mid):null;
    if(mm){for(const it of c.items||[]){if(it.prod==='cpv'||it.prod==='cpi')mm.bal+=it.pass||0;else if(it.prod==='cpp')mm.bal-=it.out||0;else if(it.prod==='lbv')mm.lib+=it.pass||0;else if(it.prod==='lbp')mm.lib-=it.out||0;}mm.bal=mm.bal==null?null:Math.round(Math.max(0,mm.bal)*100)/100;mm.lib=mm.lib==null?null:Math.round(Math.max(0,mm.lib)*100)/100;}}
   S.st.inc=(S.st.inc||0)+fee+Math.max(0,pass);addCash(fee,'rev');S.cash+=pass;S.st.pass=(S.st.pass||0)+pass;if(cp&&pass>0)S.vault=Math.round(((S.vault||0)+pass)*100)/100;S.life+=fee;S.st.served++;S.servedTot++;S.st.byType[c.type]++;
+  {const od=S.today.ord;if(od&&S.phase==='open')for(const it of c.items||[])if(!it.den&&it.prod===od.p)od.done+=it.qty||1;}
   const ppi=(c.items||[]).filter(i=>i.op==='pp'||i.sim),npp=ppi.length;
   if(npp){
     S.st.pp=(S.st.pp||0)+npp;S.ppTot=(S.ppTot||0)+npp;
@@ -1589,6 +1592,7 @@ function postDay(){
 }
 function endDay(forced){
   if(S.phase!=='open')return;
+  {const od=S.today.ord;if(od&&!od.paid){od.paid=true;if(od.done>=od.n){addCash(od.prem,'rev');S.life+=od.prem;S.st.ordPrem=od.prem;log(`Ordine della direzione raggiunto (${od.done} ${ORD[od.p].l}): premio di ${eur(od.prem)}.`,'good');}else log(`Ordine della direzione non raggiunto (${od.done} su ${od.n} ${ORD[od.p].l}).`,'info');}}
   normCash();if(drw()>CAP+.01){const ex=Math.ceil(drw()-CAP);S.safe=Math.round((S.safe+drw()-CAP)*100)/100;addCash(-60,'fines');adjRep(-1);log(`A fine giornata nel cassetto c’erano ${eur(ex)} oltre il limite: versati d’ufficio nel Safety cash, con 60 € di multa per la cassa non regolare.`,'bad');}
   {const ms=clPend();if(ms.length){const f=80*ms.length;addCash(-f,'fines');adjRep(-.4*ms.length);log(`Chiusure non effettuate (${ms.map(x=>CLN[x]).join(', ')}): multa di ${eur(f)}.`,'bad');}}
   const rest=S.queue.length+S.counters.filter(k=>k.cur).length;
@@ -1704,7 +1708,7 @@ function showReport(profit,p2,extra,forced,rep1){
   const st=S.st,d=S.today,dr=rep1-st.rep0;
   const mEnd=S.mEnd;
   const hasP=(S.post||[]).length>0;
-  const rows=[['Clienti serviti',st.served],['Persi in coda',st.angry],['Rimandati a casa',st.sent],
+  const rows=[...(d.ord?[['Ordine della direzione',`${d.ord.done}/${d.ord.n} ${ORD[d.ord.p].l}${st.ordPrem?' · premio '+eur(st.ordPrem):''}`]]:[]),['Clienti serviti',st.served],['Persi in coda',st.angry],['Rimandati a casa',st.sent],
     ...((st.pass||0)>0?[['Incasso totale (con commissioni)',eur(st.rev-(st.del||0)+st.pass,2)],['Versato agli enti',eur(-st.pass,2)]]:[]),
     [(st.pass||0)>0?'Commissioni e ricavi tuoi':(hasP?'Incasso sportelli':'Incasso'),eur(st.rev-(st.del||0),2)],
     ...(hasP?[['Consegne dei portalettere',eur(st.del||0,2)]]:[]),
@@ -1841,7 +1845,7 @@ function renderBanner(){
   if(S.apptToday&&S.apptToday.length)evs+=`<div class="evt"><b>In agenda.</b> Oggi: ${S.apptToday.map(a=>APPT[a.kind||'pol'].s).join(', ')}${S.apptToday.length>1?'':` verso le ${hh(S.apptToday[0].at)}`}.</div>`;
   if(LAST-S.off<=30)evs+=`<div class="evt"><b>Controllo Interno.</b> ${LAST-S.off<=0?'Oggi è l’ultimo giorno del mandato.':`Mancano ${LAST-S.off} giorni alla fine del mandato.`}</div>`;
   setHTML(el,`<div class="card banner bn-g"><div class="eyebrow">${esc(fill('Buongiorno, {N}'))} · ${WD[m.wd]} ${m.dom} ${MESI[m.mon]} ${m.yr} · mese ${monthNo()} di 24</div><h2>Il PDS si apre alle ${hh(DPS0)}</h2><p class="muted" style="margin:0">Il pubblico entra alle ${hh(OPEN)} e si chiude agli sportelli alle ${hh(CLOSE)}. La chiusura contabile si fa dalle ${hh(CLMIN)} alle ${hh(CLOSEOK)}. Se apri l’ufficio dopo le ${hh(OPEN)} o lo chiudi fuori da questo orario prendi una multa.</p>
-   ${tags?`<div class="tags">${tags}</div>`:''}${evs}
+   ${tags?`<div class="tags">${tags}</div>`:''}${evs}${S.today.ord?`<div class="evt"><b>Ordine dalla direzione.</b> Oggi obiettivo: <b>${S.today.ord.n} ${ORD[S.today.ord.p].l}</b>. Se lo raggiungi, premio di <b>${eur(S.today.ord.prem)}</b>.</div>`:''}
    <p>Affluenza prevista: circa <b>${n}</b> clienti. ${S.day===1?'Il tuo sportello è il primo: tocca <b>Prossimo</b> per servire i clienti.':''}</p>
    <button class="btn gold big" data-act="open">Inizia la giornata</button></div>`);
 }
@@ -2851,7 +2855,7 @@ function renderConti(){
   const rivL=[['Tu',S.rep,true],...Object.keys(S.rivals).map(id=>[RIVN[id],S.rivals[id],false])].sort((a,b)=>b[1]-a[1]);
   const rivH=`<div class="card"><h2>Gradimento degli uffici di Cenide</h2>${rivL.map(r=>`<div class="rv ${r[2]?'me':''}"><span>${r[2]?'<b>Tu</b>':esc(r[0])}</span><b class="mono">${Math.round(r[1])}</b><div class="prog"><i style="width:${clamp(r[1],0,100)}%"></i></div></div>`).join('')}<p class="muted" style="font-size:12.5px;margin:8px 0 0">Se il tuo gradimento è più basso di quello degli altri uffici, arrivano meno clienti.</p></div>`;
   setHTML($('#co-dyn'),rivH+`<div class="card"><h2>Oggi</h2>
-   <div class="kv"><span>Serviti</span><b>${st.served}</b></div><div class="kv"><span>Persi in coda</span><b>${st.angry}</b></div><div class="kv"><span>Rimandati a casa</span><b>${st.sent}</b></div><div class="kv"><span>Incasso</span><b>${eur(st.rev,2)}</b></div><div class="kv"><span>In sala adesso</span><b>${S.queue.length}</b></div></div>
+   <div class="kv"><span>Serviti</span><b>${st.served}</b></div><div class="kv"><span>Persi in coda</span><b>${st.angry}</b></div><div class="kv"><span>Rimandati a casa</span><b>${st.sent}</b></div><div class="kv"><span>Incasso</span><b>${eur(st.rev,2)}</b></div><div class="kv"><span>In sala adesso</span><b>${S.queue.length}</b></div>${S.today.ord?`<div class="kv"><span>Ordine direzione: ${S.today.ord.n} ${ORD[S.today.ord.p].l}</span><b>${Math.min(S.today.ord.done,S.today.ord.n)}/${S.today.ord.n}${S.today.ord.done>=S.today.ord.n?' ✔':''}</b></div>`:''}</div>
    <div class="card"><h2>Ultimi giorni</h2>${chartHTML()}</div>
    ${calHTML()}
    <div class="card"><h2>Obiettivi di mandato</h2><p class="muted" style="margin:0 0 6px;font-size:13px">Il Controllo Interno arriva il ${dt0(LAST).getUTCDate()} ${MESI[dt0(LAST).getUTCMonth()].toLowerCase()} ${dt0(LAST).getUTCFullYear()}: ${LAST-S.off>0?`mancano ${LAST-S.off} giorni`:'è oggi'}. Tre obiettivi su quattro e vieni confermato.</p><div class="prog" style="margin-bottom:6px"><i style="width:${(S.off/LAST*100).toFixed(1)}%"></i></div>${goals().map(x=>`<div class="kv"><span>${x.ok?'✔':'✘'} ${esc(x.t)}</span><b style="font-family:var(--f-body);font-size:12.5px">${esc(x.p)}</b></div>`).join('')}</div>
