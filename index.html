@@ -1194,10 +1194,14 @@ function mkProd(prod,a,qty,forceOp){
   return Object.assign({type:PTYPE[prod],prod,op,qty:uq,det,fee:fee*((FIXP.has(prod)||prod==='poi'||prod==='rac'||prod==='asc'||prod==='rra'||prod==='ree'||prod==='pao'||prod==='ase'||prod==='poe'||prod==='paic'||prod==='pari'||prod==='paeu'||prod==='pa3'||prod==='r1'||prod==='bol'||prod==='bau'||prod==='f24'||prod==='pagopa'||prod==='vag')?1:a.pay),pass,base:clamp(base*a.slow*rnd(.8,1.25)*.25,.5,hi),done:false,doc:DOCP.has(prod)||(op==='pp'&&(prod==='sim'||prod==='lin'))},x);
 }
 const NTB=new Set(['rra','fra','poi','poe','r1','ree','asc','ase','pao','pa3','paeu','pari','paic']);
+function famDue(){const fq=Math.floor(S.off/91.25);if(S.famQ!==fq){S.famQ=fq;S.famT=Math.round(fq*91.25+ri(3,88));S.famOk=false;}return !S.famOk&&S.off>=S.famT;}
 function addCustomer(){
   if(S.queue.length>=(S.upg.reno?70:45)){adjRep(-.2);S.st.angry++;return;}
+  let RGV=null;
+  if(S.day>=2){if(!S.reg)S.reg=[];if(chance(.06)){const act=S.reg.filter(r=>(r.gone||0)<=S.day&&!S.queue.some(x=>x.id===r.id)&&!(S.arr||[]).some(x=>x.c&&x.c.id===r.id)&&!S.counters.some(k=>k.cur&&k.cur.id===r.id));
+    if(S.reg.length<10&&(chance(.5)||!act.length))RGV={mk:true};else if(act.length)RGV=wpick(act,r=>.3+r.sat);}}
   const dist=wpick(DISTS,d=>d.w*(S.today.dist[d.id]??1));
-  const a=wpick(ARCH,a=>{let s=0;for(const t in a.types)s+=a.types[t]*S.today.tb[t];return a.w*(dist.flav[a.id]??1)*s;});
+  const a=(RGV&&RGV.arch&&ARCH.find(x=>x.id===RGV.arch))||wpick(ARCH,a=>{let s=0;for(const t in a.types)s+=a.types[t]*S.today.tb[t];return a.w*(dist.flav[a.id]??1)*s;});
   const frX=chance(.1),lang0=frX&&chance(.3)?(chance(1/3)?2:1):0,psg=lang0?chance(.7):frX&&chance(.28);
   let type=wpick(Object.keys(a.types),t=>a.types[t]*S.today.tb[t]);if(psg)type='C';
   if(a.id==='info'&&S.angolo&&!S.angoloAbs&&chance(.9)){S.st.info++;adjRep(.03);return;}
@@ -1253,6 +1257,7 @@ function addCustomer(){
   const TL=tkLetter(items),n=0;
   S.queue.push({id:cid,age,tk:'—',noTk:nt,type:TL,arch:a.id,archN:a.n,name:fr?FG.name:(()=>{const f=pick(FN);return f+' '+pick(SN.filter(x=>x!==f));})(),nat:fr?FG.nat:undefined,fr,lang,inc:lang>0&&psg,fphr:lang===2?fPhrase(first.prod,fr?FG.nat:null):'',district:dist.n,prod:first.prod,pre:lang===2?'… ':lang?'Io volere ':first.prod==='pen'?'Devo ':pick(['Devo ','Dovrei ','Vorrei ','Avrei bisogno di ']),
     diff:chance(.004),card:age>=18&&!items.some(i=>i.out)&&chance(.2),prio:false,pat:a.pat*rnd(.85,1.15)*agP,wait:0,det:items.map(i=>i.det).join(' + '),qty:first.qty,pass:sum('pass'),fee:sum('fee'),base:sum('base'),prob:a.prob,items});
+  if(RGV){const q0=S.queue[S.queue.length-1];if(RGV.id){Object.assign(q0,{id:RGV.id,name:RGV.name,age:RGV.age});q0.reg=RGV.id;}else q0.regNew=true;}
   {const q=S.queue[S.queue.length-1];if(!q.diff&&q.items.some(i=>['bol','rac','pao','pa3','paeu','pari','paic'].includes(i.prod))&&chance(1/68))q.noMod=true;accGen(q);if(q.diff)q.pat*=.7;if(q.noTk&&idle&&chance(.05))q.ask=true;
     const fn0=String(q.name).split(' ')[0],fem0=FEM.has(fn0),r0=Math.random();
     if(chance(.008)&&r0>=.055){q.trans=fem0?'fm':'mf';q.age=chance(.75)?ri(18,34):ri(35,q.trans==='fm'?50:65);}
@@ -1267,6 +1272,10 @@ function addCustomer(){
     if(fem0&&!q.trans&&!q.prov&&!q.pri&&!q.work&&!q.lang&&q.age>=20&&q.age<=45&&chance(.2)){q.mus=true;if(!q.sumF&&[6,7].includes(dt0(S.day).getUTCMonth())&&chance(.3))q.sumF=true;}
     if(!q.pri&&!q.trans&&!q.prov&&!q.work&&!q.shless&&!q.sumF&&!q.sumT&&!q.lang&&q.arch!=='tur'&&chance(.1))q.comp=mkComp(q,fem0);
     if(!q.comp&&!q.pri&&!q.prov&&!q.work&&!q.shless&&!q.sumF&&!q.sumT&&!q.lang&&q.arch!=='tur'&&q.age>=16&&chance(.035)){const r=Math.random();q.dog={br:ri(0,4),sz:ri(0,2),beh:r<.5?'calm':r<.75?'dist':r<.95?'op':'bite',ev:S.t+rnd(1,4),done:false};}}
+  {const q=S.queue[S.queue.length-1];if(q&&q.reg){const R=(S.reg||[]).find(x=>x.id===q.reg);if(R){for(const f of ['trans','prov','shless','sumF','sumT','pri','comp','dog','fight','noMod'])delete q[f];q.diff=false;q.prio=false;q.tat=R.tat;q.mus=R.mus;q.work=R.work;}}}
+  {const q=S.queue[S.queue.length-1];if(q&&!q.reg&&!q.regNew&&famDue()&&q.age>=22&&q.age<=50&&!q.trans&&!q.prov&&!q.pri&&!q.lang&&!q.fr&&!q.diff&&!q.noMod&&!q.shless&&!q.sumF&&!q.sumT){
+    const fm=FEM.has(String(q.name).split(' ')[0]),j=wpick(fm?['can','att','pre']:['cal','can','att','pre'],x=>({cal:3,can:2,att:2,pre:1.5})[x]);
+    q.fam=j;q.famL={cal:'Calciatore',can:'Cantante',att:fm?'Attrice':'Attore',pre:fm?'Presentatrice tv':'Presentatore tv'}[j];q.pat*=.7;S.famOk=true;}}
   {const q=S.queue[S.queue.length-1];if(q&&!q.noTk){S.queue.pop();(S.arr=S.arr||[]).push({c:q,rem:4.6,tot:4.6});}else if(q)q._from='door';}
 }
 function arrivals(dt){
@@ -1472,6 +1481,9 @@ function finish(k){
   }
   if(c.diff){adjRep(-.5);S.st.reclami=(S.st.reclami||0)+1;if(k.who==='tu'){log(`${c.name} (${c.tk}) non è mai contento: contesta le commissioni e minaccia un reclamo.`,'bad');angryAt(c,.7);}}
   const r=c.wait/(c.pat*patMult());
+  if(c.regNew&&S.reg&&S.reg.length<10&&!c.diff&&!c.trans&&!c.prov&&!c.pri&&!c.lang&&!c.fr&&!c.noMod&&!c.shless&&!c.sumF&&!c.sumT&&!c.comp&&!c.dog)S.reg.push({id:c.id,name:c.name,age:c.age,arch:c.arch,tat:c.tat,mus:c.mus,work:c.work,sat:3,gone:0});
+  if(c.reg){const R=(S.reg||[]).find(x=>x.id===c.reg);if(R){R.sat=clamp(R.sat+(r<.35?.5:r<.7?.2:r<.9?-.1:-.5),0,5);if(R.sat>=4)adjRep(.03);if(R.sat<1.5)R.gone=S.day+10;}}
+  if(c.fam)adjRep(r<.5?.25:r>=.9?-.5:0);
   adjRep(r<.35?.07:r<.7?.035:.01);if(c.prio)adjRep(.05);if(c.type==='F')adjRep(.02);
   if(k.who==='tu'){const bad=c.diff||r>=.9,L=bad?2:r<.35?3:r<.7?0:1,SY=bad?(c.diff?['Domani torno col reclamo!','Voglio parlare col direttore!','Che vergogna, tutta una vergogna!']:['Ci ho messo una vita!','Che attesa vergognosa!']):L===3?['Grazie, buona giornata!','Perfetto, grazie mille!','Gentilissimi, grazie!','Ottimo servizio, grazie!']:L===0?['Grazie, arrivederci.','Va bene, grazie.']:['Finalmente…','Meno male, grazie.'];(RT.exits=RT.exits||[]).length>=6&&RT.exits.shift();(RT.exits=RT.exits||[]).push({c:Object.assign({},c),L,say:pick(SY),t0:RT.scT||1000,sp:1900,W:2200,x:214,y:172,sc:.68});}
   k.cur=null;
@@ -1481,6 +1493,8 @@ function checkRank(){const ri2=rankIdx();if(ri2>S.rank){S.rank=ri2;log(`Promozio
 function angryLeave(c){
   const pen=1.1*(1-.25*(S.upg.recl||0))+(c.prio?.8:0);
   adjRep(-pen);S.st.angry++;S.angryTot++;
+  if(c.fam){adjRep(-.5);log(`${c.name} (${c.famL.toLowerCase()}) se ne va infuriato e lo racconta sui social.`,'bad');}
+  if(c.reg){const R=(S.reg||[]).find(x=>x.id===c.reg);if(R){R.sat=Math.max(0,R.sat-1.2);R.gone=S.day+(R.sat<1.5?14:5);}}
   if(chance(.55))log(`${c.name} (${c.tk}) se ne va senza essere servito.`,'bad');
 }
 function adjRep(d){S.rep=clamp(S.rep+d,0,100);}
@@ -2667,7 +2681,7 @@ function renderPC(){
     const trs=(its.length?its.map((i,ix)=>`<tr class="${c.act===i?'cur':''}"><td>${ix+1}</td><td>${i.done?'Chiusa':c.act===i?'In corso':'Da fare'}</td><td>${amt(i)}</td></tr>`).join(''):'<tr><td colspan="3">&nbsp;</td></tr>');
     const want=c?(c.lang===2?esc(c.fphr):esc(c.pre||'Devo ')+its.map(i=>`<b class="${i.done?'itd':''}">${esc(i.det)}</b>`).join(' e anche ')+'.'):'';
     const totv=its.reduce((a,i)=>a+(i.pass||0)+i.fee-(i.out||0),0);
-    const req=c?`<div class="preq"><b>${esc(c.name)}</b>${c.age!=null?' · '+c.age+' anni':''}<br>${want} <b class="rtot">Totale: ${eur(totv,2)}</b>${c.prio?' <span class="pill warn">'+priTxt(c)+'</span>':''}${accPills(c)}${m>.7?' <span class="pill bad">spazientito</span>':m>.4?' <span class="pill warn">preoccupato</span>':''}</div>`:'';
+    const req=c?`<div class="preq"><b>${esc(c.name)}</b>${c.age!=null?' · '+c.age+' anni':''}<br>${want} <b class="rtot">Totale: ${eur(totv,2)}</b>${c.prio?' <span class="pill warn">'+priTxt(c)+'</span>':''}${c.reg?' <span class="pill good">cliente abituale</span>':''}${c.fam?' <span class="pill info">personaggio famoso · '+esc(c.famL)+'</span>':''}${accPills(c)}${m>.7?' <span class="pill bad">spazientito</span>':m>.4?' <span class="pill warn">preoccupato</span>':''}</div>`:'';
     const pm=pdsMain(k,c,down,av);
     const pref=(act,l,sm,on)=>`<button class="pf${on?'':' off'}${act==='dpsopen'?' g':act==='dpsclose'?' r':''}" type="button" data-act="${act}"><span>${l}</span><small>${sm}</small></button>`;
     const aprSm=S.phase==='pre'?'Inizia la giornata':!S.uOpen?'Apri al pubblico':'Giornata aperta';
