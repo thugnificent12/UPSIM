@@ -558,7 +558,7 @@ function avSVG(i,cls,raw){
 const meOK=()=>!!(S&&S.me);
 const meN=()=>meOK()?S.me.nome:'';
 const tcog=()=>meOK()?`${AVS[S.me.av].sex==='f'?'Signora':'Signor'} ${S.me.cognome}`:'Direttore';
-const fill=s=>String(s).replace(/\{T\}/g,tcog()).replace(/\{N\}/g,meN()||'Direttore');
+const fill=s=>String(s).replace(/\{T\}/g,tcog()).replace(/\{N\}/g,meN()||'Operatore');
 const PRODS=[
  {id:'bol',l:'Bollettino',t:'A'},{id:'pa3',l:'Pacco entro 5 giorni',t:'B'},{id:'pao',l:'Pacco ordinario',t:'B'},{id:'paeu',l:'Pacco Europa',t:'B'},{id:'pari',l:'Pacco rapido internazionale',t:'B'},{id:'paic',l:'Pacco intercontinentale',t:'B'},
  {id:'rac',l:'Raccomandata',t:'B'},{id:'fra',l:'Francobolli',t:'B'},{id:'tel',l:'Ricarica telefonica',t:'C'},{id:'sim',l:'SIM',t:'C'},{id:'lin',l:'Linea di casa',t:'C'},
