@@ -1438,6 +1438,12 @@ function callCustomer(k,c,manual){
   if(k.who==='tu'&&S.phase==='open')showArrive(k);
   if(manual)ding();
 }
+function staffMayTake(k){
+  const t=S.counters.find(x=>x.who==='tu');
+  if(t&&avail(t).ok&&!t.cur)return false;
+  const m=monthNo(),th=m<=3?4:m<=8?3:m<=14?2:1;
+  return S.queue.filter(x=>!x.noTk&&k.types.includes(x.type)&&!posOff(x.type)).length>=th;
+}
 function tryCall(k,manual){const c=pickFor(k);if(c)callCustomer(k,c,manual);return !!c;}
 function pickProblem(c){
   if(c.noMod)return 'nomod';
@@ -1570,7 +1576,7 @@ function step(dt){
       if(k.who==='tu'&&c.items&&c.items.length){
         if(c.act&&c.itemLeft<=0){c.act.done=true;c.act=null;if(c.items.every(i=>i.done))finish(k);else c.prodOk=false;}
       }else if(c.left<=0)finish(k);
-    }else if(k.who!=='tu'||S.upg.pannello){tryCall(k,false);}
+    }else if(k.who==='tu'?S.upg.pannello:staffMayTake(k)){tryCall(k,false);}
     if(!k.cur&&k.who==='tu'&&S.uOpen){const w=S.queue.find(x=>x.noTk&&x.wait>=1&&k.types.includes(x.type)&&!posOff(x.type));if(w)callCustomer(k,w,false);}
   }
   if(S.t>CLOSE&&(S.queue.length||S.counters.some(k=>k.cur)))S.st.ot+=dt*.45*staffed;
@@ -2579,7 +2585,7 @@ function renderScene(){
     if(cls.includes('sc-walkv')){const fB=(cp?custSVGB(cp,o.p[0]+dx,o.p[1]-.5,cs,0,false,true,false):'')+custSVGB(c,o.p[0]-(cp?dx*.5:0),o.p[1],s0,L,false,true,false);return `<g class="${cls.trim()}" style="${sty}"><g class="wk-f">${fF()}</g><g class="wk-b">${fB}</g></g>`;}
     if(cls.includes('sc-walk'))return `<g class="${cls.trim()}" style="${sty}">${fF()}</g>`;
     return `<g class="${cls.trim()}" style="${sty}">${fF()}</g>`;}).join('')+walkersHTML(wl,seatP);
-  const clerk=meOK()?(()=>{const av=AVS[S.me.av]||AVS[0],shade=mixc(av.cl,'#000000',.22),qn=S.queue.length,ins=performance.now()-(RT.insAt||-1e9)<3500,mood=ins?'ang':(qn>=12||S.rep<35)?'tired':S.rep>=70?'happy':'neutral';
+  const mkClerk=()=>meOK()?(()=>{const av=AVS[S.me.av]||AVS[0],shade=mixc(av.cl,'#000000',.22),qn=S.queue.length,ins=performance.now()-(RT.insAt||-1e9)<3500,mood=ins?'ang':(qn>=12||S.rep<35)?'tired':S.rep>=70?'happy':'neutral';
     const armP=(d,hx,dl)=>`<g class="clk-arm${sv?(qn>=12?' on fast':' on'):''}"${dl?` style="animation-delay:${dl}s"`:''}><path d="${d}" stroke="${shade}" stroke-opacity=".55" stroke-width="9.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="${d}" stroke="${av.cl}" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="${hx}" cy="78.5" rx="4.2" ry="3.3" fill="${av.skin}"/></g>`;
     const hnd=(hx,dl)=>`<g class="clk-arm${sv?(qn>=12?' on fast':' on'):''}" style="animation-delay:${dl}s"><ellipse cx="${hx}" cy="78.5" rx="4.2" ry="3.3" fill="${av.skin}"/></g>`;
     const arm=AVO[S.me.av]?'':armP('M16 56Q11 68 21 76',21,.2)+armP('M48 56Q53 68 43 76',43,0);
@@ -2590,14 +2596,19 @@ function renderScene(){
     const EX=mood==='tired'?'<path d="M26.3 29.4q1.7 1.1 3 0M33.7 29.4q1.7 1.1 3 0" stroke="#a8745a" fill="none" stroke-width=".8" stroke-linecap="round"/>':mood==='ang'?'<path d="M25.5 22.3l5 2.2M38.5 22.3l-5 2.2" stroke="#2a1a12" stroke-width="1.4" stroke-linecap="round"/>':'';
     if(AVO[S.me.av])sv0=sv0.replace('</svg>',EX+'</svg>');else sv0=sv0.replace('<path d="M32 44l-4 5',EX+'<path d="M32 44l-4 5');
     return `<g class="clk-g${ins?' sc-shk':''}">${sv0}</g>`;})():'';
+  const clerk=mkClerk();
+  const STP={2:[215,640],3:[150,385,660],4:[130,330,525,755],5:[150,312,475,637,800],6:[133,255,385,530,655,800],7:[135,252,368,485,602,718,835],8:[110,208,320,422,540,647,735,845]};
+  const XS=S.counters.length>=2?STP[Math.min(8,S.counters.length)].map(x=>x/2.4444):null;
+  const clerkN=i=>{const k=S.counters[i];if(!k||!meOK())return '';if(k.who==='tu')return clerk;const st=staffOf(k);if(!st)return '';const o=S.me.av;S.me.av=(PERS[st.id]||{}).av||0;const r=mkClerk();S.me.av=o;return r;};
+  const pcBody=()=>`<g transform="translate(8 4)"><rect x="244" y="97" width="16" height="3" rx="1" fill="#C9CED6" stroke="#8A93A3" stroke-width=".8"/><rect x="249" y="88" width="6" height="10" fill="#B8BFCA" stroke="#8A93A3" stroke-width=".8"/><rect x="232" y="62" width="40" height="29" rx="3" fill="#E6E9EE" stroke="#8A93A3" stroke-width="1.2"/><path d="M237 68h30M237 72h30M237 76h30" stroke="#CDD2DA" stroke-width="1.2"/><circle cx="252" cy="82" r="3" fill="#C4C9D2" stroke="#9AA3B2" stroke-width=".8"/><rect x="236" y="97" width="32" height="5" rx="1.5" fill="#D5D9E0" stroke="#8A93A3" stroke-width=".8"/></g>
+   ${(()=>{const fo=id=>S.fault&&(S.fault.id===id||S.fault.id==='luce')?' opacity=".35"':'';return `<g transform="translate(164 36) scale(.7)"><g${fo('pos')}><rect x="108" y="91" width="15" height="14" rx="2.5" fill="#3A3F4B" stroke="#1F232B" stroke-width="1"/><rect x="110" y="93" width="11" height="4.5" rx="1" fill="#9BE3A8"/><g fill="#9AA3B2"><rect x="110.5" y="99" width="2.4" height="1.8"/><rect x="114.3" y="99" width="2.4" height="1.8"/><rect x="118" y="99" width="2.4" height="1.8"/><rect x="110.5" y="102" width="2.4" height="1.8"/><rect x="114.3" y="102" width="2.4" height="1.8"/><rect x="118" y="102" width="2.4" height="1.8"/></g></g><g${fo('pad')}><rect x="130" y="96" width="22" height="9" rx="1.8" fill="#1E2430" stroke="#0E121A" stroke-width="1"/><rect x="132" y="97.5" width="18" height="6" rx="1" fill="#DDE6F5"/><path d="M134 101q2-3 4 0t4 0t4-1" fill="none" stroke="#2B4C9B" stroke-width=".8" stroke-linecap="round"/><path d="M150 95l4-3" stroke="#555" stroke-width="1.2" stroke-linecap="round"/></g><g${fo('lettore')}><rect x="158" y="96" width="15" height="9" rx="2" fill="#D9DDE4" stroke="#8A93A3" stroke-width="1"/><circle cx="165.5" cy="100.5" r="3" fill="#B9D6FF" stroke="#3F7BE0" stroke-width=".8"/><circle cx="165.5" cy="100.5" r="1.2" fill="none" stroke="#3F7BE0" stroke-width=".6"/></g></g>`;})()}`;
   const html=`<svg viewBox="0 0 360 215" role="img">
    <rect width="360" height="215" fill="${PAL.wall}"/>${doors}
    <rect x="262" y="26" width="52" height="94" rx="3" fill="${PAL.dor}" stroke="${PAL.dord}" stroke-width="2.5"/><rect x="278" y="44" width="20" height="20" rx="4" fill="#9AC6E8" stroke="${PAL.dord}" stroke-width="2"/>
-   <g transform="translate(40 0)"><rect x="158" y="9" width="48" height="29" rx="3" fill="#2a2a2e" stroke="#111" stroke-width="1.2"/><rect x="160.5" y="11.5" width="43" height="22" rx="1.5" fill="#fff"/><text x="182" y="18.5" text-anchor="middle" font-size="4.8" fill="#111" font-family="monospace">${dlab}</text><path d="M162 20.5H202" stroke="#bbb" stroke-width=".5"/><text x="182" y="31" text-anchor="middle" font-size="10.5" font-weight="800" fill="#111" font-family="monospace">${tk}</text><rect x="179" y="38" width="6" height="3" fill="#333"/></g>
+   ${XS?`<rect x="0" y="108" width="360" height="30" fill="${PAL.band}"/><rect x="0" y="104" width="360" height="8" fill="${PAL.ctop}"/><rect x="0" y="138" width="360" height="77" fill="${PAL.floor}"/><defs><clipPath id="clk104"><rect x="-200" y="0" width="760" height="104"/></clipPath></defs>${XS.map((x,i)=>`<g transform="translate(${(x-220).toFixed(1)} 0)"><g transform="translate(40 0)"><rect x="158" y="9" width="48" height="29" rx="3" fill="#2a2a2e" stroke="#111" stroke-width="1.2"/><rect x="160.5" y="11.5" width="43" height="22" rx="1.5" fill="#fff"/><text x="182" y="18.5" text-anchor="middle" font-size="4.8" fill="#111" font-family="monospace">${dlab}</text><path d="M162 20.5H202" stroke="#bbb" stroke-width=".5"/><text x="182" y="31" text-anchor="middle" font-size="10.5" font-weight="800" fill="#111" font-family="monospace">${tk}</text><rect x="179" y="38" width="6" height="3" fill="#333"/></g><g clip-path="url(#clk104)">${clerkN(i)}</g><g transform="${XS.length>=5?'translate(220 103) scale(.68) translate(-262 -103)':''}">${pcBody()}</g></g>`).join('')}`:`   <g transform="translate(40 0)"><rect x="158" y="9" width="48" height="29" rx="3" fill="#2a2a2e" stroke="#111" stroke-width="1.2"/><rect x="160.5" y="11.5" width="43" height="22" rx="1.5" fill="#fff"/><text x="182" y="18.5" text-anchor="middle" font-size="4.8" fill="#111" font-family="monospace">${dlab}</text><path d="M162 20.5H202" stroke="#bbb" stroke-width=".5"/><text x="182" y="31" text-anchor="middle" font-size="10.5" font-weight="800" fill="#111" font-family="monospace">${tk}</text><rect x="179" y="38" width="6" height="3" fill="#333"/></g>
    ${clerk}
-   <rect x="0" y="108" width="360" height="30" fill="${PAL.band}"/><rect x="0" y="104" width="360" height="8" fill="${PAL.ctop}"/><rect x="0" y="138" width="360" height="77" fill="${PAL.floor}"/>
-   <g fill="#fff" stroke="#9AA8C6"><rect x="30" y="96" width="34" height="9" rx="1"/><rect x="34" y="90" width="30" height="8" rx="1" fill="#F6E7A8"/><rect x="290" y="94" width="38" height="11" rx="1"/><rect x="294" y="88" width="30" height="8" rx="1" fill="#F6E7A8"/></g><g transform="translate(8 4)"><rect x="244" y="97" width="16" height="3" rx="1" fill="#C9CED6" stroke="#8A93A3" stroke-width=".8"/><rect x="249" y="88" width="6" height="10" fill="#B8BFCA" stroke="#8A93A3" stroke-width=".8"/><rect x="232" y="62" width="40" height="29" rx="3" fill="#E6E9EE" stroke="#8A93A3" stroke-width="1.2"/><path d="M237 68h30M237 72h30M237 76h30" stroke="#CDD2DA" stroke-width="1.2"/><circle cx="252" cy="82" r="3" fill="#C4C9D2" stroke="#9AA3B2" stroke-width=".8"/><rect x="236" y="97" width="32" height="5" rx="1.5" fill="#D5D9E0" stroke="#8A93A3" stroke-width=".8"/></g>
-   ${(()=>{const fo=id=>S.fault&&(S.fault.id===id||S.fault.id==='luce')?' opacity=".35"':'';return `<g transform="translate(164 36) scale(.7)"><g${fo('pos')}><rect x="108" y="91" width="15" height="14" rx="2.5" fill="#3A3F4B" stroke="#1F232B" stroke-width="1"/><rect x="110" y="93" width="11" height="4.5" rx="1" fill="#9BE3A8"/><g fill="#9AA3B2"><rect x="110.5" y="99" width="2.4" height="1.8"/><rect x="114.3" y="99" width="2.4" height="1.8"/><rect x="118" y="99" width="2.4" height="1.8"/><rect x="110.5" y="102" width="2.4" height="1.8"/><rect x="114.3" y="102" width="2.4" height="1.8"/><rect x="118" y="102" width="2.4" height="1.8"/></g></g><g${fo('pad')}><rect x="130" y="96" width="22" height="9" rx="1.8" fill="#1E2430" stroke="#0E121A" stroke-width="1"/><rect x="132" y="97.5" width="18" height="6" rx="1" fill="#DDE6F5"/><path d="M134 101q2-3 4 0t4 0t4-1" fill="none" stroke="#2B4C9B" stroke-width=".8" stroke-linecap="round"/><path d="M150 95l4-3" stroke="#555" stroke-width="1.2" stroke-linecap="round"/></g><g${fo('lettore')}><rect x="158" y="96" width="15" height="9" rx="2" fill="#D9DDE4" stroke="#8A93A3" stroke-width="1"/><circle cx="165.5" cy="100.5" r="3" fill="#B9D6FF" stroke="#3F7BE0" stroke-width=".8"/><circle cx="165.5" cy="100.5" r="1.2" fill="none" stroke="#3F7BE0" stroke-width=".6"/></g></g>`;})()}
+   <rect x="0" y="108" width="360" height="30" fill="${PAL.band}"/><rect x="0" y="104" width="360" height="8" fill="${PAL.ctop}"/><rect x="0" y="138" width="360" height="77" fill="${PAL.floor}"/>`}
+   <g fill="#fff" stroke="#9AA8C6">${XS?'':`<rect x="30" y="96" width="34" height="9" rx="1"/><rect x="34" y="90" width="30" height="8" rx="1" fill="#F6E7A8"/>`}${XS?'':`<rect x="290" y="94" width="38" height="11" rx="1"/><rect x="294" y="88" width="30" height="8" rx="1" fill="#F6E7A8"/>`}</g>${XS?'':pcBody()}
    ${stress?'<g class="sc-sw"><path d="M142 58q-3 6 0 8q3-2 0-8z" fill="#9AD8FF"/></g><g class="sc-sw" style="animation-delay:.8s"><path d="M218 54q-3 6 0 8q3-2 0-8z" fill="#9AD8FF"/></g>':''}
    <g transform="translate(0 -34)"><rect x="3" y="197" width="38" height="5" rx="2" fill="${PAL.tots}"/><rect x="6" y="126" width="32" height="72" rx="4" fill="${PAL.tot}" stroke="${PAL.totd}" stroke-width="1.5"/><rect x="9" y="130" width="26" height="33" rx="1.5" fill="#06122E" stroke="${PAL.totl}" stroke-width=".8"/><text x="22" y="134.6" text-anchor="middle" font-size="2.6" font-weight="700" font-family="monospace" fill="#FFD54F">PRENDI IL NUMERO</text>${LETTERS.split('').map((L,i)=>`<text x="${15+(i%2)*11}" y="${143+Math.floor(i/2)*7}" font-size="5" font-weight="700" font-family="monospace" fill="#9CD0FF">${L}</text>`).join('')}<rect x="12" y="167" width="20" height="7" rx="1.5" fill="${PAL.totb}" stroke="#CFE0FF" stroke-width=".6"/><text x="22" y="171.8" text-anchor="middle" font-size="3" font-weight="700" font-family="monospace" fill="#fff">TICKET</text><rect x="14" y="178" width="16" height="3" rx="1" fill="${PAL.totk}"/><rect x="14" y="184" width="16" height="6" rx="1" fill="${PAL.totm}"/></g>
    ${crowd}
@@ -2755,13 +2766,7 @@ function cntBody(k,av){
   const c=k.cur;
   if(c){
     if(k.who==='tu')return `<div class="row"><b class="mono">${c.tk}</b><span>${esc(c.name)}</span></div><p class="muted" style="margin:4px 0 0">Il cliente è allo sportello: lavora sul PDS.</p>`;
-    let h=`<div class="row"><b class="mono">${c.tk}</b><span>${esc(c.name)}</span>${c.prio?'<span class="pill warn">'+priTxt(c)+'</span>':''}</div>
-     <div style="font-size:15px;margin:2px 0">Vuole: <b>${esc(c.lang===2?c.fphr:c.det)}</b></div><div class="muted" style="font-size:12.5px">${esc(c.archN)} · da ${esc(c.district)}</div><div class="prog"><i data-p></i></div><div class="muted" style="font-size:12.5px" data-r></div>`;
-    if(c.problem&&!c.problem.done){
-      const p=PROBS[c.problem.id];
-      h+=`<div class="prob"><p><b>Problema:</b> ${esc(c.name.split(' ')[0])} ${esc(p.t)}.</p><p class="muted">Il personale se ne occupa tra poco. Puoi intervenire tu:</p>${p.o.map((o,i)=>`<button class="btn" data-act="opt" data-k="${k.id}" data-i="${i}">${esc(o.l)} <span class="muted">· ${esc(o.h)}</span></button>`).join('')}</div>`;
-    }
-    return h;
+    return `<p class="muted" style="margin:0">Sta servendo un cliente.</p>`;
   }
   if(k.who==='tu'&&!S.upg.pannello){
     const n=S.queue.filter(x=>k.types.includes(x.type)&&!posOff(x.type)).length;
@@ -2783,7 +2788,7 @@ function renderCounters(){
       el._sig=sig;
       let pill;
       if(!av.ok)pill=`<span class="pill">${av.why==='luce'?'Senza luce':av.why==='rete'?'Senza rete':av.why==='chiuso'?'Chiuso':av.why==='vuoto'?'Vuoto':av.why==='sost'?'In sostituzione':av.why==='assente'?'Assente':'In ritardo'}</span>`;
-      else if(c&&c.problem&&!c.problem.done)pill='<span class="pill bad">Problema</span>';
+      
       else if(c)pill='<span class="pill info">In servizio</span>';
       else pill='<span class="pill good">Libero</span>';
       const name=k.who==='tu'?(meN()?meN()+' (tu)':'Tu'):(s?s.name:'—');
