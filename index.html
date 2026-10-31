@@ -2780,7 +2780,7 @@ function renderCounters(){
   if(box._csig!==csig){box._csig=csig;box.innerHTML=S.counters.map(k=>`<div class="card cnt" data-kid="${k.id}"></div>`).join('');}
   S.counters.forEach(k=>{
     const el=$(`[data-kid="${k.id}"]`,box);if(!el)return;
-    if(k.who==='tu'){el.style.display='none';return;}
+    el.style.display='none';return;
     const av=avail(k),s=k.who==='tu'?null:staffOf(k),c=k.cur;
     const canCall=k.who==='tu'&&!c&&S.queue.some(x=>k.types.includes(x.type));
     const sig=[av.ok,av.why,k.who,k.types,c?c.id:'',c&&c.problem?(c.problem.done?'d':'p'):'',canCall,S.phase==='open',S.upg.pannello||0,c?'T'+c.id:'',c&&c.items?c.items.filter(i=>i.done).length:0,S.fault?S.fault.id+(S.fault.open?'o':''):'',meOK()?S.me.nome+S.me.av:'',k.last&&S.t-k.last.t<30?Math.floor(k.last.t):0,(s&&((s.today.abs?1:0)+(s.today.sub?2:0)))||0,!c&&k.who!=='tu'?S.queue.some(x=>k.types.includes(x.type)):0].join('|');
