@@ -988,6 +988,7 @@ const DOCP=new Set(['cap','bon','lba','psg','vagi','fin','spid','spr','pcr','scw
 const PTYPE={lba:'D',vagi:'A',fin:'E',pao:'B',spid:'C',spr:'C',r1:'B',ree:'B',asc:'B',ase:'B',poi:'B',poe:'B',vag:'A',scw:'A',tgm:'B',rar:'B',par:'B',bol:'A',pa3:'B',paeu:'B',pari:'B',paic:'B',rac:'B',fra:'B',tel:'C',sim:'C',lin:'C',pcr:'C',pcn:'C',pcp:'C',cpa:'C',cpc:'C',cpp:'C',cpv:'C',pen:'D',lbv:'D',lbp:'D',buo:'D',polc:'E',poli:'E',polv:'E',pola:'E',bau:'A',f24:'A',pagopa:'A',cva:'A',att:'F',not:'F',pas:'F',psg:'C',trk:'B',rra:'B',pco:'B',cap:'B',bon:'C',frc:'B',fol:'B',bu1:'B',bu2:'B',bu3:'B',sc1:'B',sc2:'B',sc3:'B',spn:'B',stz:'B',slb:'B',ssc:'B',crt:'B'};
 const COMBO={pa3:['rac'],pae:['rac'],paeu:['rac'],pari:['rac'],paic:['rac'],rac:['pa3','fra'],fra:['rac'],pen:['lbv'],lbv:['pen'],buo:['lbv'],cpp:['pcr'],pcn:['pcr'],sim:['ppt']};
 const rk=n=>Math.round(n/10)*10;
+const depo=()=>{const r=Math.random();return Math.max(10,rk(r<.5?ri(10,50):r<.8?ri(50,200):r<.95?ri(200,600):ri(600,2000)));};
 const SHIP=new Set(['pa3','pao','paeu','pari','paic','rac','r1','ree','asc','ase','poi','poe','rra','pco']);
 const GRP={rra:'s',pco:'s',frc:'s',fol:'s',bon:'b',lba:'p',pao:'s',spid:'t',spr:'t',r1:'s',ree:'s',asc:'s',ase:'s',poi:'s',poe:'s',pa3:'s',paeu:'s',pari:'s',paic:'s',rac:'s',fra:'s',tgm:'s',cpv:'b',cpi:'b',cva:'b',cpp:'b',pcr:'b',pcp:'b',pcn:'b',cpc:'b',vag:'b',vagi:'b',scw:'b',pen:'p',lbv:'p',lbp:'p',buo:'p',tel:'t',sim:'t',lin:'t'};
 const PCLS={pens:'old',risp:'old',giov:'young',nodoc:'young',vint:'biz',comm:'biz',noto:'biz',avv:'biz',bollo:'fam',tur:'tur',coll:'coll',info:'gen'};
@@ -1168,15 +1169,15 @@ function mkProd(prod,a,qty,forceOp){
    case 'sim':op='pp';uq=1;pass=10;det='attivare una SIM PostaPhone';fee=10;base=8;break;
    case 'lin':op='pp';uq=1;pass=30;det='attivare la linea di casa PostaPhone';fee=39;base=14;break;
    case 'pcr':{const q=Math.min(qty,3);uq=q;det=q>1?`fare ${q} ricariche della PostalCard`:'ricaricare la PostalCard';fee=1*q;base=4*q;for(let i=0;i<q;i++)pass+=ri(10,80);break;}
-   case 'pcn':{const pr=!!S.pcActive;uq=1;det='fare una nuova PostalCard'+(pr?' (ho visto la promo con la SIM)':'');fee=20+(pr?5:0);base=7+(pr?2:0);if(pr){x.sim=true;x.simFee=5;}break;}
+   case 'pcn':{const pr=!!S.pcActive;uq=1;det='fare una nuova PostalCard'+(pr?' (ho visto la promo con la SIM)':'');fee=0;pass=depo();det+=` e caricarci ${pass} €`;base=7+(pr?2:0);if(pr){x.sim=true;x.simFee=5;}break;}
    case 'pcp':{uq=1;const m=rk(ri(30,250));det=`prelevare ${m} € dalla PostalCard`;x.out=m;fee=1;base=3.5;break;}
    case 'cpi':{uq=1;pass=rk(ri(100,1500));det=`incassare un assegno da ${pass} € e versarli sul conto`;fee=0;base=4;break;}
    case 'cpv':{uq=1;pass=rk(ri(50,600));det=`versare ${pass} € sul conto`;fee=0;base=3.5;break;}
    case 'cpp':{uq=1;const m=rk(ri(40,400));det=`prelevare ${m} € dal conto`;x.out=m;fee=0;base=3.5;break;}
    case 'cpc':{uq=1;det='fare la carta ContoPosta';fee=0;base=6;break;}
-   case 'cpa':{uq=1;det='aprire il ContoPosta';fee=0;base=8;break;}
+   case 'cpa':{uq=1;pass=depo();det=`aprire il ContoPosta e versarci ${pass} €`;fee=0;base=8;break;}
    case 'pen':{uq=1;det=pick(['ritirare la pensione','prendere la pensione']);x.out=rk(ri(250,500));fee=0;base=3.5;break;}
-   case 'lba':{uq=1;det='aprire un libretto di risparmio';fee=0;base=7;break;}
+   case 'lba':{uq=1;pass=depo();det=`aprire un libretto di risparmio e versarci ${pass} €`;fee=0;base=7;break;}
    case 'lbv':{uq=1;pass=rk(ri(50,900));det=`versare ${pass} € sul libretto`;fee=0;base=3.5;break;}
    case 'lbp':{uq=1;const m=rk(ri(20,200));det=`ritirare ${m} € dal libretto`;x.out=m;fee=0;base=3.5;break;}
    case 'buo':{uq=1;pass=pick([500,1000,1500,2000,3000,5000]);det=`sottoscrivere un buono postale da ${pass.toLocaleString('it-IT')} € per ${pick(['mio nipote','mia nipote','mio figlio','mia figlia','la mia nipotina'])}`;fee=0;base=13;hi=2.8;break;}
@@ -1469,7 +1470,7 @@ function finish(k){
    if(late){log(`${c.name} (${c.tk}): spedizione accettata dopo la chiusura, parte domani.`,'info');if(k.who==='tu')toast('Fuori orario: la spedizione parte domani, non rientra nella chiusura di oggi.','info');}}
   {const ac=accI();for(const it of c.items||[]){if(it.den)continue;
     if(it.prod==='cpa'||it.prod==='lba'){let m=ac.reg.find(r=>r.id===c.id);if(!m){m={id:c.id,name:c.name,age:c.age,bal:null,lib:null,w:rnd(.3,3),last:S.day};ac.reg.push(m);}
-      if(it.prod==='cpa'){m.bal=m.bal||0;if(chance(.65))ac.m++;else ac.ym[ac.mi%12]++;}else m.lib=m.lib||0;}
+      if(it.prod==='cpa'){m.bal=(m.bal||0)+(it.pass||0);if(chance(.65))ac.m++;else ac.ym[ac.mi%12]++;}else m.lib=(m.lib||0)+(it.pass||0);}
     if(it.prod==='lin')ac.l++;if(it.fin)ac.loans.push({bal:it.fin.amt,rata:it.fin.rata,left:it.fin.mo,q:finQ(it.fin.mo)});}
    const mm=c.cc&&c.cc.mid?ac.reg.find(r=>r.id===c.cc.mid):null;
    if(mm){for(const it of c.items||[]){if(it.prod==='cpv'||it.prod==='cpi')mm.bal+=it.pass||0;else if(it.prod==='cpp')mm.bal-=it.out||0;else if(it.prod==='lbv')mm.lib+=it.pass||0;else if(it.prod==='lbp')mm.lib-=it.out||0;}mm.bal=mm.bal==null?null:Math.round(Math.max(0,mm.bal)*100)/100;mm.lib=mm.lib==null?null:Math.round(Math.max(0,mm.lib)*100)/100;}}
