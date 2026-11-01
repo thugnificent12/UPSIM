@@ -1428,7 +1428,7 @@ function callCustomer(k,c,manual){
   S.queue=S.queue.filter(x=>x!==c);RT.lastTk=c.tk;
   const s=k.who==='tu'?null:staffOf(k);
   const pm=(s?s.prb*stPrb(s):1)*(1-.2*(S.upg.moduli||0))*(S.angolo&&!S.angoloAbs?.85:1)*probRamp();
-  const hasProb=c.noMod||c.diff||c.lang===1||chance(clamp(c.prob*pm,0,.95));
+  const hasProb=(RT.tut&&k.who==='tu')?false:(c.noMod||c.diff||c.lang===1||chance(clamp(c.prob*pm,0,.95)));
   k.cur=Object.assign({},c,{doc:genDoc(c),avv:genAvv(c),docOk:undefined,feeMul:1,total:c.diff?c.base*1.4:c.base,left:c.diff?c.base*1.4:c.base,hasProb,probAt:c.base*rnd(.3,.65),problem:null,ntOk:c.noTk?false:true,prodOk:k.who!=='tu',opOk:true,qtyOk:true,act:null,itemLeft:0,items:(c.items||[]).map(i=>Object.assign({},i))});
   k.menu=null;
   if(S.dogEv&&S.dogEv.id===c.id)S.dogEv=null;
@@ -1675,7 +1675,7 @@ function fireIncident(id){
 }
 
 /* ---------- salvataggio ---------- */
-function save(){RT.lastSave=Date.now();try{localStorage.setItem(KEY,JSON.stringify(S,(k,v)=>k==='_ent'?undefined:v));}catch(e){}}
+function save(){if(RT.tut)return;RT.lastSave=Date.now();try{localStorage.setItem(KEY,JSON.stringify(S,(k,v)=>k==='_ent'?undefined:v));}catch(e){}}
 function load(){try{const raw=localStorage.getItem(KEY);if(!raw)return false;const o=JSON.parse(raw);if(!o||o.v!==6||!o.counters||!o.today)return false;S=o;if(S.atm===undefined||!(S.upg&&S.upg.atm)){S.atm=S.atm&&S.upg&&S.upg.atm?S.atm:0;}if(S.atmG===undefined)S.atmG=0;if(!S.cls)S.cls={};START=o.start||Date.UTC(2026,9,12);S.speed=0;if(S.uOpen===undefined)S.uOpen=true;return true;}catch(e){return false;}}
 function lsGet(k){try{return localStorage.getItem(k);}catch(e){return null;}}
 function lsSet(k,v){try{localStorage.setItem(k,v);}catch(e){}}
@@ -1811,7 +1811,7 @@ function quickStart(){
 }
 function startWith(av,nome,cog,eta){
   const a=AVS[av];newState();S.me={nome,cognome:cog,eta:eta||a.age,av};S.meEdited=false;
-  RT.tab='sp';save();
+  RT.tab='sp';save();tutStart(true);
 }
 function meEditModal(){
   if(!meOK()||S.meEdited)return;
@@ -1874,7 +1874,7 @@ function renderBanner(){
   if(LAST-S.off<=30)evs+=`<div class="evt"><b>Controllo Interno.</b> ${LAST-S.off<=0?'Oggi è l’ultimo giorno del mandato.':`Mancano ${LAST-S.off} giorni alla fine del mandato.`}</div>`;
   setHTML(el,`<div class="card banner bn-g"><div class="eyebrow">${esc(fill('Buongiorno, {N}'))} · ${WD[m.wd]} ${m.dom} ${MESI[m.mon]} ${m.yr} · mese ${monthNo()} di 24</div><h2>Il PDS si apre alle ${hh(DPS0)}</h2><p class="muted" style="margin:0">Il pubblico entra alle ${hh(OPEN)} e si chiude agli sportelli alle ${hh(CLOSE)}. La chiusura contabile si fa dalle ${hh(CLMIN)} alle ${hh(CLOSEOK)}. Se apri l’ufficio dopo le ${hh(OPEN)} o lo chiudi fuori da questo orario prendi una multa.</p>
    ${tags?`<div class="tags">${tags}</div>`:''}${evs}<div class="evt"><b>Obiettivo del giorno.</b> Nessun errore di cassa. Premio: <b>${eur(DAILY_PREM)}</b>.</div>${S.today.ord?`<div class="evt"><b>Ordine dalla direzione.</b> Oggi obiettivo: <b>${S.today.ord.n} ${ORD[S.today.ord.p].l}</b>. Se lo raggiungi, premio di <b>${eur(S.today.ord.prem)}</b>.</div>`:''}
-   <p>Affluenza prevista: circa <b>${n}</b> clienti. ${S.day===1?'Il tuo sportello è il primo: tocca <b>Prossimo</b> per servire i clienti.':''}</p>
+   ${RT.tut?'':`<p>Affluenza prevista: circa <b>${n}</b> clienti. ${S.day===1?'Il tuo sportello è il primo: tocca <b>Prossimo</b> per servire i clienti.':''}</p>`}
    <button class="btn gold big" data-act="open">Inizia la giornata</button></div>`);
 }
 function moodOf(c){return c.fight?.95:c.wait/(c.pat*patMult());}
@@ -2909,6 +2909,7 @@ function menuModal(){
     {l:'Visualizzazione: '+(curView()==='pc'?'PC':'Cellulare'),h:'Tocca per cambiare',fn(){setView(curView()==='pc'?'mobile':'pc');menuModal();return false;}},
     ...(meOK()&&!S.meEdited?[{l:'Nome ed età',h:'Modificabili una sola volta',fn(){meEditModal();return false;}}]:[]),
     {l:'Suoni: '+(RT.snd?'attivo':'spento'),fn(){RT.snd=!RT.snd;lsSet(SNDKEY,RT.snd?'1':'0');if(RT.snd)ding();menuModal();return false;}},
+    {l:'Rivedi il tutorial',h:'Prova a servire tre clienti di prova',fn(){tutStart(false);}},
     {l:'Torna al gioco'}]});
 }
 function confirmRestart(){
@@ -2951,6 +2952,7 @@ function render(force){
   else if(tab==='uf')renderUff();
   else renderConti();
   renderPC();
+  tutTick();
   {const sc=$('#scene');if(sc)sc.classList.toggle('pz',S.speed===0||S.phase!=='open');}
   const pend=S.counters.filter(k=>k.who==='tu'&&k.cur&&k.cur.problem&&!k.cur.problem.done).length;
   const b=$('#b-sp');b.hidden=!(pend&&tab!=='sp');b.textContent=pend;
@@ -3212,6 +3214,118 @@ document.addEventListener('click',e=>{
   render(true);
 });
 
+
+/* ---------- tutorial ---------- */
+const TUT_BAD={exp:'Il documento è scaduto: guarda la data di scadenza.',other:'Il nome sul documento non è quello del cliente.',nocon:'Manca il permesso di soggiorno.',conexp:'Il permesso è scaduto.',none:'Manca il documento.'};
+function tutPath(id){const f=(nodes,pre)=>{for(const n of nodes){if(n.id===id&&!n.kids)return pre.concat(n);if(n.kids){const r=f(n.kids,pre.concat(n));if(r)return r;}}return null;};return f(MT,[]);}
+function tutEl(sel){for(const e of document.querySelectorAll(sel)){const r=e.getBoundingClientRect();if(r.width>0&&r.height>0)return e;}return null;}
+function tutMake(kind){
+  for(let i=0;i<1500;i++){
+    const nq=S.queue.length,na=(S.arr||[]).length;
+    addCustomer();
+    let c=null;
+    if((S.arr||[]).length>na)c=S.arr.pop().c;else if(S.queue.length>nq)c=S.queue.pop();
+    if(!c)continue;
+    const its=c.items||[],it=its[0];
+    const ok=it&&its.length===1&&!c.noMod&&!c.diff&&!c.lang&&!c.fr&&!c.dog&&!c.reg&&!c.fam&&!c.card&&!it.out&&!it.sim&&!['trk','rar','par'].includes(it.prod)&&(kind==='nt'?c.noTk:kind==='doc'?(!c.noTk&&it.doc):(!c.noTk&&!it.doc));
+    if(!ok)continue;
+    if(!c.noTk){c.tk=c.type+String(++S.tk[c.type]).padStart(3,'0');}
+    c.wait=0;c.pat=1e9;c.ins=3;c._ent=undefined;return c;
+  }
+  return null;
+}
+function tutStart(fresh){
+  const bak=JSON.stringify(S);
+  if(!fresh){const me=S.me;newState();S.me=me;}
+  RT.tut={stage:'intro',n:0,served:0,seq:['simple','doc','nt'],kinds:{},bak,hc:null,sig:''};
+  S.cash=300;S.today.N=0;S.today.rob=null;S.apptToday=[];S.arr=[];S.fault=null;S.speed=0;
+  RT.dps=false;RT.arrive=null;RT.tab='sp';RT.modal=false;
+  render(true);
+}
+function tutClear(){const o=document.getElementById('tuov');if(o)o.remove();}
+function tutEnd(){
+  const T=RT.tut;if(!T)return;RT.tut=null;tutClear();
+  S=JSON.parse(T.bak);RT.dps=false;RT.arrive=null;RT.lastTk='';RT.tab='sp';
+  save();render(true);
+}
+function tutCoach(){
+  const T=RT.tut;
+  if(T.stage==='intro')return{card:{h:'Impariamo a servire i clienti',p:['Facciamo una prova con tre clienti. Il tempo è fermo e nessuno si arrabbia.','Ti dico io cosa toccare: lo vedi illuminato.'],b:'Comincia',sk:'Lo so già fare: salta',go(){T.stage='run';render(true);}}};
+  if(T.stage==='end')return{card:{h:'Bravo, ce l’hai fatta!',p:['Ora sai servire un cliente. Nel gioco vero il tempo scorre e i clienti si spazientiscono.','Buon lavoro!'],b:'Inizia a giocare',go(){tutEnd();}}};
+  const k=S.counters.find(x=>x.who==='tu'),c=k&&k.cur;
+  if(RT.arrive)return{sel:'#arrive [data-act=serve]',txt:'Il cliente ti dice cosa vuole. Leggilo bene, poi tocca qui per servirlo.',pos:'up'};
+  if(!c){
+    if(S.phase==='pre'||!S.uOpen){
+      if(!RT.dps)return{sel:'[data-act=dps]',txt:'Questo è il computer dello sportello, il PDS. Toccalo per aprirlo.'};
+      return{sel:'#pc .pf[data-act=dpsopen]',txt:S.phase==='pre'?'Ogni mattina si comincia da qui: tocca «Apertura giornata».':'Ora apri l’ufficio al pubblico: tocca ancora «Apertura giornata».'};
+    }
+    if(S.queue.length&&S.queue.every(x=>x.noTk))return{noblock:true,txt:'Un cliente si avvicina allo sportello senza numero…'};
+    if(S.queue.length)return{sel:RT.dps?'#pc [data-act=call]':'#callnext',txt:'C’è un cliente in coda. Tocca per chiamarlo allo sportello.'};
+    return{noblock:true,txt:'Sta arrivando un cliente…'};
+  }
+  if(c.ntOk===false)return{sel:'#pc [data-act=nt][data-v="1"]',txt:'Questo cliente non ha preso il numero. Digli di andarlo a prendere al totem: così rispetta la fila.'};
+  if(c.problem&&!c.problem.done)return{sel:'#pc [data-act=opt]',txt:'Un imprevisto: scegli la prima soluzione.'};
+  if(c.docOk===false){
+    const bad=!(c.doc&&c.doc.kind==='ok');
+    return{sel:'#pc [data-act=doc][data-v="'+(bad?0:1)+'"]',txt:bad?('Controlla il documento. '+(TUT_BAD[c.doc.kind]||'Qualcosa non va.')+' Tocca «Non valido».'):'Controlla il documento: il nome deve essere quello del cliente e non deve essere scaduto. Qui è tutto a posto: tocca «Documento valido».',pos:'down'};
+  }
+  if(c.prodOk===false){
+    const it=(c.items||[]).find(i=>!i.done);if(!it)return{noblock:true,txt:'Un attimo…'};
+    const id=(it.op==='pp'?'pp_':'')+it.prod,path=tutPath(id);if(!path)return{noblock:true,txt:'Scegli il servizio che chiede il cliente.'};
+    const ids=path.map(n=>n.id),cur=k.menu?k.menu.split('/'):[],pre=cur.every((x,i)=>x===ids[i]);
+    const left=it.qty-(c.cnt&&c.cnt.it===it?c.cnt.n:0),want=(it.det||'')+'';
+    if(!pre)return{sel:'#pc .bk',txt:'Non è questo il menu giusto: torna indietro.'};
+    const i=cur.length,n=path[i];
+    if(n.kids)return{sel:'#pc [data-act=sub][data-sub="'+ids.slice(0,i+1).join('/')+'"]',txt:'Il cliente vuole: «'+want+'». Cerca prima «'+n.l+'».'};
+    return{sel:'#pc [data-act=prod][data-prod="'+id+'"]',txt:'Ecco il servizio: «'+n.l+'». '+(left>1?'Tocca '+left+' volte, una per ogni pezzo.':'Toccalo.')};
+  }
+  if(c.opOk===false&&c.act)return{sel:'#pc .opb[data-o="'+c.act.op+'"]',txt:'Scegli l’operatore che ha nominato il cliente.'};
+  return{noblock:true,txt:'Bene! Il PDS sta lavorando: aspetta qualche secondo.'};
+}
+function tutDraw(st){
+  tutClear();
+  const o=document.createElement('div');o.id='tuov';o.style.cssText='position:fixed;inset:0;z-index:100000;font-family:Inter,Arial,sans-serif;pointer-events:none';
+  const DK='rgba(10,20,50,.74)';
+  if(st.card){
+    o.style.pointerEvents='auto';o.style.background='rgba(10,20,50,.8)';o.style.display='flex';o.style.alignItems='center';o.style.justifyContent='center';o.style.padding='20px';
+    const cd=st.card;o.innerHTML=`<div style="background:#fff;border-radius:18px;padding:22px;max-width:360px;color:#1c2a44"><div style="font-size:12px;font-weight:700;color:#2155C8;letter-spacing:.08em">TUTORIAL</div><h2 style="margin:6px 0 8px;font-size:22px">${cd.h}</h2>${cd.p.map(t=>`<p style="font-size:15.5px;line-height:1.4;margin:0 0 8px">${t}</p>`).join('')}<button id="tu-go" style="display:block;width:100%;margin-top:12px;background:#FFC83A;border:0;border-radius:12px;padding:13px;font-weight:800;font-size:16px;color:#3a2a00">${cd.b}</button>${cd.sk?`<button id="tu-sk" style="display:block;width:100%;margin-top:8px;background:none;border:0;color:#7a869a;font-size:14px;padding:8px">${cd.sk}</button>`:''}</div>`;
+    document.body.appendChild(o);
+    o.querySelector('#tu-go').onclick=cd.go;const sk=o.querySelector('#tu-sk');if(sk)sk.onclick=()=>tutEnd();
+    return;
+  }
+  const el=st.sel?tutEl(st.sel):null;
+  const bub=document.createElement('div');
+  bub.style.cssText='position:absolute;left:12px;right:12px;background:#fff;border-radius:14px;padding:12px 14px;box-shadow:0 6px 24px rgba(0,0,0,.35);color:#1c2a44;font-size:15px;line-height:1.35;pointer-events:auto';
+  bub.innerHTML='<div style="font-size:11px;font-weight:700;color:#2155C8;letter-spacing:.08em;margin-bottom:4px">TUTORIAL</div>'+st.txt+(el?'<div style="margin-top:6px;font-size:12px;color:#7a869a">Tocca l’elemento illuminato</div>':'')+'<button id="tu-x" style="display:block;margin:6px 0 0 auto;background:none;border:0;color:#7a869a;font-size:12.5px;padding:2px 0">Salta il tutorial</button>';
+  if(el){
+    const r=el.getBoundingClientRect(),pd=6,L=r.left-pd,T=r.top-pd,W=r.width+2*pd,H=r.height+2*pd,R=L+W,B=T+H;
+    const P=(x,y,w,h)=>{const d=document.createElement('div');d.style.cssText=`position:absolute;left:${x}px;top:${y}px;width:${w}px;height:${h}px;background:${DK};pointer-events:auto`;o.appendChild(d);};
+    P(0,0,innerWidth,Math.max(0,T));P(0,B,innerWidth,Math.max(0,innerHeight-B));P(0,T,Math.max(0,L),H);P(R,T,Math.max(0,innerWidth-R),H);
+    const hl=document.createElement('div');hl.style.cssText=`position:absolute;left:${L}px;top:${T}px;width:${W}px;height:${H}px;border-radius:12px;outline:3px solid #FFC83A;pointer-events:none`;o.appendChild(hl);
+    if(r.top>innerHeight*.5||st.pos==='up')bub.style.bottom=(innerHeight-T+14)+'px';else bub.style.top=(B+14)+'px';
+  }else bub.style.bottom='84px';
+  o.appendChild(bub);document.body.appendChild(o);
+  const x=o.querySelector('#tu-x');if(x)x.onclick=()=>tutEnd();
+}
+function tutTick(){
+  const T=RT.tut;if(!T){tutClear();return;}
+  const k=S.counters.find(x=>x.who==='tu'),c=k&&k.cur;
+  if(T.hc&&!c&&!S.queue.some(x=>x.id===T.hc))T.served++;
+  T.hc=c?c.id:null;
+  if(T.stage==='run'){
+    if(c&&!c._tf){c._tf=true;c.pat=1e9;c.hasProb=false;c.problem=null;c.avv=null;if(T.kinds[c.id]==='doc'){for(let i=0;i<80&&c.doc.kind!=='exp';i++)c.doc=genDoc(c);}}
+    if(T.served>=T.seq.length&&!c)T.stage='end';
+    else if(!c&&S.uOpen&&!S.queue.length&&T.n===T.served&&T.n<T.seq.length){const x=tutMake(T.seq[T.n]);if(x){T.kinds[x.id]=T.seq[T.n];T.n++;S.queue.push(x);}}
+  }
+  const proc=!!c&&c.ntOk!==false&&c.docOk!==false&&c.prodOk!==false&&c.opOk!==false&&!(c.problem&&!c.problem.done);
+  const walk=!c&&S.uOpen&&S.queue.length&&S.queue.every(x=>x.noTk);
+  const want=(T.stage==='run'&&(proc||walk)&&!RT.arrive)?3:0;
+  if(S.phase==='open'&&S.speed!==want)S.speed=want;
+  const st=tutCoach();
+  const el=st.sel?tutEl(st.sel):null,r=el?el.getBoundingClientRect():null;
+  const sig=JSON.stringify([st.sel||'',st.txt||'',st.card?st.card.h:'',r?[Math.round(r.left),Math.round(r.top),Math.round(r.width),Math.round(r.height)]:0,innerWidth,innerHeight]);
+  if(sig!==T.sig||!document.getElementById('tuov')){T.sig=sig;tutDraw(st);}
+}
 /* ---------- avvio ---------- */
 let last=performance.now();
 function frame(now){
@@ -3233,6 +3347,6 @@ render(true);
 showStart(HAD);
 if(S.phase==='post'){if(S.over)startMenu();else if(S.fin)showFinal();else{nextDay();render(true);}}
 requestAnimationFrame(frame);
-window.__P={mkProd,avCust,avSVG,AVS,custSVGB,FEM,callCustomer,hsh,finish,doClosure,clPend,atmXfer,atmUse,atmCanLoad,vaultXfer,endDay,calcMods,expected,addCustomer,addApptCustomer,answerNt,genDoc,safeXfer,drw,normCash,fireRobbery,custSVG,get S(){return S;},POSTMEN,postDay,nextDay,goals,showFinal,isOpen,isOpenMs,dt0,LAST,nextOpen,prepDay,subDay,step,endDay,render,openDay,tryCall,callCustomer,applyOpt,fireIncident,closeModal,newState,selectQty,selectOp,bookAppt,apptDays,selectProd,answerDoc,sendAway,addCustomer,openTicket,AVS,openUP,closeUP,UPGS,POOL,PROBS,RT,openUP,buyUpg,hireStaff,hirePost,givePrem,LETTERS,mkCounter};
+window.__P={mkProd,avCust,avSVG,AVS,custSVGB,FEM,callCustomer,hsh,finish,doClosure,clPend,atmXfer,atmUse,atmCanLoad,vaultXfer,endDay,calcMods,expected,addCustomer,addApptCustomer,answerNt,genDoc,safeXfer,drw,normCash,fireRobbery,custSVG,get S(){return S;},POSTMEN,postDay,nextDay,goals,showFinal,isOpen,isOpenMs,dt0,LAST,nextOpen,prepDay,subDay,step,endDay,render,openDay,tryCall,callCustomer,applyOpt,fireIncident,closeModal,newState,selectQty,selectOp,bookAppt,apptDays,selectProd,answerDoc,sendAway,addCustomer,openTicket,AVS,openUP,closeUP,UPGS,POOL,PROBS,RT,openUP,buyUpg,hireStaff,hirePost,givePrem,LETTERS,mkCounter,tutCoach,tutEl,tutMake,tutStart,tutEnd};
 })();
 </script>
