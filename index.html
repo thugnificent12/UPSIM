@@ -1169,15 +1169,15 @@ function mkProd(prod,a,qty,forceOp){
    case 'sim':op='pp';uq=1;pass=10;det='attivare una SIM PostaPhone';fee=10;base=8;break;
    case 'lin':op='pp';uq=1;pass=30;det='attivare la linea di casa PostaPhone';fee=39;base=14;break;
    case 'pcr':{const q=Math.min(qty,3);uq=q;det=q>1?`fare ${q} ricariche della PostalCard`:'ricaricare la PostalCard';fee=1*q;base=4*q;for(let i=0;i<q;i++)pass+=ri(10,80);break;}
-   case 'pcn':{const pr=!!S.pcActive;uq=1;det='fare una nuova PostalCard'+(pr?' (ho visto la promo con la SIM)':'');fee=0;pass=depo();det+=` e caricarci ${pass} €`;base=7+(pr?2:0);if(pr){x.sim=true;x.simFee=5;}break;}
+   case 'pcn':{const pr=!!S.pcActive;uq=1;det='fare una nuova PostalCard'+(pr?' (ho visto la promo con la SIM)':'');fee=0;pass=depo();base=7+(pr?2:0);if(pr){x.sim=true;x.simFee=5;}break;}
    case 'pcp':{uq=1;const m=rk(ri(30,250));det=`prelevare ${m} € dalla PostalCard`;x.out=m;fee=1;base=3.5;break;}
    case 'cpi':{uq=1;pass=rk(ri(100,1500));det=`incassare un assegno da ${pass} € e versarli sul conto`;fee=0;base=4;break;}
    case 'cpv':{uq=1;pass=rk(ri(50,600));det=`versare ${pass} € sul conto`;fee=0;base=3.5;break;}
    case 'cpp':{uq=1;const m=rk(ri(40,400));det=`prelevare ${m} € dal conto`;x.out=m;fee=0;base=3.5;break;}
    case 'cpc':{uq=1;det='fare la carta ContoPosta';fee=0;base=6;break;}
-   case 'cpa':{uq=1;pass=depo();det=`aprire il ContoPosta e versarci ${pass} €`;fee=0;base=8;break;}
+   case 'cpa':{uq=1;pass=depo();det='aprire il ContoPosta';fee=0;base=8;break;}
    case 'pen':{uq=1;det=pick(['ritirare la pensione','prendere la pensione']);x.out=rk(ri(250,500));fee=0;base=3.5;break;}
-   case 'lba':{uq=1;pass=depo();det=`aprire un libretto di risparmio e versarci ${pass} €`;fee=0;base=7;break;}
+   case 'lba':{uq=1;pass=depo();det='aprire un libretto di risparmio';fee=0;base=7;break;}
    case 'lbv':{uq=1;pass=rk(ri(50,900));det=`versare ${pass} € sul libretto`;fee=0;base=3.5;break;}
    case 'lbp':{uq=1;const m=rk(ri(20,200));det=`ritirare ${m} € dal libretto`;x.out=m;fee=0;base=3.5;break;}
    case 'buo':{uq=1;pass=pick([500,1000,1500,2000,3000,5000]);det=`sottoscrivere un buono postale da ${pass.toLocaleString('it-IT')} € per ${pick(['mio nipote','mia nipote','mio figlio','mia figlia','la mia nipotina'])}`;fee=0;base=13;hi=2.8;break;}
@@ -1694,7 +1694,7 @@ function errSnd(){
     g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.3*.7,t+.01);g.gain.exponentialRampToValueAtTime(.001,t+.55);
     o.connect(lp);o2.connect(g2);g2.connect(lp);lp.connect(g);g.connect(AC.destination);o.start(t);o2.start(t);o.stop(t+.6);o2.stop(t+.6);}catch(e){}
 }
-const ITSHIP=new Set(['bol','pa3','pao','pco','r1','rac','rra','asc','poi','fra']);
+const ITSHIP=new Set(['bol','pa3','pao','pco','r1','rac','rra','asc','poi','fra','tgm']);
 const TYPS=new Set(['cpa','cpp','cpc','cpv','cpi','bon','pcn','pcp','pcr','lin','tel','sim','cva','pola','polc','poli','polv','fin','lba','lbp','lbv','buo','vag','vagi','scw','fra','tgm','bau','frc','fol','cap','bu1','bu2','bu3','sc1','sc2','sc3','spn','stz','slb','ssc','crt']);
 let OPLAST=0;
 function opBeepAt(manual){
