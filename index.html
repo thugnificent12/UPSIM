@@ -1694,7 +1694,7 @@ function errSnd(){
     g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.3*.7,t+.01);g.gain.exponentialRampToValueAtTime(.001,t+.55);
     o.connect(lp);o2.connect(g2);g2.connect(lp);lp.connect(g);g.connect(AC.destination);o.start(t);o2.start(t);o.stop(t+.6);o2.stop(t+.6);}catch(e){}
 }
-const ITSHIP=new Set(['bol','pa3','pao','pco','r1','rac','rra','asc','poi']);
+const ITSHIP=new Set(['bol','pa3','pao','pco','r1','rac','rra','asc','poi','fra']);
 const TYPS=new Set(['cpa','cpp','cpc','cpv','cpi','bon','pcn','pcp','pcr','lin','tel','sim','cva','pola','polc','poli','polv','fin','lba','lbp','lbv','buo','vag','vagi','scw','fra','tgm','bau','frc','fol','cap','bu1','bu2','bu3','sc1','sc2','sc3','spn','stz','slb','ssc','crt']);
 let OPLAST=0;
 function opBeepAt(manual){
@@ -1779,7 +1779,7 @@ function showFinal(){
   const gl=g.map(x=>`<div class="kv"><span>${x.ok?'✔':'✘'} ${esc(x.t)}</span><b>${esc(x.p)}</b></div>`).join('');
   modal({title:'Ispezione di controllo interno',html:`<p>${esc(fill('{T}, '))}${early?'Il Controllo Interno arriva in anticipo: sembra che tu abbia già fatto tutto.':'Sono passati due anni. Il Controllo Interno è arrivato con una cartellina e nessuna fretta.'}</p><div>${rows}</div><div><h3 style="margin:8px 0 2px">Obiettivi di mandato: ${ok} su ${g.length}</h3>${gl}</div><h2 style="margin-top:6px">${esc(v.h)}</h2><p>${esc(v.t)}</p>`,opts:[{l:'Ricomincia',cls:'gold',fn(){startMenu();return false;}}]});
 }
-function startMenu(){try{localStorage.removeItem(KEY);}catch(e){}showStart(false);}
+function startMenu(){if(RT.modal)closeModal();try{localStorage.removeItem(KEY);}catch(e){}showStart(false);}
 function newGame(has){
   if(!has){hideStart();quickStart();return;}
   modal({title:'Nuova partita?',html:'<p>La partita salvata verrà cancellata.</p>',opts:[{l:'Sì, nuova partita',cls:'gold',fn(){hideStart();quickStart();return false;}},{l:'No, torna indietro'}]});
