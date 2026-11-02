@@ -1811,6 +1811,7 @@ function quickStart(){
 }
 function startWith(av,nome,cog,eta){
   const a=AVS[av];newState();S.me={nome,cognome:cog,eta:eta||a.age,av};S.meEdited=false;
+  if(dt0(0).getUTCDate()<=3)S.cash=2000;
   RT.tab='sp';save();tutStart(true);
 }
 function meEditModal(){
