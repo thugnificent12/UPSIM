@@ -1262,7 +1262,7 @@ function addCustomer(){
   if(lang===2&&items.length>1)items.length=1;
   const TL=tkLetter(items),n=0;
   S.queue.push({id:cid,age,tk:'—',noTk:nt,type:TL,arch:a.id,archN:a.n,name:fr?FG.name:(()=>{const f=pick(FN);return f+' '+pick(SN.filter(x=>x!==f));})(),nat:fr?FG.nat:undefined,fr,lang,inc:lang>0&&psg,fphr:lang===2?fPhrase(first.prod,fr?FG.nat:null):'',district:dist.n,prod:first.prod,pre:lang===2?'… ':lang?'Io volere ':first.prod==='pen'?'Devo ':pick(['Devo ','Dovrei ','Vorrei ','Avrei bisogno di ']),
-    diff:chance(.004),card:age>=18&&!items.some(i=>i.out)&&chance(.2),prio:false,pat:a.pat*rnd(.85,1.15)*agP,wait:0,det:items.map(i=>i.det).join(' + '),qty:first.qty,pass:sum('pass'),fee:sum('fee'),base:sum('base'),prob:a.prob,items});
+    diff:chance(.004),card:age>=18&&!items.some(i=>i.out||['lba','lbv','lbp','cpa','cpc','cpp','cpv','cpi','pcn','pcp','pcr','buo'].includes(i.prod))&&chance(.2),prio:false,pat:a.pat*rnd(.85,1.15)*agP,wait:0,det:items.map(i=>i.det).join(' + '),qty:first.qty,pass:sum('pass'),fee:sum('fee'),base:sum('base'),prob:a.prob,items});
   if(RGV){const q0=S.queue[S.queue.length-1];if(RGV.id){Object.assign(q0,{id:RGV.id,name:RGV.name,age:RGV.age});q0.reg=RGV.id;}else q0.regNew=true;}
   {const q=S.queue[S.queue.length-1];if(!q.diff&&q.items.some(i=>['bol','rac','pao','pa3','paeu','pari','paic'].includes(i.prod))&&chance(1/68))q.noMod=true;accGen(q);if(q.diff)q.pat*=.7;if(q.noTk&&idle&&chance(.05))q.ask=true;
     const fn0=String(q.name).split(' ')[0],fem0=FEM.has(fn0),r0=Math.random();
