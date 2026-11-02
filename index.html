@@ -3048,7 +3048,7 @@ function selectProd(k,pid){
     c.cnt.n++;
     if(c.cnt.n<it.qty)return true;
     c.cnt=null;if(it.out){S.cash-=it.out;S.st.pass=(S.st.pass||0)-it.out;normCash();}c.prodOk=true;c.act=it;c.itemLeft=it.base;c.opOk=fromPP||!it.op;c.qtyOk=true;k.menu=null;
-    if((it.doc||(c.card&&!ITSHIP.has(it.prod)))&&c.docOk===undefined)c.docOk=false;
+    if(it.doc&&c.docOk===undefined)c.docOk=false;
     if(it.sim)toast('Promo: la SIM PostaPhone è inclusa nella nuova PostalCard.','good');
     if(prod==='trk')openTrack(k,c,it);
     return true;
