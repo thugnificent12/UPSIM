@@ -13,6 +13,21 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Baloo+2:wght@500;700;800&family=Lilita+One&family=Nunito:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
+.fxp{line-height:1.1;position:fixed;pointer-events:none;z-index:40;font-weight:800;font-size:22px;text-shadow:0 1px 0 #fff,0 0 6px #fff;animation:fxup 1.3s ease-out forwards;white-space:nowrap}
+.fxp.pos{color:#1f9d4c}.fxp.neg{color:#d12a2a}
+.fxp i{font-style:normal;display:inline-block;animation:fxstar .6s ease-out}
+.fxc{position:fixed;width:9px;height:9px;border-radius:50%;background:radial-gradient(#ffe27a,#e0a800);border:1px solid #b78300;pointer-events:none;z-index:39;animation:fxco .9s ease-out forwards}
+@keyframes fxup{0%{opacity:0;transform:translate(-50%,10px) scale(.6)}15%{opacity:1;transform:translate(-50%,0) scale(1.15)}30%{transform:translate(-50%,-4px) scale(1)}100%{opacity:0;transform:translate(-50%,-60px) scale(1)}}
+@keyframes fxstar{0%{transform:scale(0) rotate(-90deg)}70%{transform:scale(1.4) rotate(15deg)}100%{transform:scale(1) rotate(0)}}
+@keyframes fxco{0%{opacity:1;transform:translate(0,0)}100%{opacity:0;transform:translate(var(--dx),var(--dy))}}
+</style>
+<script>
+window.fxPop=function(amt){const sc=document.getElementById('scene');if(!sc||!amt)return;const r=sc.getBoundingClientRect();if(r.height<10)return;
+ const cx=r.left+r.width*.5,cy=r.top+r.height*.5,pos=amt>0,t=Math.abs(amt).toFixed(2).replace('.',',');
+ const d=document.createElement('div');d.className='fxp '+(pos?'pos':'neg');d.style.left=cx+'px';d.style.top=cy+'px';d.innerHTML=(pos?'<i>⭐</i> +':'−')+t+' €';document.documentElement.appendChild(d);setTimeout(()=>d.remove(),1400);
+ if(pos)for(let i=0;i<6;i++){const c=document.createElement('div');c.className='fxc';c.style.left=cx+'px';c.style.top=(cy+15)+'px';c.style.setProperty('--dx',(Math.random()*80-40)+'px');c.style.setProperty('--dy',(-20-Math.random()*40)+'px');document.documentElement.appendChild(c);setTimeout(()=>c.remove(),1000);}};
+</script>
+<style>
 /* Layout: insegna blu, barra comandi fissa (orologio, velocità, cassa, gradimento), quattro schede con navigazione in basso. */
 :root{
   --bg:#DDF0FF; --surface:#FFFFFF; --surface2:#EAF5FF; --line:#B7D8F5;
@@ -1480,7 +1495,7 @@ function finish(k){
     if(it.prod==='lin')ac.l++;if(it.fin)ac.loans.push({bal:it.fin.amt,rata:it.fin.rata,left:it.fin.mo,q:finQ(it.fin.mo)});}
    const mm=c.cc&&c.cc.mid?ac.reg.find(r=>r.id===c.cc.mid):null;
    if(mm){for(const it of c.items||[]){if(it.prod==='cpv'||it.prod==='cpi')mm.bal+=it.pass||0;else if(it.prod==='cpp')mm.bal-=it.out||0;else if(it.prod==='lbv')mm.lib+=it.pass||0;else if(it.prod==='lbp')mm.lib-=it.out||0;}mm.bal=mm.bal==null?null:Math.round(Math.max(0,mm.bal)*100)/100;mm.lib=mm.lib==null?null:Math.round(Math.max(0,mm.lib)*100)/100;}}
-  S.st.inc=(S.st.inc||0)+fee+Math.max(0,pass);addCash(fee,'rev');S.cash+=pass;S.st.pass=(S.st.pass||0)+pass;if(cp&&pass>0)S.vault=Math.round(((S.vault||0)+pass)*100)/100;S.life+=fee;S.st.served++;S.servedTot++;S.st.byType[c.type]++;
+  S.st.inc=(S.st.inc||0)+fee+Math.max(0,pass);addCash(fee,'rev');S.cash+=pass;S.st.pass=(S.st.pass||0)+pass;try{const net=fee+pass;if(Math.abs(net)>=.005){window.fxPop(net);if(net>0&&RT.snd)ding();}}catch(e){}if(cp&&pass>0)S.vault=Math.round(((S.vault||0)+pass)*100)/100;S.life+=fee;S.st.served++;S.servedTot++;S.st.byType[c.type]++;
   {const od=S.today.ord;if(od&&S.phase==='open')for(const it of c.items||[])if(!it.den&&it.prod===od.p)od.done+=it.qty||1;}
   const ppi=(c.items||[]).filter(i=>i.op==='pp'||i.sim),npp=ppi.length;
   if(npp){
