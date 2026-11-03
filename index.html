@@ -1799,12 +1799,19 @@ function newGame(has){
   if(!has){hideStart();quickStart();return;}
   modal({title:'Nuova partita?',html:'<p>La partita salvata verrà cancellata.</p>',opts:[{l:'Sì, nuova partita',cls:'gold',fn(){hideStart();quickStart();return false;}},{l:'No, torna indietro'}]});
 }
+/* tocco affidabile: se il pulsante viene ridisegnato mentre lo premi, il tocco va comunque a segno */
+(()=>{const ACT='[data-mi],[data-tab],[data-sp],[data-act],[data-s],[data-av],[data-id],button';let PD=null,LS=0;
+ const selOf=a=>{if(a.id)return '#'+CSS.escape(a.id);const at=[...a.attributes].filter(x=>x.name.startsWith('data-'));if(!at.length)return null;return a.tagName.toLowerCase()+at.map(x=>'['+x.name+'="'+CSS.escape(x.value)+'"]').join('');};
+ document.addEventListener('pointerdown',e=>{const a=e.target.closest&&e.target.closest(ACT);PD=a?{a,sel:selOf(a),x:e.clientX,y:e.clientY,t:Date.now()}:null;},true);
+ document.addEventListener('pointerup',e=>{const p=PD;PD=null;if(!p||!p.sel||p.a.isConnected)return;if(Date.now()-p.t>1500||Math.hypot(e.clientX-p.x,e.clientY-p.y)>15)return;let n=null;try{n=document.querySelector(p.sel);}catch(x){}if(n){LS=Date.now();n.click();}},true);
+ document.addEventListener('click',e=>{if(e.isTrusted&&Date.now()-LS<400){e.stopImmediatePropagation();e.preventDefault();}},true);
+})();
 document.addEventListener('click',e=>{
   const sb=e.target.closest('#start [data-s]');
   if(sb){const k=sb.dataset.s,has=!$('#st-cont').disabled;
     if(k==='new')newGame(has);
     else if(k==='cont'&&has){hideStart();if(S&&S.phase==='open')toast('Partita ripresa: tocca 1× per continuare.');}
-    else if(k==='exit'){$('#st-msg').textContent='Arrivederci, Direttore. Lo sportello resta aperto.';try{window.close();}catch(x){}}
+    else if(k==='exit'){$('#st-msg').textContent='Arrivederci, Direttore.';let ok=false;try{const C=window.Capacitor;if(C&&C.Plugins&&C.Plugins.App&&C.Plugins.App.exitApp){C.Plugins.App.exitApp();ok=true;}}catch(x){}if(!ok){try{if(navigator.app&&navigator.app.exitApp)navigator.app.exitApp();}catch(x){}try{window.close();}catch(x){}}}
     return;}
   const pb=e.target.closest('#st-pick [data-id]');
   if(pb)setStyle(pb.dataset.id);
