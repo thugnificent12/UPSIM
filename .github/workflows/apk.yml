@@ -23,7 +23,7 @@ jobs:
           mkdir www
           cp -r index.html manifest.webmanifest icons www/
           npm init -y
-          npm i @capacitor/core @capacitor/cli @capacitor/android @capacitor/assets @capacitor/app
+          npm i @capacitor/core @capacitor/cli @capacitor/android @capacitor/assets
           cat > capacitor.config.json <<'EOF'
           {"appId":"it.upsim.game","appName":"UPSimulator","webDir":"www","backgroundColor":"#dbeeff","server":{"url":"https://thugnificent12.github.io/UPSIM/","cleartext":false,"allowNavigation":["thugnificent12.github.io"]}}
           EOF
